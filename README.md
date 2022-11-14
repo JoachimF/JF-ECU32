@@ -13,7 +13,7 @@ RC Jet Engine ECU
 
 ### Composants :
 - Processeur ESP32
-- Interface sonde K MAX31865
+- Interface sonde K MAX31855
 
 ### Entrées :
 - Entrée 2S - 3S pour accus LIPO ou LIION
