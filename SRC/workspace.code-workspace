@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"name": "Tasmota-development",
+			"path": "..\\Tasmota-development"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"task.h": "c",
+			"*.inc": "c"
+		}
+	}
+}

@@ -1,0 +1,19 @@
+  	p{margin:0.5em 0;}
+  	input{width:100%;box-sizing:border-box;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;background:#999;color:#000;}
+  	input[type=checkbox],input[type=radio]{width:1em;margin-right:6px;vertical-align:-1px;}
+  	input[type=range]{width:99%;}
+	select{width:100%;background:#999;color:#000;}
+  	textarea{resize:vertical;width:98%;height:318px;padding:5px;overflow:auto;background:#999;color:#000;}
+  	body{text-align:center;font-family:verdana,sans-serif;background:#999;}
+  	td{padding:0px;}
+	button{border:0;border-radius:0.3rem;background:#1fa3ec;color:#fff;line-height:2.4rem;font-size:1.2rem;width:100%;-webkit-transition-duration:0.4s;transition-duration:0.4s;cursor:pointer;}  /* COLOR_BUTTON, COLOR_BUTTON_TEXT */
+  	button:hover{background:#0e70a4;}  /* COLOR_BUTTON_HOVER */
+  	.bred{background:#1fa3ec;}  /* COLOR_BUTTON_RESET */
+  	.bred:hover{background:#0e70a4;}  /* COLOR_BUTTON_RESET_HOVER */
+  	.bgrn{background:#1fa3ec;}  /* COLOR_BUTTON_SAVE */
+  	.bgrn:hover{background:#0e70a4;}  /* COLOR_BUTTON_SAVE_HOVER*/
+   	a{color:#1fa3ec;text-decoration:none;}  /* COLOR_BUTTON*/
+  	.p{float:left;text-align:left;}
+  	.q{float:right;text-align:right;}
+  	.r{border-radius:0.3em;padding:2px;margin:6px 2px;}
+  	.hf{display:none;}*/
