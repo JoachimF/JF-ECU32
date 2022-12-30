@@ -1,5 +1,4 @@
-/*
-  jf-ecu32.h - setting variables for Tasmota
+/*  jf-ecu32.h
 
   Copyright (C) 2022  Joachim Franken
 
@@ -17,6 +16,7 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+
 typedef union {                            
   uint32_t data;                           
   struct {                                 
@@ -33,18 +33,20 @@ typedef union {
     uint32_t use_led : 1;
     uint32_t use_input2 : 1;
     uint32_t use_pump2 : 1;
-    uint32_t use_led : 1;
   };
-} BITsconfigECU;
+} _BITsconfigECU_u;
 
 enum start_modes {
-    MANUAL,AUTO-GAS,AUTO-KERO
+    MANUAL,AUTO_GAS,AUTO_KERO
  };
 
 enum glow_types {
     GAS,KERO
  };
 
+enum phases {
+    WAIT,START,GLOW,KEROSTART,PREHEAT,RAMP,IDLE,PURGE,COOL
+ };
 
 typedef union {                            
   uint32_t data;                           
@@ -52,10 +54,10 @@ typedef union {
     uint32_t glow_type : 1 ;  // GLOW ou KERO             
     uint32_t start_mode : 2 ; // MANUAL ou AUTO-GAS ou AUTO-KERO
   };
-} BITsconfigstart;
+} _BITsconfigstart_u;
 
 
-typedef typedef struct {
+typedef struct {
   uint8_t glow_power ; // Puissance de la bougie gas ou kero
   uint16_t jet_full_power_rpm ; // trs/min plein gaz
   uint16_t jet_idle_rpm ; // trs/min ralenti
@@ -69,5 +71,52 @@ typedef typedef struct {
   uint16_t min_pump1 ; // puissance min de la pompe 1
   uint16_t max_pump2 ; // puissance max de la pompe 1
   uint16_t min_pump2 ; // puissance min de la pompe 1
-  };
-} configEngine;
+} _configEngine_t;
+
+typedef struct{
+  uint8_t gpio_num ;
+  uint8_t ledc_channel ;
+}_pwm_config ;
+
+
+typedef struct {
+  uint16_t value;
+  uint16_t max ; // puissance max de la bougie
+  bool state;
+  _pwm_config config ;
+  void (*set_power)(_pwm_config *config,uint16_t power);
+  uint16_t (*get_power)(struct GLOW_t * glow);
+  void (*off)(_pwm_config *config);
+} _GLOW_t ;
+
+typedef struct {
+  uint16_t value;
+  uint16_t max ; // puissance max de la pompe
+  uint16_t min ; // puissance min de la pompe
+  bool state;
+  _pwm_config config ;
+  void (*set_power)( _pwm_config *config,uint16_t power);
+  uint16_t (*get_power)(struct _PUMP_t * pump) ;
+  void (*off)(_pwm_config *config);
+} _PUMP_t;
+
+typedef struct {
+  uint16_t value;
+  bool state;
+  _pwm_config config ;
+  void (*set_power)(_pwm_config *config,uint16_t power);
+  uint16_t (*get_power)(struct _VALVE_t * valve);
+  void (*on)(_pwm_config *config);
+  void (*off)(_pwm_config *config);
+} _VALVE_t;
+
+typedef struct {
+  _PUMP_t pump1 ;
+  _PUMP_t pump2 ;
+  _GLOW_t glow ;
+  _VALVE_t vanne1 ; //Vanne KEROSTART/GAZ
+  _VALVE_t vanne2 ; //Vanne KERO
+  uint8_t phase_fonctionnement ;
+} _engine_t;
+
+void init(void);

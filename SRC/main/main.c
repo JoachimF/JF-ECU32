@@ -16,8 +16,12 @@
 #include "esp_log.h"
 #include "mdns.h"
 #include "lwip/dns.h"
+#include "jf-ecu32.h"
+
 
 #include "http_server.h"
+
+
 
 #define TAG	"MAIN"
 
@@ -33,7 +37,6 @@ static EventGroupHandle_t s_wifi_event_group;
 static int s_retry_num = 0;
 
 QueueHandle_t xQueueHttp;
-
 
 static void event_handler(void* arg, esp_event_base_t event_base,
 								int32_t event_id, void* event_data)
@@ -229,6 +232,9 @@ void app_main()
 	// Initialize mDNS
 	initialise_mdns();
 
+	//Init ECU
+	init() ;
+
 	// Initialize SPIFFS
 	ESP_LOGI(TAG, "Initializing SPIFFS");
 	if (mountSPIFFS("/html", "storage", 6) != ESP_OK)
@@ -248,6 +254,5 @@ void app_main()
 	sprintf(cparam0, IPSTR, IP2STR(&ip_info.ip));
 	xTaskCreate(http_server_task, "HTTP", 1024*6, (void *)cparam0, 2, NULL);
 
-	// Wait for the task to start, because cparam0 is discarded.
 	vTaskDelay(10);
 }
