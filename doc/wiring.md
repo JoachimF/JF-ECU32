@@ -32,8 +32,8 @@
 
 ## Pompes
   Sortie PWM/PPM - module LEDC
-  - 1 - GPIO34
-  - 2 - GPIO35
+  - 1 - GPIO
+  - 2 - GPIO
 
 ## Bougie GAS/KERO
   Sortie PWM - module LEDC
