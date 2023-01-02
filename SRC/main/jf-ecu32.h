@@ -15,7 +15,12 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
+typedef struct {  
+  uint32_t pump[50]; //Table RPM/PWM
+  uint32_t RPM[50];
+  uint32_t checksum_pump;
+  uint32_t checksum_RPM;
+}_pump_table_t;
 
 typedef union {                            
   uint32_t data;                           
@@ -59,9 +64,9 @@ typedef union {
 
 typedef struct {
   uint8_t glow_power ; // Puissance de la bougie gas ou kero
-  uint16_t jet_full_power_rpm ; // trs/min plein gaz
-  uint16_t jet_idle_rpm ; // trs/min ralenti
-  uint16_t jet_min_rpm ; // trs/min fonctionnement
+  uint32_t jet_full_power_rpm ; // trs/min plein gaz
+  uint32_t jet_idle_rpm ; // trs/min ralenti
+  uint32_t jet_min_rpm ; // trs/min fonctionnement
   uint16_t start_temp ; // température de démarrage apèrs préchauffe
   uint16_t max_temp ; // température max en fonctionnement
   uint8_t acceleration_delay ; // délais d'accélération
@@ -71,6 +76,7 @@ typedef struct {
   uint16_t min_pump1 ; // puissance min de la pompe 1
   uint16_t max_pump2 ; // puissance max de la pompe 1
   uint16_t min_pump2 ; // puissance min de la pompe 1
+  _pump_table_t power_table;
 } _configEngine_t;
 
 typedef struct{
@@ -81,7 +87,6 @@ typedef struct{
 
 typedef struct {
   uint16_t value;
-  uint16_t max ; // puissance max de la bougie
   bool state;
   _pwm_config config ;
   void (*set_power)(_pwm_config *config,uint16_t power);
@@ -90,10 +95,10 @@ typedef struct {
 } _GLOW_t ;
 
 typedef struct {
-  uint16_t value;
-  uint16_t max ; // puissance max de la pompe
-  uint16_t min ; // puissance min de la pompe
+  uint32_t target ;
+  uint16_t value ;
   bool state;
+  bool new_target ;
   _pwm_config config ;
   void (*set_power)( _pwm_config *config,uint16_t power);
   uint16_t (*get_power)(struct _PUMP_t * pump) ;
@@ -120,3 +125,10 @@ typedef struct {
 } _engine_t;
 
 void init(void);
+void linear_interpolation(uint32_t x0,uint32_t y0,uint32_t x1,uint32_t y1,uint32_t rpm,uint32_t *res) ;
+void set_kero_pump_target(uint32_t RPM) ;
+void init_power_table(void) ;
+void init_random_pump(void) ;
+void write_nvs(void) ;
+void read_nvs(void) ;
+uint32_t checksum_power_table(void) ; 
