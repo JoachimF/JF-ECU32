@@ -20,18 +20,21 @@
 #include "driver/ledc.h"
 #include "jf-ecu32.h"
 #include <stdio.h>
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
+#include "esp_system.h"
 #include "esp_system.h"
 #include "driver/gpio.h"
 #include "nvs_flash.h"
 #include "nvs.h"
 #include <string.h>
+#include "esp_log.h"
+#include "esp_err.h"
+#include "esp_vfs.h"
+#include "esp_spiffs.h"
 
 #define BLINK_GPIO 2
 #define BUFFSIZE 2000
 
-
+static const char *TAG = "HTTP";
 
 void linear_interpolation(uint32_t rpm1,uint32_t pump1,uint32_t rpm2,uint32_t pump2,uint32_t rpm,uint32_t *res) //RPM,PUMP,RPM,PUMP
 {
@@ -84,6 +87,7 @@ _engine_t turbine = {
 
 void init_nvs(void)
 {
+    //nvs_flash_erase() ;
     esp_err_t err = nvs_flash_init();
     if (err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND) {
         // NVS partition was truncated and needs to be erased
@@ -103,12 +107,13 @@ void read_nvs(void)
 {
     esp_err_t err = nvs_flash_init();
     size_t required_size;
-    uint32_t checksum ;
+    
     err = nvs_get_blob(my_handle, "config", NULL, &required_size );
     err = nvs_get_blob(my_handle, "config", (void *)&turbine_config, &required_size);
     switch (err) {
             case ESP_OK:
                 printf("Done\n\n");
+                printf("Log count = %d\n\n", turbine_config.log_count);
                 printf("glow power = %d\n\n", turbine_config.glow_power);
                 printf("Max rpm = %d\n\n", turbine_config.jet_full_power_rpm);
                 printf("idle rpm = %d\n\n", turbine_config.jet_idle_rpm);
@@ -138,6 +143,7 @@ void read_nvs(void)
             case ESP_ERR_NVS_NOT_FOUND:
                 printf("The value is not initialized yet!\n");
                 required_size = sizeof(turbine_config);
+                turbine_config.log_count = 1 ;
                 turbine_config.glow_power = 25 ;
                 turbine_config.jet_full_power_rpm = 145000 ;
                 turbine_config.jet_idle_rpm = 35000 ;
@@ -212,65 +218,8 @@ void write_nvs(void)
 
 void init(void)
 {
-
-/*else {
-        printf("Done\n");
-
-        gpio_reset_pin(BLINK_GPIO);
-        // Set the GPIO as a push/pull output 
-        gpio_set_direction(BLINK_GPIO, GPIO_MODE_OUTPUT);
-        // Read
-        printf("Reading string from NVS ... ");
-        struct NVS_Data {
-            //    long cap1;
-            //    long cap2;
-            int number1;
-            int number2;
-            uint8_t s_led_state;
-            char character;
-            char buffer[BUFFSIZE];
-        };
-        struct NVS_Data nvs_struct;
-        char test_string[] = "Here is a load of text to test the NVS string storage. ";
-        int textsize = 0;
-
-        
-
-        // Write
-        printf("Adding text to NVS Struct... ");
-        strncat(nvs_struct.buffer, (const char*)test_string, strlen(test_string));
-        nvs_struct.number1++;
-        nvs_struct.number2--;
-        nvs_struct.character++;
-        printf("Turning the LED %s!\n", nvs_struct.s_led_state == true ? "ON" : "OFF");
-        gpio_set_level(BLINK_GPIO, nvs_struct.s_led_state);
-        nvs_struct.s_led_state = !nvs_struct.s_led_state;
-        err = nvs_set_blob(my_handle, "nvs_struct", (const void*)&nvs_struct, required_size);
-        //err = nvs_set_str(my_handle, "nvs_struct", (const char*)nvs_struct.buffer);
-        printf((err != ESP_OK) ? "Failed!\n" : "Done\n");
-
-        // Commit written value.
-        // After setting any values, nvs_commit() must be called to ensure changes are written
-        // to flash storage. Implementations may write to storage at other times,
-        // but this is not guaranteed.
-        printf("Committing updates in NVS ... ");
-        err = nvs_commit(my_handle);
-        printf((err != ESP_OK) ? "Failed!\n" : "Done\n");
-
-        // Close
-        nvs_close(my_handle);
-    }
-
-    printf("\n");
-
-    // Restart module
-    for (int i = 4; i >= 0; i--) {
-        printf("Restarting in %d seconds...\n", i);
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
-    }
-    printf("Restarting now.\n");
-    fflush(stdout);*/
-    //esp_restart();
+    turbine.secondes = 0 ;
+    turbine.minutes = 0 ;
 
     ESP_ERROR_CHECK(ledc_timer_config(&ledc_timer));
     ledc_channel[0].channel = turbine.pump1.config.ledc_channel;
@@ -285,6 +234,8 @@ void init(void)
     ledc_channel[4].gpio_num = turbine.vanne2.config.gpio_num ;
     init_nvs() ;
     read_nvs() ;
+    turbine_config.log_count++ ;
+    write_nvs() ;
     //turbine_config.jet_full_power_rpm = 150000 ;
     //write_nvs() ;
     for (int i = 0; i < 5; i++)
@@ -302,11 +253,8 @@ void init(void)
     turbine.glow.set_power(&turbine.glow.config,128) ;
     turbine.vanne1.set_power(&turbine.vanne1.config,50) ;
     turbine.vanne2.set_power(&turbine.vanne2.config,100) ;
-    set_kero_pump_target(36000);
-    set_kero_pump_target(54000);
-    set_kero_pump_target(70000);
-    set_kero_pump_target(91000);
-    set_kero_pump_target(143000);
+    
+    create_timers() ;
 }
 
 void set_kero_pump_target(uint32_t RPM)
@@ -372,4 +320,105 @@ void init_power_table(void)
   }
   turbine_config.power_table.RPM[49] = turbine_config.jet_full_power_rpm ;
   turbine_config.power_table.checksum_RPM += turbine_config.power_table.RPM[49] ;
+}
+
+void update_curve_file(void)
+{
+    FILE *fd = NULL;
+	char FileName[] = "/html/curves.txt" ;
+    fd = fopen(FileName, "w");
+	if (!fd) {
+       ESP_LOGI("File", "Failed to read existing file : logs.txt");
+    }
+    fprintf(fd,"RPM;Pompe\n");
+    for (int i=0;i<50;i++) {
+		fprintf(fd,"%d;%d\n", turbine_config.power_table.RPM[i],turbine_config.power_table.pump[i]);
+	}
+    fclose(fd);
+}
+
+
+void head_logs_file(void)
+{
+    FILE *fd = NULL;
+	char FileName[] = "/html/logs.txt" ;
+    fd = fopen(FileName, "a");
+	if (!fd) {
+       ESP_LOGI("File", "Failed to read existing file : logs.txt");
+    }
+    fprintf(fd,"Num;Time;RPM;EGT;Pompe1;Cible Pompe1;Pompe2;Glow;Vanne1;Vanne2;Voie Gaz;Voie aux\n");
+    fclose(fd);
+}
+
+void update_logs_file(void)
+{
+    FILE *fd = NULL;
+	char FileName[] = "/html/logs.txt" ;
+    uint8_t minutes,secondes ;
+    if( xSemaphoreTake(xTimeMutex,( TickType_t ) 10) == pdTRUE ) 
+    {
+        minutes = turbine.minutes ;
+        secondes = turbine.secondes ;
+    }
+    else
+    {
+        minutes = 99 ;
+        secondes = 99 ;
+    
+    }
+    xSemaphoreGive(xTimeMutex) ;
+    fd = fopen(FileName, "a");
+    if (!fd) {
+        ESP_LOGI("File", "Failed to read existing file : logs.txt");
+    }
+    fprintf(fd,"%d;%02d:%02d;%06d;%03d;%04d;%04d;%04d;%03d;%03d;%03d;%04d;%04d\n", turbine_config.log_count,minutes,secondes,turbine.RPM,turbine.EGT,
+                                                                                            turbine.pump1.value,turbine.pump1.target,turbine.pump2.value,turbine.glow.value,
+                                                                                            turbine.vanne1.value,turbine.vanne2.value,turbine.GAZ,turbine.Aux);   
+
+    fclose(fd);                                                                                            
+}
+
+void log_task( void * pvParameters )
+{
+
+
+
+ 	ESP_LOGI(TAG, "Start Logtask");
+    while(1) {
+        //ESP_LOGI("LOG", "New Log");
+
+        update_logs_file() ;
+        
+        vTaskDelay( 500 / portTICK_PERIOD_MS);
+    }
+    //ESP_LOGI(TAG, "finish");
+	vTaskDelete(xlogHandle);
+}
+
+void create_timers(void)
+{
+    xTimeMutex = xSemaphoreCreateMutex() ;
+    xTimer1s = xTimerCreate("Timer1s",       // Just a text name, not used by the kernel.
+                            ( 1000 /portTICK_PERIOD_MS ),   // The timer period in ticks.
+                            pdTRUE,        // The timers will auto-reload themselves when they expire.
+                            ( void * ) 1,  // Assign each timer a unique id equal to its array index.
+                            vTimer1sCallback // Each timer calls the same callback when it expires.
+                            );
+
+    xTimerStart( xTimer1s, 0 ) ;
+}
+
+void vTimer1sCallback( TimerHandle_t pxTimer )
+{
+    if( xSemaphoreTake(xTimeMutex,( TickType_t ) 10) == pdTRUE ) {
+        turbine.secondes++ ;
+        if(turbine.secondes > 59) {
+            turbine.secondes = 0 ;
+            turbine.minutes++ ;
+        }
+    }
+    xSemaphoreGive(xTimeMutex) ;
+    //ESP_LOGI("Time", "%02d:%02d",turbine.minutes,turbine.secondes);
+    //long long int Timer1 = esp_timer_get_time();
+    //printf("Timer: %lld μs\n", Timer1/1000);  
 }

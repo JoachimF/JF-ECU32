@@ -15,8 +15,12 @@
 #include "freertos/queue.h"
 #include "esp_log.h"
 #include "esp_err.h"
+#include "esp_vfs.h"
+#include "esp_spiffs.h"
 #include "nvs.h"
 #include "esp_http_server.h"
+#include "jf-ecu32.h"
+
 
 #include "http_server.h"
 
@@ -290,22 +294,8 @@ static esp_err_t root_get_handler(httpd_req_t *req)
 	httpd_resp_sendstr_chunk(req, "<hr>");
 
 	strcpy(key, "submit2");
-	char glow_power[5] = {0};
-	char jet_full_power_rpm[10] = {0};
-	char jet_idle_rpm[10] = {0};
-	char jet_min_rpm[10] = {0};
-	char start_temp[5] = {0};
-	char max_temp[5] = {0};
-	char acceleration_delay[4] = {0};
-	char deceleration_delay[4] = {0};
-	char stability_delay[4] = {0};
-	char max_pump1[6] = {0};
-	char min_pump1[6] = {0};
-	char max_pump2[6] = {0};
-	char min_pump2[6] = {0};
 
-
-	err = load_key_value(key, parameter, sizeof(parameter));
+/*	err = load_key_value(key, parameter, sizeof(parameter));
 	ESP_LOGI(TAG, "%s=%d", key, err);
 	if (err == ESP_OK) {
 		ESP_LOGI(TAG, "parameter=[%s]", parameter);
@@ -322,60 +312,73 @@ static esp_err_t root_get_handler(httpd_req_t *req)
 		find_value("=min_pump1", parameter,min_pump1);
 		find_value("=max_pump2", parameter,max_pump2);
 		find_value("=min_pump2", parameter,min_pump2 );
-	}
-
+	}*/
+	char tmp[10] ;
 	httpd_resp_sendstr_chunk(req, "<h2>Paramètres moteur</h2>");
 	httpd_resp_sendstr_chunk(req, "<form method=\"post\" action=\"/post\">");
 	httpd_resp_sendstr_chunk(req, "Puissance de la bougie 0-255 : <input type=\"number\" class=\"dig3\" name=\"glow_power\" value=\"");
-	if (strlen(glow_power)) httpd_resp_sendstr_chunk(req, glow_power);
+	itoa(turbine_config.glow_power,tmp,10) ;
+	httpd_resp_sendstr_chunk(req,tmp);
 	httpd_resp_sendstr_chunk(req, "\">");
 	httpd_resp_sendstr_chunk(req, "<br>");
 	httpd_resp_sendstr_chunk(req, "RPM plein gaz : <input type=\"number\" class=\"dig10\" name=\"jet_full_power_rpm\" value=\"");
-	if (strlen(jet_full_power_rpm)) httpd_resp_sendstr_chunk(req, jet_full_power_rpm);
+	itoa(turbine_config.jet_full_power_rpm,tmp,10) ;
+	httpd_resp_sendstr_chunk(req,tmp);
 	httpd_resp_sendstr_chunk(req, "\">");
 	httpd_resp_sendstr_chunk(req, "<br>");
 	httpd_resp_sendstr_chunk(req, "RPM ralenti : <input type=\"number\" class=\"dig10\" name=\"jet_idle_rpm\" value=\"");
-	if (strlen(jet_idle_rpm)) httpd_resp_sendstr_chunk(req, jet_idle_rpm);
+	itoa(turbine_config.jet_idle_rpm,tmp,10) ;
+	httpd_resp_sendstr_chunk(req,tmp);
 	httpd_resp_sendstr_chunk(req, "\">");
 	httpd_resp_sendstr_chunk(req, "<br>");
 	httpd_resp_sendstr_chunk(req, "RPM mini : <input type=\"number\" class=\"dig10\" name=\"jet_min_rpm\" value=\"");
-	if (strlen(jet_min_rpm)) httpd_resp_sendstr_chunk(req, jet_min_rpm);
+	itoa(turbine_config.jet_min_rpm,tmp,10) ;
+	httpd_resp_sendstr_chunk(req,tmp);
 	httpd_resp_sendstr_chunk(req, "\">");
 	httpd_resp_sendstr_chunk(req, "<br>");	
 	httpd_resp_sendstr_chunk(req, "Température de démarrage : <input type=\"number\" class=\"dig4\" name=\"start_temp\" value=\"");
-	if (strlen(start_temp)) httpd_resp_sendstr_chunk(req, start_temp);
+	itoa(turbine_config.start_temp,tmp,10) ;
+	httpd_resp_sendstr_chunk(req,tmp);
 	httpd_resp_sendstr_chunk(req, "\"> °C");
 	httpd_resp_sendstr_chunk(req, "<br>");
 	httpd_resp_sendstr_chunk(req, "Température max : <input type=\"number\" class=\"dig4\" name=\"max_temp\" value=\"");
-	if (strlen(max_temp)) httpd_resp_sendstr_chunk(req, max_temp);
+	itoa(turbine_config.max_temp,tmp,10) ;
+	httpd_resp_sendstr_chunk(req,tmp);
 	httpd_resp_sendstr_chunk(req, "\"> °C");
 	httpd_resp_sendstr_chunk(req, "<br>");
 	httpd_resp_sendstr_chunk(req, "Délai d'accélération : <input type=\"number\" class=\"dig2\" name=\"acceleration_delay\" value=\"");
-	if (strlen(acceleration_delay)) httpd_resp_sendstr_chunk(req, acceleration_delay);
+	itoa(turbine_config.acceleration_delay,tmp,10) ;
+	httpd_resp_sendstr_chunk(req,tmp);
 	httpd_resp_sendstr_chunk(req, "\">");
 	httpd_resp_sendstr_chunk(req, "<br>");
 	httpd_resp_sendstr_chunk(req, "Délai de décélération : <input type=\"number\" class=\"dig2\" name=\"deceleration_delay\" value=\"");
-	if (strlen(deceleration_delay)) httpd_resp_sendstr_chunk(req, deceleration_delay);
+	itoa(turbine_config.deceleration_delay,tmp,10) ;
+	httpd_resp_sendstr_chunk(req,tmp);
 	httpd_resp_sendstr_chunk(req, "\">");
 	httpd_resp_sendstr_chunk(req, "<br>");
 	httpd_resp_sendstr_chunk(req, "Délai de stabilité : <input type=\"number\" class=\"dig2\" name=\"stability_delay\" value=\"");
-	if (strlen(stability_delay)) httpd_resp_sendstr_chunk(req, stability_delay);
+	itoa(turbine_config.stability_delay,tmp,10) ;
+	httpd_resp_sendstr_chunk(req,tmp);
 	httpd_resp_sendstr_chunk(req, "\">");
 	httpd_resp_sendstr_chunk(req, "<br>");
-	httpd_resp_sendstr_chunk(req, "PWM max pompe 1 : <input type=\"number\" class=\"dig3\" name=\"max_pump1\" value=\"");
-	if (strlen(max_pump1)) httpd_resp_sendstr_chunk(req, max_pump1);
+	httpd_resp_sendstr_chunk(req, "PWM max pompe 1 : <input type=\"number\" class=\"dig4\" name=\"max_pump1\" value=\"");
+	itoa(turbine_config.max_pump1,tmp,10) ;
+	httpd_resp_sendstr_chunk(req,tmp);
 	httpd_resp_sendstr_chunk(req, "\">");
 	httpd_resp_sendstr_chunk(req, "<br>");
-	httpd_resp_sendstr_chunk(req, "PWM mix pompe 1 : <input type=\"number\" class=\"dig3\" name=\"min_pump1\" value=\"");
-	if (strlen(min_pump1)) httpd_resp_sendstr_chunk(req, min_pump1);
+	httpd_resp_sendstr_chunk(req, "PWM mix pompe 1 : <input type=\"number\" class=\"dig4\" name=\"min_pump1\" value=\"");
+	itoa(turbine_config.min_pump1,tmp,10) ;
+	httpd_resp_sendstr_chunk(req,tmp);
 	httpd_resp_sendstr_chunk(req, "\">");
 	httpd_resp_sendstr_chunk(req, "<br>");
-	httpd_resp_sendstr_chunk(req, "PWM max pompe 2 : <input type=\"number\" class=\"dig3\" name=\"max_pump2\" value=\"");
-	if (strlen(max_pump2)) httpd_resp_sendstr_chunk(req, max_pump2);
+	httpd_resp_sendstr_chunk(req, "PWM max pompe 2 : <input type=\"number\" class=\"dig4\" name=\"max_pump2\" value=\"");
+	itoa(turbine_config.max_pump2,tmp,10) ;
+	httpd_resp_sendstr_chunk(req,tmp);
 	httpd_resp_sendstr_chunk(req, "\">");
 	httpd_resp_sendstr_chunk(req, "<br>");
-	httpd_resp_sendstr_chunk(req, "PWM min pompe 2 : <input type=\"number\" class=\"dig3\" name=\"min_pump2\" value=\"");
-	if (strlen(min_pump2)) httpd_resp_sendstr_chunk(req, min_pump2);
+	httpd_resp_sendstr_chunk(req, "PWM min pompe 2 : <input type=\"number\" class=\"dig4\" name=\"min_pump2\" value=\"");
+	itoa(turbine_config.min_pump2,tmp,10) ;
+	httpd_resp_sendstr_chunk(req,tmp);
 	httpd_resp_sendstr_chunk(req, "\">");
 	httpd_resp_sendstr_chunk(req, "<br>");
 	httpd_resp_sendstr_chunk(req, "<input type=\"submit\" name=\"submit\" value=\"submit2\">");
@@ -461,7 +464,7 @@ static esp_err_t root_get_handler(httpd_req_t *req)
 
 	httpd_resp_sendstr_chunk(req, "<br>");
 	httpd_resp_sendstr_chunk(req, "<input type=\"submit\" name=\"submit\" value=\"submit4\">");
-
+	httpd_resp_sendstr_chunk(req, "<br>");
 	err = load_key_value(key, parameter, sizeof(parameter));
 	ESP_LOGI(TAG, "%s=%d", key, err);
 	if (err == ESP_OK) {
@@ -471,10 +474,15 @@ static esp_err_t root_get_handler(httpd_req_t *req)
 		httpd_resp_sendstr_chunk(req, parameter);
 	}
 	httpd_resp_sendstr_chunk(req, "</form><br>");
-
+	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"logs.txt\">");
+	httpd_resp_sendstr_chunk(req, "<input type=\"submit\" name=\"submit\" value=\"Logs\">");
+	httpd_resp_sendstr_chunk(req, "</form>");
+	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"curves.txt\">");
+	httpd_resp_sendstr_chunk(req, "<input type=\"submit\" name=\"submit\" value=\"Courbes\">");
+	httpd_resp_sendstr_chunk(req, "</form>");	
 	/* Send Image to HTML file */
-	//Image2Html(req, "/html/ESP-IDF.txt", "png");
-	Image2Html(req, "/html/ESP-LOGO.txt", "png");
+	Image2Html(req, "/html/ESP-IDF.txt", "png");
+	//Image2Html(req, "/html/ESP-LOGO.txt", "png");
 
 	/* Send remaining chunk of HTML file to complete it */
 	httpd_resp_sendstr_chunk(req, "</body></html>");
@@ -536,6 +544,114 @@ static esp_err_t favicon_get_handler(httpd_req_t *req)
 	return ESP_OK;
 }
 
+static esp_err_t curves_get_handler(httpd_req_t *req)
+{
+    FILE *fd = NULL;
+    struct stat st;
+	char FileName[] = "/html/curves.txt" ;
+
+	update_curve_file() ;
+	if (stat(FileName, &st) != 0) {
+		ESP_LOGE(TAG, "[%s] not found", FileName);
+		return ESP_FAIL;
+	}
+	ESP_LOGI(TAG, "%s st.st_size=%ld", FileName, st.st_size);
+
+	char*	file_buffer = NULL;
+	size_t file_buffer_len = st.st_size;
+	file_buffer = malloc(file_buffer_len);
+	if (file_buffer == NULL) {
+		ESP_LOGE(TAG, "malloc fail. file_buffer_len %d", file_buffer_len);
+		return ESP_FAIL;
+	}
+
+	ESP_LOGI(TAG, "logs_get_handler req->uri=[%s]", req->uri);
+	fd = fopen(FileName, "r");
+	if (!fd) {
+       ESP_LOGE(TAG, "Failed to read existing file : logs.txt");
+        /* Respond with 500 Internal Server Error */
+        httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to read existing file");
+        return ESP_FAIL;
+    }
+	for (int i=0;i<st.st_size;i++) {
+		fread(&file_buffer[i], sizeof(char), 1, fd);
+	}
+	fclose(fd);
+
+	ESP_LOGI(TAG, "Sending file : logs.txt...");
+	ESP_LOGI(TAG, "%s",file_buffer);
+	httpd_resp_set_type(req, "application/octet-stream");
+	if (httpd_resp_send_chunk(req, file_buffer, st.st_size) != ESP_OK) {
+                fclose(fd);
+                ESP_LOGE(TAG, "File sending failed!");
+                /* Abort sending file */
+                httpd_resp_sendstr_chunk(req, NULL);
+                /* Respond with 500 Internal Server Error */
+                httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to send file");
+               return ESP_FAIL;
+	}
+	httpd_resp_sendstr_chunk(req, NULL);
+
+    ESP_LOGI(TAG, "File sending complete");
+	return ESP_OK;
+}
+
+static esp_err_t logs_get_handler(httpd_req_t *req)
+{
+    FILE *fd = NULL;
+    struct stat st;
+	char FileName[] = "/html/logs.txt" ;
+    vTaskSuspend( xlogHandle );
+	if (stat(FileName, &st) != 0) {
+		ESP_LOGE(TAG, "[%s] not found", FileName);
+		return ESP_FAIL;
+	}
+	ESP_LOGI(TAG, "%s st.st_size=%ld", FileName, st.st_size);
+
+	char*	file_buffer = NULL;
+	size_t file_buffer_len = st.st_size;
+	if(file_buffer_len > 0)
+	{
+		file_buffer = malloc(file_buffer_len);
+		if (file_buffer == NULL) {
+			ESP_LOGE(TAG, "malloc fail. file_buffer_len %d", file_buffer_len);
+			return ESP_FAIL;
+		}
+
+		ESP_LOGI(TAG, "logs_get_handler req->uri=[%s]", req->uri);
+		fd = fopen(FileName, "r");
+		if (!fd) {
+		ESP_LOGE(TAG, "Failed to read existing file : logs.txt");
+			/* Respond with 500 Internal Server Error */
+			httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to read existing file");
+			return ESP_FAIL;
+		}
+		for (int i=0;i<st.st_size;i++) {
+			fread(&file_buffer[i], sizeof(char), 1, fd);
+		}
+		fclose(fd);
+
+		ESP_LOGI(TAG, "Sending file : logs.txt...");
+		//ESP_LOGI(TAG, "%s",file_buffer);
+		httpd_resp_set_type(req, "application/octet-stream");
+		if (httpd_resp_send_chunk(req, file_buffer, st.st_size) != ESP_OK) {
+					fclose(fd);
+					ESP_LOGE(TAG, "File sending failed!");
+					/* Abort sending file */
+					httpd_resp_sendstr_chunk(req, NULL);
+					/* Respond with 500 Internal Server Error */
+					httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to send file");
+				return ESP_FAIL;
+		}
+		httpd_resp_sendstr_chunk(req, NULL);
+		ESP_LOGI(TAG, "File sending complete");
+	}
+    vTaskResume( xlogHandle );
+	return ESP_OK;
+}
+
+
+
 /* Function to start the web server */
 esp_err_t start_server(const char *base_path, int port)
 {
@@ -581,6 +697,24 @@ esp_err_t start_server(const char *base_path, int port)
 	};
 	httpd_register_uri_handler(server, &_favicon_get_handler);
 
+	/* Fichier curves.txt */
+		httpd_uri_t _curves_get_handler = {
+		.uri		 = "/curves.txt",
+		.method		 = HTTP_GET,
+		.handler	 = curves_get_handler,
+		//.user_ctx  = server_data	// Pass server data as context
+	};
+	httpd_register_uri_handler(server, &_curves_get_handler);
+
+	/* Fichier curves.txt */
+		httpd_uri_t _logs_get_handler = {
+		.uri		 = "/logs.txt",
+		.method		 = HTTP_GET,
+		.handler	 = logs_get_handler,
+		//.user_ctx  = server_data	// Pass server data as context
+	};
+	httpd_register_uri_handler(server, &_logs_get_handler);
+
 	return ESP_OK;
 }
 
@@ -603,6 +737,7 @@ void http_server_task(void *pvParameters)
 			ESP_LOGI(TAG, "url=%s", urlBuf.url);
 			ESP_LOGI(TAG, "parameter=%s", urlBuf.parameter);
 
+			/*
 			// save key & value to NVS
 			esp_err_t err = save_key_value(urlBuf.url, urlBuf.parameter);
 			if (err != ESP_OK) {
@@ -613,7 +748,7 @@ void http_server_task(void *pvParameters)
 			err = load_key_value(urlBuf.url, urlBuf.parameter, sizeof(urlBuf.parameter));
 			if (err != ESP_OK) {
 				ESP_LOGE(TAG, "Error (%s) loading to NVS", esp_err_to_name(err));
-			}
+			}*/
 		}
 	}
 

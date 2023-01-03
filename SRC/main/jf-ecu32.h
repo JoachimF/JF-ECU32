@@ -15,6 +15,15 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/queue.h"
+#include "freertos/event_groups.h"
+#include "freertos/semphr.h"
+#include "freertos/timers.h"
+
+
 typedef struct {  
   uint32_t pump[50]; //Table RPM/PWM
   uint32_t RPM[50];
@@ -63,6 +72,7 @@ typedef union {
 
 
 typedef struct {
+  uint8_t log_count ; //Numéro du log dans le fichier
   uint8_t glow_power ; // Puissance de la bougie gas ou kero
   uint32_t jet_full_power_rpm ; // trs/min plein gaz
   uint32_t jet_idle_rpm ; // trs/min ralenti
@@ -116,6 +126,12 @@ typedef struct {
 } _VALVE_t;
 
 typedef struct {
+  uint8_t minutes ;
+  uint8_t secondes ;
+  uint16_t GAZ ;
+  uint16_t Aux ;
+  uint32_t RPM ;
+  uint16_t EGT ;
   _PUMP_t pump1 ;
   _PUMP_t pump2 ;
   _GLOW_t glow ;
@@ -124,11 +140,22 @@ typedef struct {
   uint8_t phase_fonctionnement ;
 } _engine_t;
 
+TaskHandle_t xlogHandle ;
+TimerHandle_t xTimer1s ;
+SemaphoreHandle_t xTimeMutex;
+
+
 void init(void);
 void linear_interpolation(uint32_t x0,uint32_t y0,uint32_t x1,uint32_t y1,uint32_t rpm,uint32_t *res) ;
 void set_kero_pump_target(uint32_t RPM) ;
 void init_power_table(void) ;
 void init_random_pump(void) ;
+void init_nvs(void) ;
 void write_nvs(void) ;
 void read_nvs(void) ;
 uint32_t checksum_power_table(void) ; 
+void update_curve_file(void) ;
+void head_logs_file(void) ;
+void log_task( void * pvParameters ) ;
+void create_timers(void) ;
+void vTimer1sCallback( TimerHandle_t pxTimer ) ;

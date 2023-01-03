@@ -219,12 +219,14 @@ void http_server_task(void *pvParameters);
 void app_main()
 {
 	// Initialize NVS
-	esp_err_t ret = nvs_flash_init();
+	init_nvs() ;
+
+	/*esp_err_t ret = nvs_flash_init();
 	if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
 		ESP_ERROR_CHECK(nvs_flash_erase());
 		ret = nvs_flash_init();
 	}
-	ESP_ERROR_CHECK(ret);
+	ESP_ERROR_CHECK(ret);*/
 
 	// Initialize WiFi
 	wifi_init_sta();
@@ -253,6 +255,20 @@ void app_main()
 	char cparam0[64];
 	sprintf(cparam0, IPSTR, IP2STR(&ip_info.ip));
 	xTaskCreate(http_server_task, "HTTP", 1024*6, (void *)cparam0, 2, NULL);
-
+	head_logs_file();
+	xTaskCreate(log_task, "LOG", 1024*6, NULL, 2, &xlogHandle);
+	configASSERT( xlogHandle );
+	vTaskSuspend( xlogHandle );
+	
 	vTaskDelay(10);
+	set_kero_pump_target(36000);
+	vTaskDelay(3000 / portTICK_PERIOD_MS);
+    set_kero_pump_target(54000);
+	vTaskDelay(3000 / portTICK_PERIOD_MS);
+    set_kero_pump_target(70000);
+	vTaskDelay(3000 / portTICK_PERIOD_MS);
+    set_kero_pump_target(91000);
+	vTaskDelay(3000 / portTICK_PERIOD_MS);
+    set_kero_pump_target(143000);
+	vTaskDelay(3000 / portTICK_PERIOD_MS);
 }
