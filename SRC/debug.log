@@ -1,0 +1,24 @@
+2023-01-05 02:05:12,320 - Debug Adapter (main) - CRITICAL - Debug adapter -> Extension: DEBUG_ADAPTER_STARTED
+2023-01-05 02:05:12,332 - Debug Adapter (main) - CRITICAL - Debug adapter -> Extension: DEBUG_ADAPTER_READY2CONNECT
+2023-01-05 02:06:52,488 - Debug Adapter (main) - ERROR - Failed to connect to "remote 127.0.0.1:3333"!
+Traceback (most recent call last):
+  File "c:\Users\Boby\.vscode\extensions\espressif.esp-idf-extension-1.5.1\esp_debug_adapter\debug_adapter\command_processor.py", line 52, in __call__
+    on_request(protocol_message)
+  File "c:\Users\Boby\.vscode\extensions\espressif.esp-idf-extension-1.5.1\esp_debug_adapter\debug_adapter\command_processor.py", line 75, in on_initialize_request
+    raise e
+  File "c:\Users\Boby\.vscode\extensions\espressif.esp-idf-extension-1.5.1\esp_debug_adapter\debug_adapter\command_processor.py", line 70, in on_initialize_request
+    self.da.adapter_init()
+  File "c:\Users\Boby\.vscode\extensions\espressif.esp-idf-extension-1.5.1\esp_debug_adapter\debug_adapter\debug_adapter.py", line 328, in adapter_init
+    raise e
+  File "c:\Users\Boby\.vscode\extensions\espressif.esp-idf-extension-1.5.1\esp_debug_adapter\debug_adapter\debug_adapter.py", line 324, in adapter_init
+    self.start_gdb()
+  File "c:\Users\Boby\.vscode\extensions\espressif.esp-idf-extension-1.5.1\esp_debug_adapter\debug_adapter\debug_adapter.py", line 654, in start_gdb
+    raise e
+  File "c:\Users\Boby\.vscode\extensions\espressif.esp-idf-extension-1.5.1\esp_debug_adapter\debug_adapter\debug_adapter.py", line 651, in start_gdb
+    self._gdb.connect()
+  File "c:\Users\Boby\.vscode\extensions\espressif.esp-idf-extension-1.5.1\esp_debug_adapter\debug_adapter\debug_backend\debug_backend\gdb.py", line 578, in connect
+    self.target_select(remote_mode, self._remote_target, tmo=tmo)
+  File "c:\Users\Boby\.vscode\extensions\espressif.esp-idf-extension-1.5.1\esp_debug_adapter\debug_adapter\debug_backend\debug_backend\gdb.py", line 258, in target_select
+    raise DebuggerError('Failed to connect to "%s %s"!' % (tgt_type, tgt_params))
+debug_adapter.debug_backend.debug_backend.defs.DebuggerError: Failed to connect to "remote 127.0.0.1:3333"!
+2023-01-05 02:06:52,526 - Debug Adapter (main) - CRITICAL - Debug adapter -> Extension: DEBUG_ADAPTER_STOPPED

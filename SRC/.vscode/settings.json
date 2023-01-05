@@ -1,5 +1,13 @@
 {
     "idf.adapterTargetName": "esp32",
-    "idf.flashType": "UART",
-    "idf.portWin": "COM3"
+    "idf.espIdfPathWin": "C:\\Users\\Boby\\esp\\esp-idf",
+    "idf.toolsPathWin": "c:\\Users\\Boby\\.espressif",
+    "idf.customExtraPaths": "c:\\Users\\Boby\\.espressif\\tools\\xtensa-esp32-elf\\esp-2021r2-patch3-8.4.0\\xtensa-esp32-elf\\bin;c:\\Users\\Boby\\.espressif\\tools\\xtensa-esp32s2-elf\\esp-2021r2-patch3-8.4.0\\xtensa-esp32s2-elf\\bin;c:\\Users\\Boby\\.espressif\\tools\\xtensa-esp32s3-elf\\esp-2021r2-patch3-8.4.0\\xtensa-esp32s3-elf\\bin;c:\\Users\\Boby\\.espressif\\tools\\riscv32-esp-elf\\esp-2021r2-patch3-8.4.0\\riscv32-esp-elf\\bin;c:\\Users\\Boby\\.espressif\\tools\\esp32ulp-elf\\2.28.51-esp-20191205\\esp32ulp-elf-binutils\\bin;c:\\Users\\Boby\\.espressif\\tools\\esp32s2ulp-elf\\2.28.51-esp-20191205\\esp32s2ulp-elf-binutils\\bin;c:\\Users\\Boby\\.espressif\\tools\\cmake\\3.16.4\\bin;c:\\Users\\Boby\\.espressif\\tools\\openocd-esp32\\v0.11.0-esp32-20220706\\openocd-esp32\\bin;c:\\Users\\Boby\\.espressif\\tools\\ninja\\1.10.2;c:\\Users\\Boby\\.espressif\\tools\\idf-exe\\1.0.1;c:\\Users\\Boby\\.espressif\\tools\\ccache\\3.7;c:\\Users\\Boby\\.espressif\\tools\\dfu-util\\0.9\\dfu-util-0.9-win64",
+    "idf.customExtraVars": "{\"OPENOCD_SCRIPTS\":\"c:\\\\Users\\\\Boby\\\\.espressif\\\\tools\\\\openocd-esp32\\\\v0.11.0-esp32-20220706/openocd-esp32/share/openocd/scripts\",\"IDF_CCACHE_ENABLE\":\"1\"}",
+    "idf.flashType": "JTAG",
+    "idf.portWin": "COM3",
+    "idf.openOcdConfigs": [
+        "interface/ftdi/esp32_devkitj_v1.cfg",
+        "target/esp32.cfg"
+    ]
 }

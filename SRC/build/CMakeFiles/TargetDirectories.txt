@@ -8,7 +8,7 @@ C:/Users/Boby/Documents/GitHub/JF-ECU32/SRC/build/CMakeFiles/flash.dir
 C:/Users/Boby/Documents/GitHub/JF-ECU32/SRC/build/CMakeFiles/monitor.dir
 C:/Users/Boby/Documents/GitHub/JF-ECU32/SRC/build/CMakeFiles/encrypted-flash.dir
 C:/Users/Boby/Documents/GitHub/JF-ECU32/SRC/build/CMakeFiles/_project_elf_src.dir
-C:/Users/Boby/Documents/GitHub/JF-ECU32/SRC/build/CMakeFiles/web-form.elf.dir
+C:/Users/Boby/Documents/GitHub/JF-ECU32/SRC/build/CMakeFiles/JF-ECU32.elf.dir
 C:/Users/Boby/Documents/GitHub/JF-ECU32/SRC/build/CMakeFiles/size.dir
 C:/Users/Boby/Documents/GitHub/JF-ECU32/SRC/build/CMakeFiles/size-files.dir
 C:/Users/Boby/Documents/GitHub/JF-ECU32/SRC/build/CMakeFiles/size-components.dir

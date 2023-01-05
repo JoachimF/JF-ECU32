@@ -1,0 +1,54 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "GDB",
+      "type": "cppdbg",
+      "request": "launch",
+      "MIMode": "gdb",
+      "miDebuggerPath": "${command:espIdf.getXtensaGdb}",
+      "program": "${workspaceFolder}/build/JF-ECU32.elf",
+      "windows": {
+        "program": "${workspaceFolder}\\build\\${command:espIdf.getProjectName}.elf"
+      },
+      "cwd": "${workspaceFolder}",
+      "environment": [{ "name": "PATH", "value": "${config:idf.customExtraPaths}" }],
+      "setupCommands": [
+        //{ "text": "ftdi tdo_sample_edge falling" },
+        { "text": "target extended-remote :3333" },
+        { "text": "set remote hardware-watchpoint-limit 2"},
+        { "text": "mon reset halt" },
+        { "text": "thb app_main" },
+        { "text": "flushregs" }
+      ],
+      "externalConsole": false,
+      "logging": {
+        "engineLogging": true
+      }
+    }
+  ]
+}
+/*{
+  "version": "0.2.0",
+  "configurations": [
+      {
+          "name": "ESPIDF",
+          "type": "espidf",
+          "request": "launch",
+          "mode": "auto",
+          "logLevel": 2,
+          "verifyAppBinBeforeDebug": false,
+          "tmoScaleFactor": 10,
+          "initGdbCommands": [
+              // "mon esp appimage_offset 0x100000",
+              "disconnect",
+              "target extended-remote :3333",
+              "set remote hardware-watchpoint-limit 2",
+              "mon reset halt",
+              "thb app_main",
+              "flushregs"
+          ],
+          "env": {}
+      }
+  ]
+}*/

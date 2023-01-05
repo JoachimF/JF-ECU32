@@ -87,7 +87,8 @@ _engine_t turbine = {
 
 void init_nvs(void)
 {
-    //nvs_flash_erase() ;
+    ESP_LOGI("NVS", "Init...");
+    nvs_flash_erase() ; // en cas de remise a 0
     esp_err_t err = nvs_flash_init();
     if (err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND) {
         // NVS partition was truncated and needs to be erased
@@ -97,52 +98,56 @@ void init_nvs(void)
     }
     ESP_ERROR_CHECK( err );
     printf("\n");
-    printf("Opening Non-Volatile Storage (NVS) handle... ");
+    ESP_LOGI("NVS", "Init OK");
+}
+void read_nvs(void)
+{
+    esp_err_t err ;// = nvs_flash_init();
+    size_t required_size;
+    ESP_LOGI("NVS", "Ouverture du handle");
     err = nvs_open("storage", NVS_READWRITE, &my_handle);
     if (err != ESP_OK) {
         printf("Error (%s) opening NVS handle!\n", esp_err_to_name(err));
     } 
-}
-void read_nvs(void)
-{
-    esp_err_t err = nvs_flash_init();
-    size_t required_size;
-    
+    ESP_LOGI("NVS", "Lecture config turbine");
     err = nvs_get_blob(my_handle, "config", NULL, &required_size );
     err = nvs_get_blob(my_handle, "config", (void *)&turbine_config, &required_size);
     switch (err) {
             case ESP_OK:
-                printf("Done\n\n");
-                printf("Log count = %d\n\n", turbine_config.log_count);
-                printf("glow power = %d\n\n", turbine_config.glow_power);
-                printf("Max rpm = %d\n\n", turbine_config.jet_full_power_rpm);
-                printf("idle rpm = %d\n\n", turbine_config.jet_idle_rpm);
-                printf("start_temp = %d\n\n", turbine_config.start_temp);
-                printf("max_temp = %d\n\n", turbine_config.max_temp);
-                printf("acceleration_delay = %d\n\n", turbine_config.acceleration_delay);
-                printf("deceleration_delay = %d\n\n", turbine_config.deceleration_delay);
-                printf("stability_delay = %d\n\n", turbine_config.stability_delay);
-                printf("max_pump1 = %d\n\n", turbine_config.max_pump1);
-                printf("min_pump1= %d\n\n", turbine_config.min_pump1);
-                printf("max_pump2 = %d\n\n", turbine_config.max_pump2);
-                printf("min_pump2= %d\n\n", turbine_config.jet_min_rpm);
+                ESP_LOGI(TAG,"Name = %s", turbine_config.name);
+                ESP_LOGI(TAG,"Log count = %d", turbine_config.log_count);
+                ESP_LOGI(TAG,"glow power = %d", turbine_config.glow_power);
+                ESP_LOGI(TAG,"Max rpm = %d", turbine_config.jet_full_power_rpm);
+                ESP_LOGI(TAG,"idle rpm = %d", turbine_config.jet_idle_rpm);
+                ESP_LOGI(TAG,"start_temp = %d", turbine_config.start_temp);
+                ESP_LOGI(TAG,"max_temp = %d", turbine_config.max_temp);
+                ESP_LOGI(TAG,"acceleration_delay = %d", turbine_config.acceleration_delay);
+                ESP_LOGI(TAG,"deceleration_delay = %d", turbine_config.deceleration_delay);
+                ESP_LOGI(TAG,"stability_delay = %d", turbine_config.stability_delay);
+                ESP_LOGI(TAG,"max_pump1 = %d", turbine_config.max_pump1);
+                ESP_LOGI(TAG,"min_pump1= %d", turbine_config.min_pump1);
+                ESP_LOGI(TAG,"max_pump2 = %d", turbine_config.max_pump2);
+                ESP_LOGI(TAG,"min_pump2= %d", turbine_config.jet_min_rpm);
                 for(int i=0;i<50;i++)
                 {
-                    printf("pump = %d - ", turbine_config.power_table.pump[i]);
-                    printf("rpm = %d\n", turbine_config.power_table.RPM[i]);
+                    ESP_LOGI(TAG,"pump = %d - ", turbine_config.power_table.pump[i]);
+                    ESP_LOGI(TAG,"rpm = %d\n", turbine_config.power_table.RPM[i]);
                 }
-                printf("\nChecksum = %d\n", turbine_config.power_table.checksum_RPM);
-                printf("\nChecksum2 = %d\n", checksum_power_table());
+                ESP_LOGI(TAG,"\nChecksum = %d\n", turbine_config.power_table.checksum_RPM);
+                ESP_LOGI(TAG,"\nChecksum2 = %d\n", checksum_power_table());
                 if(checksum_power_table() != turbine_config.power_table.checksum_RPM)
                     {
                     init_power_table() ;
                     init_random_pump() ;
-                    write_nvs() ;
+                    write_nvs_turbine() ;
                     }
                 break;
             case ESP_ERR_NVS_NOT_FOUND:
-                printf("The value is not initialized yet!\n");
+                ESP_LOGI(TAG,"Les valeurs config turbine ne sont pas initialisées\n");
                 required_size = sizeof(turbine_config);
+                ESP_LOGI("NVS", "Taille de turbine_config %d",required_size);
+                strcpy(turbine_config.name,"Nom du moteur") ;
+                ESP_LOGI("NVS", "Nom : %s",turbine_config.name);
                 turbine_config.log_count = 1 ;
                 turbine_config.glow_power = 25 ;
                 turbine_config.jet_full_power_rpm = 145000 ;
@@ -157,62 +162,85 @@ void read_nvs(void)
                 turbine_config.max_pump2 = 512 ;
                 turbine_config.jet_min_rpm = 0 ;
                 init_power_table() ;
-                write_nvs() ;
+                init_random_pump() ;
+                write_nvs_turbine() ;
+                ESP_LOGI("NVS", "Ouverture du handle");
+                err = nvs_open("storage", NVS_READWRITE, &my_handle);
+                if (err != ESP_OK) {
+                    ESP_LOGI(TAG,"Error (%s) opening NVS handle!\n", esp_err_to_name(err));
+                } 
                 break;
             default :
-                printf("Error (%s) reading!\n", esp_err_to_name(err));
+                ESP_LOGI(TAG,"Error (%s) reading turbine_config!\n", esp_err_to_name(err));
                 init_power_table() ;
                 init_random_pump() ;
-                write_nvs() ;
+                write_nvs_turbine() ;
         }
+    ESP_LOGI("NVS", "Lecture config ECU");
     err = nvs_get_blob(my_handle, "configECU", NULL, &required_size );
     err = nvs_get_blob(my_handle, "configECU", (void *)&config_ECU, &required_size);
     switch (err) {
             case ESP_OK:
-                printf("config_ECU Done\n\n");
+                ESP_LOGI(TAG,"config_ECU Done");
                 break;
             case ESP_ERR_NVS_NOT_FOUND:
-                printf("config_ECU The value is not initialized yet!\n");
-                write_nvs() ;
+                ESP_LOGI(TAG,"config_ECU The value is not initialized yet!");
+                config_ECU.input_type = PPM ;
+                config_ECU.glow_type = GAS ;
+                config_ECU.start_type = AUTO ;
+                config_ECU.output_pump1 = PWM;
+                config_ECU.output_pump2 = NONE ;
+                config_ECU.output_starter = PPM ;
+                config_ECU.use_telem = NONE ;
+                config_ECU.use_input2 = NO ;
+                config_ECU.use_led = NO ;
+                write_nvs_ecu() ;
                 break;
             default :
-                printf("Error (%s) reading!\n", esp_err_to_name(err));
-        }        
+                ESP_LOGI(TAG,"Error (%s) reading config_ECU!", esp_err_to_name(err));
+        }  
+    ESP_LOGI("NVS", "Fermeture du handle");
+    nvs_close(my_handle);      
 }
 
-void write_nvs(void)
+void write_nvs_turbine(void)
 {
+        esp_err_t err ;//
+        ESP_LOGI("NVS", "Ouverture du handle");
+        err = nvs_open("storage", NVS_READWRITE, &my_handle);
+        if (err != ESP_OK) {
+            ESP_LOGI(TAG,"Error (%s) opening NVS handle!\n", esp_err_to_name(err));
+        } 
         // Write
-        esp_err_t err = nvs_flash_init();
+        ESP_LOGI("NVS", "Ecriture turbine");
         size_t required_size = sizeof(_configEngine_t);
-        printf("Save config to turbine_config Struct... Size : %d ",required_size);
+        ESP_LOGI(TAG,"Save config to turbine_config Struct... Size : %d ",required_size);
         err = nvs_set_blob(my_handle, "config", (const void*)&turbine_config, required_size);
-        //err = nvs_set_str(my_handle, "nvs_struct", (const char*)nvs_struct.buffer);
-        printf((err != ESP_OK) ? "Failed!\n" : "Done\n");
-
-        // Commit written value.
-        // After setting any values, nvs_commit() must be called to ensure changes are written
-        // to flash storage. Implementations may write to storage at other times,
-        // but this is not guaranteed.
-        printf("Committing updates in NVS ... ");
+        printf((err != ESP_OK) ? "Failed!" : "Done");
+        ESP_LOGI(TAG,"Committing turbine_config in NVS ... ");
         err = nvs_commit(my_handle);
-        printf((err != ESP_OK) ? "Failed!\n" : "Done\n");
+        printf((err != ESP_OK) ? "Failed!" : "Done");
+}
 
-        required_size = sizeof(_BITsconfigECU_u);
-        printf("Save config to config_ECU Struct... Size : %d ",required_size);
+void write_nvs_ecu(void)
+{
+        esp_err_t err ;//
+        ESP_LOGI("NVS", "Ouverture du handle");
+        err = nvs_open("storage", NVS_READWRITE, &my_handle);
+        if (err != ESP_OK) {
+            ESP_LOGI(TAG,"Error (%s) opening NVS handle!", esp_err_to_name(err));
+        } 
+        // Write
+        ESP_LOGI("NVS", "Ecriture ECU");        
+        size_t required_size = sizeof(_BITsconfigECU_u);
+        ESP_LOGI(TAG,"Save config to config_ECU Struct... Size : %d ",required_size);
         err = nvs_set_blob(my_handle, "configECU", (const void*)&config_ECU, required_size);
-        //err = nvs_set_str(my_handle, "nvs_struct", (const char*)nvs_struct.buffer);
-        printf((err != ESP_OK) ? "Failed!\n" : "Done\n");
-
-        // Commit written value.
-        // After setting any values, nvs_commit() must be called to ensure changes are written
-        // to flash storage. Implementations may write to storage at other times,
-        // but this is not guaranteed.
-        printf("Committing updates in NVS ... ");
+        printf((err != ESP_OK) ? "Failed!" : "Done");
+        ESP_LOGI(TAG,"Committing config_ECU in NVS ... ");
         err = nvs_commit(my_handle);
-        printf((err != ESP_OK) ? "Failed!\n" : "Done\n");
-
+        printf((err != ESP_OK) ? "Failed!" : "Done");
         // Close
+        ESP_LOGI("NVS", "Fermeture du handle");
         nvs_close(my_handle);
 }
 
@@ -235,9 +263,8 @@ void init(void)
     init_nvs() ;
     read_nvs() ;
     turbine_config.log_count++ ;
-    write_nvs() ;
-    //turbine_config.jet_full_power_rpm = 150000 ;
-    //write_nvs() ;
+    write_nvs_turbine() ;
+
     for (int i = 0; i < 5; i++)
     {   
         ledc_channel[i].speed_mode = LEDC_LOW_SPEED_MODE;
@@ -277,7 +304,7 @@ void set_kero_pump_target(uint32_t RPM)
     linear_interpolation(rpm1,pump1,rpm2,pump2,RPM,&res) ;
     turbine.pump1.target = res ;
     turbine.pump1.new_target = 1 ;
-    printf("Target : %d - pump : %d\n",RPM,res) ;
+    ESP_LOGI(TAG,"Target : %d - pump : %d\n",RPM,res) ;
 }
 
 void init_random_pump(void)

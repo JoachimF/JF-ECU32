@@ -15,6 +15,8 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+#ifndef _JF_ECU32_H_
+#define _JF_ECU32_H_
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -31,47 +33,54 @@ typedef struct {
   uint32_t checksum_RPM;
 }_pump_table_t;
 
-typedef union {                            
-  uint32_t data;                           
-  struct {                                 
-    uint32_t input_ppm : 1;
-    uint32_t input_sbus : 1;
-    uint32_t output_pump1_pwm : 1;
-    uint32_t output_pump1_ppm : 1;
-    uint32_t output_pump2_pwm : 1;
-    uint32_t output_pump2_ppm : 1;
-    uint32_t output_starter_pwm : 1;
-    uint32_t output_starter_ppm : 1;
-    uint32_t use_frsky_telem : 1;
-    uint32_t use_futaba_telem : 1;
-    uint32_t use_led : 1;
-    uint32_t use_input2 : 1;
-    uint32_t use_pump2 : 1;
-  };
-} _BITsconfigECU_u;
-
-enum start_modes {
-    MANUAL,AUTO_GAS,AUTO_KERO
- };
-
 enum glow_types {
     GAS,KERO
- };
+};
+
+#define   PPM     0
+#define   PWM     1
+#define   SBUS   1
+#define   NONE    2
+#define   FRSKY   0
+#define   FUTABA  0
+#define   MANUAL  0
+#define   AUTO    1
+
+enum yesno_type {
+    NO,YES
+};
+
+typedef struct {                                 
+    uint8_t input_type ;
+    uint8_t glow_type ;  // GLOW ou KERO             
+    uint8_t start_type ; // MANUAL ou AUTO-GAS ou AUTO-KERO
+    uint8_t output_pump1 ;
+    uint8_t output_pump2 ;
+    uint8_t output_starter ;
+    uint8_t use_telem ;
+    uint8_t use_led ;
+    uint8_t use_input2 ;
+}_BITsconfigECU_u;
+
+
+
+
 
 enum phases {
     WAIT,START,GLOW,KEROSTART,PREHEAT,RAMP,IDLE,PURGE,COOL
  };
-
+/*
 typedef union {                            
   uint32_t data;                           
   struct { 
     uint32_t glow_type : 1 ;  // GLOW ou KERO             
     uint32_t start_mode : 2 ; // MANUAL ou AUTO-GAS ou AUTO-KERO
   };
-} _BITsconfigstart_u;
+} _BITsconfigstart_u;*/
 
 
 typedef struct {
+  char name[20] ; // Nom du moteur
   uint8_t log_count ; //Numéro du log dans le fichier
   uint8_t glow_power ; // Puissance de la bougie gas ou kero
   uint32_t jet_full_power_rpm ; // trs/min plein gaz
@@ -87,6 +96,7 @@ typedef struct {
   uint16_t max_pump2 ; // puissance max de la pompe 1
   uint16_t min_pump2 ; // puissance min de la pompe 1
   _pump_table_t power_table;
+  uint32_t checksum ;
 } _configEngine_t;
 
 typedef struct{
@@ -151,7 +161,8 @@ void set_kero_pump_target(uint32_t RPM) ;
 void init_power_table(void) ;
 void init_random_pump(void) ;
 void init_nvs(void) ;
-void write_nvs(void) ;
+void write_nvs_turbine(void) ;
+void write_nvs_ecu(void) ;
 void read_nvs(void) ;
 uint32_t checksum_power_table(void) ; 
 void update_curve_file(void) ;
@@ -159,3 +170,5 @@ void head_logs_file(void) ;
 void log_task( void * pvParameters ) ;
 void create_timers(void) ;
 void vTimer1sCallback( TimerHandle_t pxTimer ) ;
+
+#endif
