@@ -165,9 +165,9 @@ static void set_defaut_ecu(void)
 static void set_defaut_wifi(void)
 {
     ESP_LOGI(TAG, "Taille de wifi_params %d",sizeof(_wifi_params_t));
-    strcpy(wifi_params.ssid,"Zigbee") ;
+    strcpy(wifi_params.ssid,"SSID") ;
     ESP_LOGI(TAG, "SSID : %s",wifi_params.ssid);
-    strcpy(wifi_params.password,"tototata") ;
+    strcpy(wifi_params.password,"PASSWORD") ;
     ESP_LOGI(TAG, "Password : %s",wifi_params.password);
     wifi_params.retry = 5 ;
     ESP_LOGI(TAG, "Retry : %d",wifi_params.retry);

@@ -808,18 +808,18 @@ static esp_err_t wifi_get_handler(httpd_req_t *req)
 	httpd_resp_sendstr_chunk(req, "<b>SSID</b><br>");
 	httpd_resp_sendstr_chunk(req, "<input id=\"ssid\" placeholder=\"\" value=\"");
 	httpd_resp_sendstr_chunk(req, wifi_params.ssid) ;
-	httpd_resp_sendstr_chunk(req, "\" name=\"ssid\"></p><p>");
+	httpd_resp_sendstr_chunk(req, "\" name=\"ssid\" minlength=\"1\" maxlength=\"32\"></p><p>");
 	/*Password*/
 	httpd_resp_sendstr_chunk(req, "<b>Clef</b><br>");
 	httpd_resp_sendstr_chunk(req, "<input id=\"password\" placeholder=\"\" value=\"");
 	httpd_resp_sendstr_chunk(req, wifi_params.password) ;
-	httpd_resp_sendstr_chunk(req, "\" name=\"password\"></p><p>");
+	httpd_resp_sendstr_chunk(req, "\" name=\"password\" minlength=\"8\" maxlength=\"64\"></p><p>");
 
 	httpd_resp_sendstr_chunk(req, "<b>Nombre de tentatives de connection</b><br>");
 	httpd_resp_sendstr_chunk(req, "<input id=\"retry\" placeholder=\"\" value=\"");
 	itoa(wifi_params.retry,tmp,10) ;
 	httpd_resp_sendstr_chunk(req, tmp) ;
-	httpd_resp_sendstr_chunk(req, "\" name=\"retry\"></p><p>");
+	httpd_resp_sendstr_chunk(req, "\" name=\"retry\" type=\"number\" min=\"1\" max=\"50\"></p><p>");
 	
 	httpd_resp_sendstr_chunk(req, "<button name=\"save\" type=\"submit\" class=\"button bgrn\">Sauvegarde</button>") ;
 	httpd_resp_sendstr_chunk(req, "</form></fieldset>") ;
@@ -1007,8 +1007,9 @@ static esp_err_t frontpage(httpd_req_t *req)
 		favicon_get_handler(req) ;
 	else if(strcmp(filename, "/wifi") == 0) 
 		wifi_get_handler(req) ;
-	else if(strcmp(filename, "/stopwifi") == 0) 
+	else if(strcmp(filename, "/stopwifi") == 0) {
 		ESP_ERROR_CHECK(esp_wifi_stop() );
+		vTaskDelete( xWebHandle ); }
 	else if(strcmp(filename, "/") == 0 ) 
 	{
 		// Send HTML header

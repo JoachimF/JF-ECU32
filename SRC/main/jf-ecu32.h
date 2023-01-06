@@ -70,6 +70,12 @@ typedef struct {
 enum phases {
     WAIT,START,GLOW,KEROSTART,PREHEAT,RAMP,IDLE,PURGE,COOL
  };
+
+enum manche_de_gaz {
+    COUPE,RALENTI,MIGAZ,PLEINGAZ
+ };
+
+
 /*
 typedef union {                            
   uint32_t data;                           
@@ -145,16 +151,24 @@ typedef struct {
   uint16_t EGT ;
   _PUMP_t pump1 ;
   _PUMP_t pump2 ;
+  _PUMP_t starter ;
   _GLOW_t glow ;
   _VALVE_t vanne1 ; //Vanne KEROSTART/GAZ
   _VALVE_t vanne2 ; //Vanne KERO
   uint8_t phase_fonctionnement ;
+  uint8_t position_gaz ;
 } _engine_t;
 
+//Taches
 TaskHandle_t xlogHandle ;
 TaskHandle_t xWebHandle ;
+TaskHandle_t xecuHandle ;
+
+//Timers
 TimerHandle_t xTimer1s ;
 TimerHandle_t xTimer60s ;
+
+// Semaphores
 SemaphoreHandle_t xTimeMutex;
 
 
@@ -168,5 +182,6 @@ void log_task( void * pvParameters ) ;
 void create_timers(void) ;
 void vTimer1sCallback( TimerHandle_t pxTimer ) ;
 void vTimer60sCallback( TimerHandle_t pxTimer ) ;
+void ecu_task(void * pvParameters ) ;
 
 #endif

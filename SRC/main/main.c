@@ -117,12 +117,17 @@ void app_main()
 	sprintf(cparam0, IPSTR, IP2STR(&ip_info.ip));
 	xTaskCreate(http_server_task, "HTTP", 1024*6, (void *)cparam0, 2, &xWebHandle);
 	configASSERT( xWebHandle ) ;
+	
 	head_logs_file();
+	
 	xTaskCreate(log_task, "LOG", 1024*6, NULL, 2, &xlogHandle);
-	
 	configASSERT( xlogHandle );
-	vTaskSuspend( xlogHandle );
+	vTaskSuspend( xlogHandle ); 
 	
+	xTaskCreatePinnedToCore(ecu_task, "ECU", 1024*6, NULL, ( 1UL | portPRIVILEGE_BIT ), &xecuHandle,1);
+	configASSERT( xecuHandle );
+
+
 	vTaskDelay(10);
 	/*
 	set_kero_pump_target(36000);
