@@ -14619,7 +14619,10 @@
                                 "help": "DHCP client will send this many probes before self-assigning a\nlink local address.\n\nFrom LWIP help: \"This can be set as low as 1 to get an AutoIP\naddress very quickly, but you should be prepared to handle a\nchanging IP address when DHCP overrides AutoIP.\" (In the case of\nESP-IDF, this means multiple SYSTEM_EVENT_STA_GOT_IP events.)",
                                 "id": "LWIP_AUTOIP_TRIES",
                                 "name": "LWIP_AUTOIP_TRIES",
-                                "range": null,
+                                "range": [
+                                    1,
+                                    100
+                                ],
                                 "title": "DHCP Probes before self-assigning IPv4 LL address",
                                 "type": "int"
                             },
@@ -14629,7 +14632,10 @@
                                 "help": "If the AUTOIP functionality detects this many IP conflicts while\nself-assigning an address, it will go into a rate limited mode.",
                                 "id": "LWIP_AUTOIP_MAX_CONFLICTS",
                                 "name": "LWIP_AUTOIP_MAX_CONFLICTS",
-                                "range": null,
+                                "range": [
+                                    1,
+                                    100
+                                ],
                                 "title": "Max IP conflicts before rate limiting",
                                 "type": "int"
                             },
@@ -14639,7 +14645,10 @@
                                 "help": "If rate limiting self-assignment requests, wait this long between\neach request.",
                                 "id": "LWIP_AUTOIP_RATE_LIMIT_INTERVAL",
                                 "name": "LWIP_AUTOIP_RATE_LIMIT_INTERVAL",
-                                "range": null,
+                                "range": [
+                                    5,
+                                    120
+                                ],
                                 "title": "Rate limited interval (seconds)",
                                 "type": "int"
                             }

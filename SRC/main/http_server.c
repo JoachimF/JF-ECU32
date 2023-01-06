@@ -19,13 +19,21 @@
 #include "esp_spiffs.h"
 #include "nvs.h"
 #include "esp_http_server.h"
-#include "jf-ecu32.h"
+#include "esp_wifi.h"
 
+#include "jf-ecu32.h"
+#include "nvs_ecu.h"
 #include "http_server.h"
+#include "wifi.h"
 
 static const char *TAG = "HTTP";
 
 #define STORAGE_NAMESPACE "storage"
+
+extern QueueHandle_t xQueueHttp;
+extern _BITsconfigECU_u config_ECU ;
+extern _configEngine_t turbine_config ;
+extern _wifi_params_t wifi_params ;
 
 esp_err_t save_key_value(char * key, char * value)
 {
@@ -80,13 +88,13 @@ int find_value(char * key, char * parameter, char * value)
 	//char * addr1;
 	char * addr1 = strstr(parameter, key);
 	if (addr1 == NULL) return 0;
-	ESP_LOGI(TAG, "addr1=%s", addr1);
+	//ESP_LOGI(TAG, "addr1=%s", addr1);
 
 	char * addr2 = addr1 + strlen(key);
-	ESP_LOGI(TAG, "addr2=[%s]", addr2);
+	//ESP_LOGI(TAG, "addr2=[%s]", addr2);
 
 	char * addr3 = strstr(addr2, "&");
-	ESP_LOGI(TAG, "addr3=%p", addr3);
+	//ESP_LOGI(TAG, "addr3=%p", addr3);
 	if (addr3 == NULL) {
 		strcpy(value, addr2);
 	} else {
@@ -95,7 +103,7 @@ int find_value(char * key, char * parameter, char * value)
 		strncpy(value, addr2, length);
 		value[length] = 0;
 	}
-	ESP_LOGI(TAG, "key=[%s] value=[%s]", key, value);
+	//ESP_LOGI(TAG, "key=[%s] value=[%s]", key, value);
 	return strlen(value);
 }
 
@@ -397,43 +405,7 @@ static esp_err_t logs_get_handler(httpd_req_t *req)
 	return ESP_OK;
 }
 
-static esp_err_t frontpage(httpd_req_t *req)
-{
-	ESP_LOGI(TAG, "root_get_handler req->uri=[%s]", req->uri);
 
-	// Send HTML header
-	httpd_resp_sendstr_chunk(req, "<!DOCTYPE html><html>");
-	Text2Html(req, "/html/head.html");
-
-	httpd_resp_sendstr_chunk(req, "<h2>");
-	httpd_resp_sendstr_chunk(req, turbine_config.name);
-	httpd_resp_sendstr_chunk(req, "</h2>");
-		
-	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"configecu\">");
-	httpd_resp_sendstr_chunk(req, "<button>Paramètres ECU</button></form>");
-	httpd_resp_sendstr_chunk(req, "</form>");
-	httpd_resp_sendstr_chunk(req, "<p></p>");
-	
-	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"configmoteur\">");
-	httpd_resp_sendstr_chunk(req, "<button>Paramètres moteur</button></form>");
-	httpd_resp_sendstr_chunk(req, "</form>");
-	httpd_resp_sendstr_chunk(req, "<p></p>");
-	
-	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"info\">");
-	httpd_resp_sendstr_chunk(req, "<button>Information</button></form>");
-	httpd_resp_sendstr_chunk(req, "</form>");
-	httpd_resp_sendstr_chunk(req, "<p></p>");
-	
-	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"logs\">");
-	httpd_resp_sendstr_chunk(req, "<button>Logs</button></form>");
-	httpd_resp_sendstr_chunk(req, "</form>");
-	httpd_resp_sendstr_chunk(req, "<p></p>");
-
-	Text2Html(req, "/html/footer.html");
-	httpd_resp_sendstr_chunk(req, NULL); //fin de la page
-
-	return ESP_OK;
-}
 
 static esp_err_t logs(httpd_req_t *req)
 {
@@ -469,16 +441,16 @@ static esp_err_t logs(httpd_req_t *req)
 
 void save_configecu(httpd_req_t *req)
 {
-	char *buf = malloc(strlen(req->uri+5)) ;
+	char *buf = malloc(strlen(req->uri)+1) ;
 	char param[20] ;
 	int len;
 
 	ESP_LOGI(TAG, "Sauvegarde config ECU");
-	ESP_LOGI(TAG, "Uri=%s",req->uri);
-	ESP_LOGI(TAG, "Uri len=%d",strlen(req->uri));
+//	ESP_LOGI(TAG, "Uri=%s",req->uri);
+//	ESP_LOGI(TAG, "Uri len=%d",req->content_len);
 	strcpy(buf,req->uri) ;
-	ESP_LOGI(TAG, "buf=%s",buf);
-	ESP_LOGI(TAG, "buf len=%d",strlen(buf));
+//	ESP_LOGI(TAG, "buf=%s",buf);
+//	ESP_LOGI(TAG, "buf len=%d",strlen(buf));
 	len = find_value("input=",buf,param) ;
 	ESP_LOGI(TAG, "input=%c len=%d",*param,len);
 	if(len==1) {
@@ -529,13 +501,13 @@ void save_configecu(httpd_req_t *req)
 	if(len==1) {
 		switch(*param){
 			case '0' : 
-			config_ECU.use_telem = NONE ;
+			config_ECU.use_telem = FUTABA ;
 			break ;
 			case '1' :
 			config_ECU.use_telem = FRSKY ;
 			break ;
 			case '2' :
-			config_ECU.use_telem = FUTABA ;
+			config_ECU.use_telem = NONE ;
 			break ;
 		}
 	}
@@ -544,13 +516,13 @@ void save_configecu(httpd_req_t *req)
 	if(len==1) {
 		switch(*param){
 			case '0' :
-			config_ECU.output_pump2 = NONE ;
-			break;
-			case '1' :
 			config_ECU.output_pump2 = PPM ;
 			break;
-			case '2' :
+			case '1' :
 			config_ECU.output_pump2 = PWM ;
+			break;
+			case '2' :
+			config_ECU.output_pump2 = NONE ;
 			break;
 		}
 	}
@@ -630,42 +602,46 @@ static esp_err_t configecu(httpd_req_t *req)
 	httpd_resp_sendstr_chunk(req, "</fieldset><p>") ;
 	/*Type de pompe*/
 	httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Pompe 1</b></legend>") ;
-		httpd_resp_sendstr_chunk(req, "<p><input id=\"output_pump1_pwm\" name=\"output_pump1\" type=\"radio\" value=\"0\"") ;
+		httpd_resp_sendstr_chunk(req, "<p><input id=\"output_pump1_pwm\" name=\"output_pump1\" type=\"radio\" value=\"1\"") ;
 		httpd_resp_sendstr_chunk(req, (config_ECU.output_pump1 == PWM) ? "checked=\"\"" :" " ) ;
 		httpd_resp_sendstr_chunk(req, "><b>Moteur DC</b>") ;
 		
-		httpd_resp_sendstr_chunk(req, "<p><input id=\"output_pump1_ppm\" name=\"output_pump1\" type=\"radio\" value=\"1\"") ;
+		httpd_resp_sendstr_chunk(req, "<p><input id=\"output_pump1_ppm\" name=\"output_pump1\" type=\"radio\" value=\"0\"") ;
 		httpd_resp_sendstr_chunk(req, (config_ECU.output_pump1 == PPM) ? "checked=\"\"" :" " ) ;
 		httpd_resp_sendstr_chunk(req, "><b>Variateur</b>") ;
 	httpd_resp_sendstr_chunk(req, "</fieldset><p>") ;
 	/*Type de démarreur*/
 	httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Démarreur</b></legend>") ;
-		httpd_resp_sendstr_chunk(req, "<p><input id=\"output_starter_pwm\" name=\"output_starter\" type=\"radio\" value=\"0\"") ;
+		httpd_resp_sendstr_chunk(req, "<p><input id=\"output_starter_pwm\" name=\"output_starter\" type=\"radio\" value=\"1\"") ;
 		httpd_resp_sendstr_chunk(req, (config_ECU.output_starter == PWM) ? "checked=\"\"" :" " ) ;
 		httpd_resp_sendstr_chunk(req, "><b>Moteur DC</b>") ;
 		
-		httpd_resp_sendstr_chunk(req, "<p><input id=\"output_starter_ppm\" name=\"output_starter\" type=\"radio\" value=\"1\"") ;
+		httpd_resp_sendstr_chunk(req, "<p><input id=\"output_starter_ppm\" name=\"output_starter\" type=\"radio\" value=\"0\"") ;
 		httpd_resp_sendstr_chunk(req, (config_ECU.output_starter == PPM) ? "checked=\"\"" :" " ) ;
 		httpd_resp_sendstr_chunk(req, "><b>Variateur</b>") ;
 	httpd_resp_sendstr_chunk(req, "</fieldset><p>") ;
 	/*Type de télémétrie*/
 	httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Télémétrie</b></legend>") ;
-		httpd_resp_sendstr_chunk(req, "<p><input id=\"no_telem\" name=\"telem\" type=\"radio\" value=\"0\"") ;
-		httpd_resp_sendstr_chunk(req, (config_ECU.use_telem == NONE) ? "checked=\"\"" :" " ) ;
+		httpd_resp_sendstr_chunk(req, "<p><input id=\"futaba_telem\" name=\"telem\" type=\"radio\" value=\"0\"") ;
+		httpd_resp_sendstr_chunk(req, (config_ECU.use_telem == FUTABA ) ? "checked=\"\"" :" " ) ;
 		httpd_resp_sendstr_chunk(req, "><b>Désactivée</b>") ;
 	
 		httpd_resp_sendstr_chunk(req, "<p><input id=\"use_frsky_telem\" name=\"telem\" type=\"radio\" value=\"1\"") ;
 		httpd_resp_sendstr_chunk(req, (config_ECU.use_telem == FRSKY ) ? "checked=\"\"" :" " ) ;
 		httpd_resp_sendstr_chunk(req, "><b>FrSky</b>") ;
+
+		httpd_resp_sendstr_chunk(req, "<p><input id=\"use_hott_telem\" name=\"telem\" type=\"radio\" value=\"3\"") ;
+		httpd_resp_sendstr_chunk(req, (config_ECU.use_telem == HOTT ) ? "checked=\"\"" :" " ) ;
+		httpd_resp_sendstr_chunk(req, "><b>FrSky</b>") ;
 		
-		httpd_resp_sendstr_chunk(req, "<p><input id=\"use_futaba_telem\" name=\"telem\" type=\"radio\" value=\"2\"") ;
-		httpd_resp_sendstr_chunk(req, (config_ECU.use_telem == FUTABA) ? "checked=\"\"" :" " ) ;
+		httpd_resp_sendstr_chunk(req, "<p><input id=\"no_telem\" name=\"telem\" type=\"radio\" value=\"2\"") ;
+		httpd_resp_sendstr_chunk(req, (config_ECU.use_telem == NONE ) ? "checked=\"\"" :" " ) ;
 		httpd_resp_sendstr_chunk(req, "><b>Futaba</b>") ;
 	httpd_resp_sendstr_chunk(req, "</fieldset><p>") ;
 	/*Pompe 2*/
 	httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Pompe 2</b></legend>") ;
 		httpd_resp_sendstr_chunk(req, "<p><input id=\"no_pump2\" name=\"output_pump2\" type=\"radio\" value=\"0\"") ;
-		httpd_resp_sendstr_chunk(req, (config_ECU.output_pump2 == NONE) ? "checked=\"\"" :" " ) ;
+		httpd_resp_sendstr_chunk(req, (config_ECU.output_pump2 == PPM) ? "checked=\"\"" :" " ) ;
 		httpd_resp_sendstr_chunk(req, "><b>Désactivée</b>") ;
 
 		httpd_resp_sendstr_chunk(req, "<p><input id=\"output_pump2_pwm\" name=\"output_pump2\" type=\"radio\" value=\"1\"") ;
@@ -673,7 +649,7 @@ static esp_err_t configecu(httpd_req_t *req)
 		httpd_resp_sendstr_chunk(req, "><b>Moteur DC</b>") ;
 		
 		httpd_resp_sendstr_chunk(req, "<p><input id=\"output_pump2_ppm\" name=\"output_pump2\" type=\"radio\" value=\"2\"") ;
-		httpd_resp_sendstr_chunk(req, (config_ECU.output_pump2 == PPM) ? "checked=\"\"" :" " ) ;
+		httpd_resp_sendstr_chunk(req, (config_ECU.output_pump2 == NONE) ? "checked=\"\"" :" " ) ;
 		httpd_resp_sendstr_chunk(req, "><b>Variateur</b>") ;
 	httpd_resp_sendstr_chunk(req, "</fieldset><p>") ;
 	/*Voie aux*/
@@ -699,7 +675,7 @@ static esp_err_t configecu(httpd_req_t *req)
 
 void save_configturbine(httpd_req_t *req)
 {
-	char *buf = malloc(strlen(req->uri+1)) ;
+	char *buf = malloc(strlen(req->uri)+1) ;
 	char param[30] ;
 	int len;
 
@@ -781,6 +757,81 @@ void save_configturbine(httpd_req_t *req)
 	free(buf) ;
 }
 
+void save_configwifi(httpd_req_t *req)
+{
+	char *buf = malloc(strlen(req->uri)+1) ;
+	char param[30] ;
+	int len;
+
+	strcpy(buf,req->uri) ;
+	ESP_LOGI(TAG, "Sauvegarde config wifi");
+	/*SSID*/
+	len = find_value("ssid=",buf,param) ;
+	ESP_LOGI(TAG, "ssid=%c len=%d",*param,len);
+	if(len>1) {
+		strcpy(wifi_params.ssid,param) ;
+	}
+	/*Password*/
+	len = find_value("pasword=",buf,param) ;
+	ESP_LOGI(TAG, "pasword=%c len=%d",*param,len);
+	if(len>1) {
+		strcpy(wifi_params.password,param) ;
+	}
+		/*Min pump2*/
+	len = find_value("retry=",buf,param) ;
+	ESP_LOGI(TAG, "retry=%c len=%d",*param,len);
+	if(len>1) {
+		wifi_params.retry = atoi(param) ;		
+	}
+	write_nvs_wifi() ;
+	free(buf) ;
+}
+
+static esp_err_t wifi_get_handler(httpd_req_t *req)
+{
+	ESP_LOGI(TAG, "root_get_handler req->uri=[%s]", req->uri);
+
+	char * addr1 = strstr(req->uri, "save=");
+	if (addr1 != NULL) save_configwifi(req) ; // Paramètres a sauvagarder
+		
+	char tmp[10] ;
+	// Send HTML header
+	httpd_resp_sendstr_chunk(req, "<!DOCTYPE html><html>");
+	Text2Html(req, "/html/head.html");
+
+	httpd_resp_sendstr_chunk(req, "<h2>");
+	httpd_resp_sendstr_chunk(req, turbine_config.name);
+	httpd_resp_sendstr_chunk(req, "</h2></div>");
+		
+	httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Paramètres Wifi&nbsp;</b></legend><form method=\"GET\" action=\"wifi\"><p>") ;
+	/*SSID*/
+	httpd_resp_sendstr_chunk(req, "<b>SSID</b><br>");
+	httpd_resp_sendstr_chunk(req, "<input id=\"ssid\" placeholder=\"\" value=\"");
+	httpd_resp_sendstr_chunk(req, wifi_params.ssid) ;
+	httpd_resp_sendstr_chunk(req, "\" name=\"ssid\"></p><p>");
+	/*Password*/
+	httpd_resp_sendstr_chunk(req, "<b>Clef</b><br>");
+	httpd_resp_sendstr_chunk(req, "<input id=\"password\" placeholder=\"\" value=\"");
+	httpd_resp_sendstr_chunk(req, wifi_params.password) ;
+	httpd_resp_sendstr_chunk(req, "\" name=\"password\"></p><p>");
+
+	httpd_resp_sendstr_chunk(req, "<b>Nombre de tentatives de connection</b><br>");
+	httpd_resp_sendstr_chunk(req, "<input id=\"retry\" placeholder=\"\" value=\"");
+	itoa(wifi_params.retry,tmp,10) ;
+	httpd_resp_sendstr_chunk(req, tmp) ;
+	httpd_resp_sendstr_chunk(req, "\" name=\"retry\"></p><p>");
+	
+	httpd_resp_sendstr_chunk(req, "<button name=\"save\" type=\"submit\" class=\"button bgrn\">Sauvegarde</button>") ;
+	httpd_resp_sendstr_chunk(req, "</form></fieldset>") ;
+
+	httpd_resp_sendstr_chunk(req, "<p></p><form action=\"/\" method=\"get\"><button name="">Retour</button></form>") ;
+	
+	Text2Html(req, "/html/footer.html");
+	httpd_resp_sendstr_chunk(req, NULL); //fin de la page
+
+	return ESP_OK;
+}
+
 static esp_err_t configmoteur(httpd_req_t *req)
 {
 	ESP_LOGI(TAG, "root_get_handler req->uri=[%s]", req->uri);
@@ -802,85 +853,85 @@ static esp_err_t configmoteur(httpd_req_t *req)
 	httpd_resp_sendstr_chunk(req, "<b>Nom du moteur</b><br>");
 	httpd_resp_sendstr_chunk(req, "<input id=\"name\" placeholder=\"\" value=\"");
 	httpd_resp_sendstr_chunk(req, turbine_config.name) ;
-	httpd_resp_sendstr_chunk(req, "\" name=\"name\"></p><p>");
+	httpd_resp_sendstr_chunk(req, "\" name=\"name\" minlength=\"1\" maxlength=\"20\"></p><p>");
 
 	httpd_resp_sendstr_chunk(req, "<b>Puissance de la bougie 0-255</b><br>");
 	httpd_resp_sendstr_chunk(req, "<input id=\"glow_power\" placeholder=\"\" value=\"");
 	itoa(turbine_config.glow_power,tmp,10) ;
 	httpd_resp_sendstr_chunk(req, tmp) ;
-	httpd_resp_sendstr_chunk(req, "\" name=\"glow_power\"></p><p>");
+	httpd_resp_sendstr_chunk(req, "\" name=\"glow_power\" type=\"number\" min=\"0\" max=\"255\"></p><p>");
 
 	httpd_resp_sendstr_chunk(req, "<b>RPM plein gaz</b><br>");
 	httpd_resp_sendstr_chunk(req, "<input id=\"jet_full_power_rpm\" placeholder=\"\" value=\"");
 	itoa(turbine_config.jet_full_power_rpm,tmp,10) ;
 	httpd_resp_sendstr_chunk(req, tmp) ;
-	httpd_resp_sendstr_chunk(req, "\" name=\"jet_full_power_rpm\"></p><p>");
+	httpd_resp_sendstr_chunk(req, "\" name=\"jet_full_power_rpm\" type=\"number\" min=\"0\" max=\"300000\"></p><p>");
 
 	httpd_resp_sendstr_chunk(req, "<b>RPM ralenti</b><br>");
 	httpd_resp_sendstr_chunk(req, "<input id=\"jet_idle_rpm\" placeholder=\"\" value=\"");
 	itoa(turbine_config.jet_idle_rpm,tmp,10) ;
 	httpd_resp_sendstr_chunk(req, tmp) ;
-	httpd_resp_sendstr_chunk(req, "\" name=\"\"></p><p>");
+	httpd_resp_sendstr_chunk(req, "\" name=\"\"  type=\"number\" min=\"0\" max=\"300000\"></p><p>");
 
 	httpd_resp_sendstr_chunk(req, "<b>RPM mini</b><br>");
 	httpd_resp_sendstr_chunk(req, "<input id=\"jet_min_rpm\" placeholder=\"\" value=\"");
 	itoa(turbine_config.jet_min_rpm,tmp,10) ;
 	httpd_resp_sendstr_chunk(req, tmp) ;
-	httpd_resp_sendstr_chunk(req, "\" name=\"jet_min_rpm\"></p><p>");
+	httpd_resp_sendstr_chunk(req, "\" name=\"jet_min_rpm\"  type=\"number\" min=\"0\" max=\"100000\"></p><p>");
 
 	httpd_resp_sendstr_chunk(req, "<b>Température de démarrage en °C</b><br>");
 	httpd_resp_sendstr_chunk(req, "<input id=\"start_temp\" placeholder=\"\" value=\"");
 	itoa(turbine_config.start_temp,tmp,10) ;
 	httpd_resp_sendstr_chunk(req, tmp) ;
-	httpd_resp_sendstr_chunk(req, "\" name=\"start_temp\"></p><p>");
+	httpd_resp_sendstr_chunk(req, "\" name=\"start_temp\"  type=\"number\" min=\"0\" max=\"500\"></p><p>");
 
 	httpd_resp_sendstr_chunk(req, "<b>Température max en °C</b><br>");
 	httpd_resp_sendstr_chunk(req, "<input id=\"max_temp\" placeholder=\"\" value=\"");
 	itoa(turbine_config.max_temp,tmp,10) ;
 	httpd_resp_sendstr_chunk(req, tmp) ;
-	httpd_resp_sendstr_chunk(req, "\" name=\"max_temp\"></p><p>");
+	httpd_resp_sendstr_chunk(req, "\" name=\"max_temp\"  type=\"number\" min=\"0\" max=\"1000\"></p><p>");
 
 	httpd_resp_sendstr_chunk(req, "<b>Délai d'accélération (0-100)</b><br>");
 	httpd_resp_sendstr_chunk(req, "<input id=\"acceleration_delay\" placeholder=\"\" value=\"");
 	itoa(turbine_config.acceleration_delay,tmp,10) ;
 	httpd_resp_sendstr_chunk(req, tmp) ;
-	httpd_resp_sendstr_chunk(req, "\" name=\"acceleration_delay\"></p><p>");
+	httpd_resp_sendstr_chunk(req, "\" name=\"acceleration_delay\"  type=\"number\" min=\"0\" max=\"30\"></p><p>");
 
 	httpd_resp_sendstr_chunk(req, "<b>Délai de décélération (0-100)</b><br>");
 	httpd_resp_sendstr_chunk(req, "<input id=\"deceleration_delay\" placeholder=\"\" value=\"");
 	itoa(turbine_config.deceleration_delay,tmp,10) ;
 	httpd_resp_sendstr_chunk(req, tmp) ;
-	httpd_resp_sendstr_chunk(req, "\" name=\"deceleration_delay\"></p><p>");
+	httpd_resp_sendstr_chunk(req, "\" name=\"deceleration_delay\"  type=\"number\" min=\"0\" max=\"30\"></p><p>");
 
 	httpd_resp_sendstr_chunk(req, "<b>Délai de stabilité (0-100)</b><br>");
 	httpd_resp_sendstr_chunk(req, "<input id=\"stability_delay\" placeholder=\"\" value=\"");
 	itoa(turbine_config.stability_delay,tmp,10) ;
 	httpd_resp_sendstr_chunk(req, tmp) ;
-	httpd_resp_sendstr_chunk(req, "\" name=\"stability_delay\"></p><p>");
+	httpd_resp_sendstr_chunk(req, "\" name=\"stability_delay\"  type=\"number\" min=\"0\" max=\"30\"></p><p>");
 
 	httpd_resp_sendstr_chunk(req, "<b>PWM Max pompe 1 (0-1024)</b><br>");
 	httpd_resp_sendstr_chunk(req, "<input id=\"max_pump1\" placeholder=\"\" value=\"");
 	itoa(turbine_config.max_pump1,tmp,10) ;
 	httpd_resp_sendstr_chunk(req, tmp) ;
-	httpd_resp_sendstr_chunk(req, "\" name=\"max_pump1\"></p><p>");
+	httpd_resp_sendstr_chunk(req, "\" name=\"max_pump1\"  type=\"number\" min=\"0\" max=\"1024\"></p><p>");
 
 	httpd_resp_sendstr_chunk(req, "<b>PWM Min pompe 1 (0-1024)</b><br>");
 	httpd_resp_sendstr_chunk(req, "<input id=\"min_pump1\" placeholder=\"\" value=\"");
 	itoa(turbine_config.min_pump1,tmp,10) ;
 	httpd_resp_sendstr_chunk(req, tmp) ;
-	httpd_resp_sendstr_chunk(req, "\" name=\"min_pump1\"></p><p>");
+	httpd_resp_sendstr_chunk(req, "\" name=\"min_pump1\" type=\"number\" min=\"0\" max=\"1024\"></p><p>");
 
 	httpd_resp_sendstr_chunk(req, "<b>PWM Max pompe 2 (0-1024)</b><br>");
 	httpd_resp_sendstr_chunk(req, "<input id=\"max_pump2\" placeholder=\"\" value=\"");
 	itoa(turbine_config.max_pump2,tmp,10) ;
 	httpd_resp_sendstr_chunk(req, tmp) ;
-	httpd_resp_sendstr_chunk(req, "\" name=\"max_pump2\"></p><p>");
+	httpd_resp_sendstr_chunk(req, "\" name=\"max_pump2\" type=\"number\" min=\"0\" max=\"1024\"></p><p>");
 
 	httpd_resp_sendstr_chunk(req, "<b>PWM Min pompe 2 (0-1024)</b><br>");
 	httpd_resp_sendstr_chunk(req, "<input id=\"min_pump2\" placeholder=\"\" value=\"");
 	itoa(turbine_config.min_pump2,tmp,10) ;
 	httpd_resp_sendstr_chunk(req, tmp) ;
-	httpd_resp_sendstr_chunk(req, "\" name=\"min_pump2\"></p><p>");
+	httpd_resp_sendstr_chunk(req, "\" name=\"min_pump2\" type=\"number\" min=\"0\" max=\"1024\"></p><p>");
 
 	httpd_resp_sendstr_chunk(req, "<button name=\"save\" type=\"submit\" class=\"button bgrn\">Sauvegarde</button>") ;
 	httpd_resp_sendstr_chunk(req, "</form></fieldset>") ;
@@ -890,6 +941,122 @@ static esp_err_t configmoteur(httpd_req_t *req)
 	Text2Html(req, "/html/footer.html");
 	httpd_resp_sendstr_chunk(req, NULL); //fin de la page
 
+	return ESP_OK;
+}
+
+static esp_err_t slider(httpd_req_t *req)
+{
+	ESP_LOGI(TAG, "slider_get_handler req->uri=[%s]", req->uri);
+	Text2Html(req, "/html/slider.html");
+	httpd_resp_sendstr_chunk(req, NULL); //fin de la page
+	return ESP_OK;
+}
+#define MIN(A,B) (A<B) ? A: B
+
+static const char* get_path_from_uri(char *dest, const char *uri, size_t destsize)
+{
+    size_t pathlen = strlen(uri);
+
+    const char *quest = strchr(uri, '?');
+    if (quest) 
+    {
+        pathlen = MIN(pathlen, quest - uri);
+    }
+    const char *hash = strchr(uri, '#');
+    if (hash) 
+    {
+        pathlen = MIN(pathlen, hash - uri);
+    }
+
+    // construit le chemin complet (base + path)
+    strlcpy(dest, uri, pathlen + 1);
+
+    // retourne le pointeur ver les chemin (sans la base)
+    return dest;
+}
+
+static esp_err_t frontpage(httpd_req_t *req)
+{
+	ESP_LOGI(TAG, "root_get_handler req->uri=[%s]", req->uri);
+    char filepath[20];
+    ESP_LOGI(TAG, "URI : %s", req->uri);
+
+    const char *filename = get_path_from_uri(filepath, req->uri, sizeof(filepath));
+    if (!filename) 
+    {
+        ESP_LOGE(TAG, "Filename is too long");
+        // retourne une erreur 500 (Internal Server Error)
+        httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Filename too long");
+        return ESP_FAIL;
+    }
+	ESP_LOGI(TAG, "File : %s", filename);
+
+	if(strcmp(filename, "/configecu") == 0) 
+		configecu(req) ;
+	else if(strcmp(filename, "/configmoteur") == 0) 
+		configmoteur(req) ;
+	else if(strcmp(filename, "/logs") == 0) 
+		logs(req) ;
+	else if(strcmp(filename, "/slider") == 0) 
+		slider(req) ;
+	else if(strcmp(filename, "/curves.txt") == 0) 
+		curves_get_handler(req) ;
+	else if(strcmp(filename, "/logs.txt") == 0) 
+		logs_get_handler(req) ;
+	else if(strcmp(filename, "/favicon.ico") == 0) 
+		favicon_get_handler(req) ;
+	else if(strcmp(filename, "/wifi") == 0) 
+		wifi_get_handler(req) ;
+	else if(strcmp(filename, "/stopwifi") == 0) 
+		ESP_ERROR_CHECK(esp_wifi_stop() );
+	else if(strcmp(filename, "/") == 0 ) 
+	{
+		// Send HTML header
+	httpd_resp_sendstr_chunk(req, "<!DOCTYPE html><html>");
+	Text2Html(req, "/html/head.html");
+
+	httpd_resp_sendstr_chunk(req, "<h2>");
+	httpd_resp_sendstr_chunk(req, turbine_config.name);
+	httpd_resp_sendstr_chunk(req, "</h2>");
+		
+	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"configecu\">");
+	httpd_resp_sendstr_chunk(req, "<button>Paramètres ECU</button></form>");
+	httpd_resp_sendstr_chunk(req, "</form>");
+	httpd_resp_sendstr_chunk(req, "<p></p>");
+	
+	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"configmoteur\">");
+	httpd_resp_sendstr_chunk(req, "<button>Paramètres moteur</button></form>");
+	httpd_resp_sendstr_chunk(req, "</form>");
+	httpd_resp_sendstr_chunk(req, "<p></p>");
+	
+	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"info\">");
+	httpd_resp_sendstr_chunk(req, "<button>Information</button></form>");
+	httpd_resp_sendstr_chunk(req, "</form>");
+	httpd_resp_sendstr_chunk(req, "<p></p>");
+	
+	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"logs\">");
+	httpd_resp_sendstr_chunk(req, "<button>Logs</button></form>");
+	httpd_resp_sendstr_chunk(req, "</form>");
+	httpd_resp_sendstr_chunk(req, "<p></p>");
+
+	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"wifi\">");
+	httpd_resp_sendstr_chunk(req, "<button>WiFi</button></form>");
+	httpd_resp_sendstr_chunk(req, "</form>");
+	httpd_resp_sendstr_chunk(req, "<p></p>");
+
+	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"slider\">");
+	httpd_resp_sendstr_chunk(req, "<button>Slider</button></form>");
+	httpd_resp_sendstr_chunk(req, "</form>");
+	httpd_resp_sendstr_chunk(req, "<p></p>");
+
+	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"stopwifi\">");
+	httpd_resp_sendstr_chunk(req, "<button class=\"button bred\">Couper le WiFi</button></form>");
+	httpd_resp_sendstr_chunk(req, "</form>");
+	httpd_resp_sendstr_chunk(req, "<p></p>");
+
+	Text2Html(req, "/html/footer.html");
+	httpd_resp_sendstr_chunk(req, NULL); //fin de la page
+	}
 	return ESP_OK;
 }
 
@@ -913,7 +1080,7 @@ esp_err_t start_server(const char *base_path, int port)
 
 	/* URI handler for get */
 	httpd_uri_t _root_get_handler = {
-		.uri		 = "/",
+		.uri		 = "/*",
 		.method		 = HTTP_GET,
 		.handler	 = frontpage, //root_get_handler,
 		//.user_ctx  = server_data	// Pass server data as context
@@ -921,31 +1088,6 @@ esp_err_t start_server(const char *base_path, int port)
 
 	httpd_register_uri_handler(server, &_root_get_handler);
 
-	httpd_uri_t _configmoteur_get_handler = {
-		.uri		 = "/configmoteur",
-		.method		 = HTTP_GET,
-		.handler	 = configmoteur, //root_get_handler,
-		//.user_ctx  = server_data	// Pass server data as context
-	};
-
-	httpd_register_uri_handler(server, &_configmoteur_get_handler);
-
-		httpd_uri_t _configecu_get_handler = {
-		.uri		 = "/configecu",
-		.method		 = HTTP_GET,
-		.handler	 = configecu, //root_get_handler,
-		//.user_ctx  = server_data	// Pass server data as context
-	};
-	httpd_register_uri_handler(server, &_configecu_get_handler);
-
-	httpd_uri_t _logs_get_handler = {
-		.uri		 = "/logs",
-		.method		 = HTTP_GET,
-		.handler	 = logs, //root_get_handler,
-		//.user_ctx  = server_data	// Pass server data as context
-	};
-	
-	httpd_register_uri_handler(server, &_logs_get_handler);
 
 	/* URI handler for post */
 	httpd_uri_t _root_post_handler = {
@@ -956,32 +1098,7 @@ esp_err_t start_server(const char *base_path, int port)
 	};
 	httpd_register_uri_handler(server, &_root_post_handler);
 
-	/* URI handler for favicon.ico */
-	httpd_uri_t _favicon_get_handler = {
-		.uri		 = "/favicon.ico",
-		.method		 = HTTP_GET,
-		.handler	 = favicon_get_handler,
-		//.user_ctx  = server_data	// Pass server data as context
-	};
-	httpd_register_uri_handler(server, &_favicon_get_handler);
 
-	/* Fichier curves.txt */
-		httpd_uri_t _curves_get_handler = {
-		.uri		 = "/curves.txt",
-		.method		 = HTTP_GET,
-		.handler	 = curves_get_handler,
-		//.user_ctx  = server_data	// Pass server data as context
-	};
-	httpd_register_uri_handler(server, &_curves_get_handler);
-
-	/* Fichier curves.txt */
-		httpd_uri_t _logsfile_get_handler = {
-		.uri		 = "/logs.txt",
-		.method		 = HTTP_GET,
-		.handler	 = logs_get_handler,
-		//.user_ctx  = server_data	// Pass server data as context
-	};
-	httpd_register_uri_handler(server, &_logsfile_get_handler);
 
 	return ESP_OK;
 }

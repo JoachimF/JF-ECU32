@@ -18,23 +18,24 @@
 */
 
 #include "driver/ledc.h"
-#include "jf-ecu32.h"
 #include <stdio.h>
 #include "esp_system.h"
 #include "esp_system.h"
 #include "driver/gpio.h"
-#include "nvs_flash.h"
-#include "nvs.h"
+#include "esp_wifi.h"
 #include <string.h>
 #include "esp_log.h"
 #include "esp_err.h"
 #include "esp_vfs.h"
 #include "esp_spiffs.h"
 
+#include "jf-ecu32.h"
+#include "nvs_ecu.h"
+
 #define BLINK_GPIO 2
 #define BUFFSIZE 2000
 
-static const char *TAG = "HTTP";
+static const char *TAG = "ECU";
 
 void linear_interpolation(uint32_t rpm1,uint32_t pump1,uint32_t rpm2,uint32_t pump2,uint32_t rpm,uint32_t *res) //RPM,PUMP,RPM,PUMP
 {
@@ -82,167 +83,7 @@ _engine_t turbine = {
  
  _configEngine_t turbine_config ;
  _BITsconfigECU_u config_ECU ;
- nvs_handle my_handle;
 
-
-void init_nvs(void)
-{
-    ESP_LOGI("NVS", "Init...");
-    nvs_flash_erase() ; // en cas de remise a 0
-    esp_err_t err = nvs_flash_init();
-    if (err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND) {
-        // NVS partition was truncated and needs to be erased
-        // Retry nvs_flash_init
-        ESP_ERROR_CHECK(nvs_flash_erase());
-        err = nvs_flash_init();
-    }
-    ESP_ERROR_CHECK( err );
-    printf("\n");
-    ESP_LOGI("NVS", "Init OK");
-}
-void read_nvs(void)
-{
-    esp_err_t err ;// = nvs_flash_init();
-    size_t required_size;
-    ESP_LOGI("NVS", "Ouverture du handle");
-    err = nvs_open("storage", NVS_READWRITE, &my_handle);
-    if (err != ESP_OK) {
-        printf("Error (%s) opening NVS handle!\n", esp_err_to_name(err));
-    } 
-    ESP_LOGI("NVS", "Lecture config turbine");
-    err = nvs_get_blob(my_handle, "config", NULL, &required_size );
-    err = nvs_get_blob(my_handle, "config", (void *)&turbine_config, &required_size);
-    switch (err) {
-            case ESP_OK:
-                ESP_LOGI(TAG,"Name = %s", turbine_config.name);
-                ESP_LOGI(TAG,"Log count = %d", turbine_config.log_count);
-                ESP_LOGI(TAG,"glow power = %d", turbine_config.glow_power);
-                ESP_LOGI(TAG,"Max rpm = %d", turbine_config.jet_full_power_rpm);
-                ESP_LOGI(TAG,"idle rpm = %d", turbine_config.jet_idle_rpm);
-                ESP_LOGI(TAG,"start_temp = %d", turbine_config.start_temp);
-                ESP_LOGI(TAG,"max_temp = %d", turbine_config.max_temp);
-                ESP_LOGI(TAG,"acceleration_delay = %d", turbine_config.acceleration_delay);
-                ESP_LOGI(TAG,"deceleration_delay = %d", turbine_config.deceleration_delay);
-                ESP_LOGI(TAG,"stability_delay = %d", turbine_config.stability_delay);
-                ESP_LOGI(TAG,"max_pump1 = %d", turbine_config.max_pump1);
-                ESP_LOGI(TAG,"min_pump1= %d", turbine_config.min_pump1);
-                ESP_LOGI(TAG,"max_pump2 = %d", turbine_config.max_pump2);
-                ESP_LOGI(TAG,"min_pump2= %d", turbine_config.jet_min_rpm);
-                for(int i=0;i<50;i++)
-                {
-                    ESP_LOGI(TAG,"pump = %d - ", turbine_config.power_table.pump[i]);
-                    ESP_LOGI(TAG,"rpm = %d\n", turbine_config.power_table.RPM[i]);
-                }
-                ESP_LOGI(TAG,"\nChecksum = %d\n", turbine_config.power_table.checksum_RPM);
-                ESP_LOGI(TAG,"\nChecksum2 = %d\n", checksum_power_table());
-                if(checksum_power_table() != turbine_config.power_table.checksum_RPM)
-                    {
-                    init_power_table() ;
-                    init_random_pump() ;
-                    write_nvs_turbine() ;
-                    }
-                break;
-            case ESP_ERR_NVS_NOT_FOUND:
-                ESP_LOGI(TAG,"Les valeurs config turbine ne sont pas initialisées\n");
-                required_size = sizeof(turbine_config);
-                ESP_LOGI("NVS", "Taille de turbine_config %d",required_size);
-                strcpy(turbine_config.name,"Nom du moteur") ;
-                ESP_LOGI("NVS", "Nom : %s",turbine_config.name);
-                turbine_config.log_count = 1 ;
-                turbine_config.glow_power = 25 ;
-                turbine_config.jet_full_power_rpm = 145000 ;
-                turbine_config.jet_idle_rpm = 35000 ;
-                turbine_config.start_temp = 100 ;
-                turbine_config.max_temp = 750 ;
-                turbine_config.acceleration_delay = 10 ;
-                turbine_config.deceleration_delay = 12 ;
-                turbine_config.stability_delay = 5 ;
-                turbine_config.max_pump1 = 1024 ;
-                turbine_config.min_pump1 = 0 ;
-                turbine_config.max_pump2 = 512 ;
-                turbine_config.jet_min_rpm = 0 ;
-                init_power_table() ;
-                init_random_pump() ;
-                write_nvs_turbine() ;
-                ESP_LOGI("NVS", "Ouverture du handle");
-                err = nvs_open("storage", NVS_READWRITE, &my_handle);
-                if (err != ESP_OK) {
-                    ESP_LOGI(TAG,"Error (%s) opening NVS handle!\n", esp_err_to_name(err));
-                } 
-                break;
-            default :
-                ESP_LOGI(TAG,"Error (%s) reading turbine_config!\n", esp_err_to_name(err));
-                init_power_table() ;
-                init_random_pump() ;
-                write_nvs_turbine() ;
-        }
-    ESP_LOGI("NVS", "Lecture config ECU");
-    err = nvs_get_blob(my_handle, "configECU", NULL, &required_size );
-    err = nvs_get_blob(my_handle, "configECU", (void *)&config_ECU, &required_size);
-    switch (err) {
-            case ESP_OK:
-                ESP_LOGI(TAG,"config_ECU Done");
-                break;
-            case ESP_ERR_NVS_NOT_FOUND:
-                ESP_LOGI(TAG,"config_ECU The value is not initialized yet!");
-                config_ECU.input_type = PPM ;
-                config_ECU.glow_type = GAS ;
-                config_ECU.start_type = AUTO ;
-                config_ECU.output_pump1 = PWM;
-                config_ECU.output_pump2 = NONE ;
-                config_ECU.output_starter = PPM ;
-                config_ECU.use_telem = NONE ;
-                config_ECU.use_input2 = NO ;
-                config_ECU.use_led = NO ;
-                write_nvs_ecu() ;
-                break;
-            default :
-                ESP_LOGI(TAG,"Error (%s) reading config_ECU!", esp_err_to_name(err));
-        }  
-    ESP_LOGI("NVS", "Fermeture du handle");
-    nvs_close(my_handle);      
-}
-
-void write_nvs_turbine(void)
-{
-        esp_err_t err ;//
-        ESP_LOGI("NVS", "Ouverture du handle");
-        err = nvs_open("storage", NVS_READWRITE, &my_handle);
-        if (err != ESP_OK) {
-            ESP_LOGI(TAG,"Error (%s) opening NVS handle!\n", esp_err_to_name(err));
-        } 
-        // Write
-        ESP_LOGI("NVS", "Ecriture turbine");
-        size_t required_size = sizeof(_configEngine_t);
-        ESP_LOGI(TAG,"Save config to turbine_config Struct... Size : %d ",required_size);
-        err = nvs_set_blob(my_handle, "config", (const void*)&turbine_config, required_size);
-        printf((err != ESP_OK) ? "Failed!" : "Done");
-        ESP_LOGI(TAG,"Committing turbine_config in NVS ... ");
-        err = nvs_commit(my_handle);
-        printf((err != ESP_OK) ? "Failed!" : "Done");
-}
-
-void write_nvs_ecu(void)
-{
-        esp_err_t err ;//
-        ESP_LOGI("NVS", "Ouverture du handle");
-        err = nvs_open("storage", NVS_READWRITE, &my_handle);
-        if (err != ESP_OK) {
-            ESP_LOGI(TAG,"Error (%s) opening NVS handle!", esp_err_to_name(err));
-        } 
-        // Write
-        ESP_LOGI("NVS", "Ecriture ECU");        
-        size_t required_size = sizeof(_BITsconfigECU_u);
-        ESP_LOGI(TAG,"Save config to config_ECU Struct... Size : %d ",required_size);
-        err = nvs_set_blob(my_handle, "configECU", (const void*)&config_ECU, required_size);
-        printf((err != ESP_OK) ? "Failed!" : "Done");
-        ESP_LOGI(TAG,"Committing config_ECU in NVS ... ");
-        err = nvs_commit(my_handle);
-        printf((err != ESP_OK) ? "Failed!" : "Done");
-        // Close
-        ESP_LOGI("NVS", "Fermeture du handle");
-        nvs_close(my_handle);
-}
 
 void init(void)
 {
@@ -260,10 +101,10 @@ void init(void)
     ledc_channel[3].gpio_num = turbine.vanne1.config.gpio_num ;
     ledc_channel[4].channel = turbine.vanne2.config.ledc_channel;
     ledc_channel[4].gpio_num = turbine.vanne2.config.gpio_num ;
-    init_nvs() ;
+
     read_nvs() ;
-    turbine_config.log_count++ ;
-    write_nvs_turbine() ;
+    //turbine_config.log_count++ ;
+    //write_nvs_turbine() ;
 
     for (int i = 0; i < 5; i++)
     {   
@@ -281,7 +122,7 @@ void init(void)
     turbine.vanne1.set_power(&turbine.vanne1.config,50) ;
     turbine.vanne2.set_power(&turbine.vanne2.config,100) ;
     
-    create_timers() ;
+    //create_timers() ;
 }
 
 void set_kero_pump_target(uint32_t RPM)
@@ -307,47 +148,7 @@ void set_kero_pump_target(uint32_t RPM)
     ESP_LOGI(TAG,"Target : %d - pump : %d\n",RPM,res) ;
 }
 
-void init_random_pump(void)
-{
-  uint32_t interval = 20 ;
-  turbine_config.power_table.checksum_pump = 0 ;
-  turbine_config.power_table.pump[0] = 50 ;
-  turbine_config.power_table.checksum_pump += turbine_config.power_table.pump[0] ;
-  for(int i=1;i<50;i++)
-  {
-        turbine_config.power_table.pump[i] = turbine_config.power_table.pump[0] + interval*i;
-        turbine_config.power_table.checksum_pump += turbine_config.power_table.pump[i] ;
-  }
-}
-uint32_t checksum_power_table(void)
-{
-  uint32_t interval,checksum_RPM ;
-  interval = (turbine_config.jet_full_power_rpm - turbine_config.jet_idle_rpm) / 48 ;
-  checksum_RPM = 0 ;
-  checksum_RPM += turbine_config.power_table.RPM[0] ;
-  for(int i=1;i<49;i++)
-  {
-        checksum_RPM += turbine_config.jet_idle_rpm + interval*i;
-  }
-  checksum_RPM += turbine_config.jet_full_power_rpm ;
-  return checksum_RPM ;
-}
 
-void init_power_table(void)
-{
-  uint32_t interval ;
-  turbine_config.power_table.checksum_RPM = 0 ;
-  interval = (turbine_config.jet_full_power_rpm - turbine_config.jet_idle_rpm) / 48 ;
-  turbine_config.power_table.RPM[0] = turbine_config.jet_idle_rpm ;
-  turbine_config.power_table.checksum_RPM += turbine_config.power_table.RPM[0] ;
-  for(int i=1;i<49;i++)
-  {
-        turbine_config.power_table.RPM[i] = turbine_config.jet_idle_rpm + interval*i;
-        turbine_config.power_table.checksum_RPM += turbine_config.power_table.RPM[i] ;
-  }
-  turbine_config.power_table.RPM[49] = turbine_config.jet_full_power_rpm ;
-  turbine_config.power_table.checksum_RPM += turbine_config.power_table.RPM[49] ;
-}
 
 void update_curve_file(void)
 {
@@ -407,9 +208,6 @@ void update_logs_file(void)
 
 void log_task( void * pvParameters )
 {
-
-
-
  	ESP_LOGI(TAG, "Start Logtask");
     while(1) {
         //ESP_LOGI("LOG", "New Log");
@@ -432,7 +230,15 @@ void create_timers(void)
                             vTimer1sCallback // Each timer calls the same callback when it expires.
                             );
 
+    xTimer60s = xTimerCreate("Timer60s",       // Just a text name, not used by the kernel.
+                            ( 60000 /portTICK_PERIOD_MS ),   // The timer period in ticks.
+                            pdFALSE,        // The timers will auto-reload themselves when they expire.
+                            ( void * ) 2,  // Assign each timer a unique id equal to its array index.
+                            vTimer60sCallback // Each timer calls the same callback when it expires.
+                            );
+
     xTimerStart( xTimer1s, 0 ) ;
+    xTimerStart( xTimer60s, 0 ) ;
 }
 
 void vTimer1sCallback( TimerHandle_t pxTimer )
@@ -443,9 +249,19 @@ void vTimer1sCallback( TimerHandle_t pxTimer )
             turbine.secondes = 0 ;
             turbine.minutes++ ;
         }
+        ESP_LOGI(TAG,"%02d:%02d",turbine.minutes,turbine.secondes) ;
     }
     xSemaphoreGive(xTimeMutex) ;
     //ESP_LOGI("Time", "%02d:%02d",turbine.minutes,turbine.secondes);
     //long long int Timer1 = esp_timer_get_time();
     //printf("Timer: %lld μs\n", Timer1/1000);  
+}
+
+void vTimer60sCallback( TimerHandle_t pxTimer )
+{
+        ESP_ERROR_CHECK(esp_wifi_stop() );
+        ESP_LOGI(TAG,"Wifi STOP") ;
+        vTaskDelete( xWebHandle );
+        ESP_LOGI(TAG,"Server STOP") ;
+
 }

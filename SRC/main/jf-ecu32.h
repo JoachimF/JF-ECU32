@@ -29,8 +29,7 @@
 typedef struct {  
   uint32_t pump[50]; //Table RPM/PWM
   uint32_t RPM[50];
-  uint32_t checksum_pump;
-  uint32_t checksum_RPM;
+  uint32_t checksum;
 }_pump_table_t;
 
 enum glow_types {
@@ -39,9 +38,10 @@ enum glow_types {
 
 #define   PPM     0
 #define   PWM     1
-#define   SBUS   1
+#define   SBUS    1
 #define   NONE    2
-#define   FRSKY   0
+#define   HOTT    3
+#define   FRSKY   1
 #define   FUTABA  0
 #define   MANUAL  0
 #define   AUTO    1
@@ -60,6 +60,7 @@ typedef struct {
     uint8_t use_telem ;
     uint8_t use_led ;
     uint8_t use_input2 ;
+    uint32_t checksum ;
 }_BITsconfigECU_u;
 
 
@@ -80,7 +81,7 @@ typedef union {
 
 
 typedef struct {
-  char name[20] ; // Nom du moteur
+  char name[21] ; // Nom du moteur
   uint8_t log_count ; //Numéro du log dans le fichier
   uint8_t glow_power ; // Puissance de la bougie gas ou kero
   uint32_t jet_full_power_rpm ; // trs/min plein gaz
@@ -151,24 +152,21 @@ typedef struct {
 } _engine_t;
 
 TaskHandle_t xlogHandle ;
+TaskHandle_t xWebHandle ;
 TimerHandle_t xTimer1s ;
+TimerHandle_t xTimer60s ;
 SemaphoreHandle_t xTimeMutex;
 
 
 void init(void);
 void linear_interpolation(uint32_t x0,uint32_t y0,uint32_t x1,uint32_t y1,uint32_t rpm,uint32_t *res) ;
 void set_kero_pump_target(uint32_t RPM) ;
-void init_power_table(void) ;
-void init_random_pump(void) ;
-void init_nvs(void) ;
-void write_nvs_turbine(void) ;
-void write_nvs_ecu(void) ;
-void read_nvs(void) ;
-uint32_t checksum_power_table(void) ; 
+
 void update_curve_file(void) ;
 void head_logs_file(void) ;
 void log_task( void * pvParameters ) ;
 void create_timers(void) ;
 void vTimer1sCallback( TimerHandle_t pxTimer ) ;
+void vTimer60sCallback( TimerHandle_t pxTimer ) ;
 
 #endif
