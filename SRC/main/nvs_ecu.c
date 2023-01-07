@@ -1,3 +1,21 @@
+/*  nvs-ecu.c
+
+  Copyright (C) 2022  Joachim Franken
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #include "esp_err.h"
 #include "esp_log.h"
 #include "esp_vfs.h"
@@ -267,7 +285,7 @@ void read_nvs(void)
     nvs_close(my_handle);  
     switch (err) {
             case ESP_OK:
-                /*ESP_LOGI(TAG,"Name = %s", turbine_config.name);
+                ESP_LOGI(TAG,"Name = %s", turbine_config.name);
                 ESP_LOGI(TAG,"Log count = %d", turbine_config.log_count);
                 ESP_LOGI(TAG,"glow power = %d", turbine_config.glow_power);
                 ESP_LOGI(TAG,"Max rpm = %d", turbine_config.jet_full_power_rpm);
@@ -281,12 +299,12 @@ void read_nvs(void)
                 ESP_LOGI(TAG,"min_pump1= %d", turbine_config.min_pump1);
                 ESP_LOGI(TAG,"max_pump2 = %d", turbine_config.max_pump2);
                 ESP_LOGI(TAG,"min_pump2= %d", turbine_config.jet_min_rpm);
-                for(int i=0;i<50;i++)
+                /*for(int i=0;i<50;i++)
                 {
                     ESP_LOGI(TAG,"pump = %d - ", turbine_config.power_table.pump[i]);
                     ESP_LOGI(TAG,"rpm = %d\n", turbine_config.power_table.RPM[i]);
-                }
-                ESP_LOGI(TAG,"\nChecksum = %d\n", turbine_config.power_table.checksum_RPM);*/
+                }*/
+                
                 if(test_checksum_turbine(&turbine_config,&turbine_config.checksum) == 0){
                     ESP_LOGI(TAG,"Paramètre turbine érronés") ;
                     set_defaut_turbine() ;
@@ -343,6 +361,15 @@ void read_nvs(void)
                     set_defaut_ecu() ;
                     write_nvs_ecu() ;
                 }
+                ESP_LOGI("CONFIG_ECU","input : %d",config_ECU.input_type) ;
+                ESP_LOGI("CONFIG_ECU","glow_type : %d",config_ECU.glow_type) ;	
+                ESP_LOGI("CONFIG_ECU","start_type : %d",config_ECU.start_type) ;
+                ESP_LOGI("CONFIG_ECU","output_pump1 : %d",config_ECU.output_pump1) ;
+                ESP_LOGI("CONFIG_ECU","output_pump2 : %d",config_ECU.output_pump2) ;
+                ESP_LOGI("CONFIG_ECU","output_starter : %d",config_ECU.output_starter) ;
+                ESP_LOGI("CONFIG_ECU","use_telem : %d",config_ECU.use_telem) ;
+                ESP_LOGI("CONFIG_ECU","use_input2 : %d",config_ECU.use_input2) ;
+                ESP_LOGI("CONFIG_ECU","use_led : %d",config_ECU.use_led) ;
                 break;
             case ESP_ERR_NVS_NOT_FOUND:
                 ESP_LOGI(TAG,"config_ECU The value is not initialized yet!");

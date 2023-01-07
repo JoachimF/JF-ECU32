@@ -11,5 +11,6 @@
     "files.associations": {
         "*.cps": "javascript",
         "jf-ecu32.h": "c"
-    }
+    },
+    "C_Cpp.errorSquiggles": "enabled"
 }

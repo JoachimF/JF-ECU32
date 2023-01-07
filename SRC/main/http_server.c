@@ -1,8 +1,19 @@
-/* HTTP Server Example
-	 This example code is in the Public Domain (or CC0 licensed, at your option.)
-	 Unless required by applicable law or agreed to in writing, this
-	 software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-	 CONDITIONS OF ANY KIND, either express or implied.
+/*  http_server.c
+
+  Copyright (C) 2022  Joachim Franken
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <stdio.h>
@@ -34,6 +45,7 @@ extern QueueHandle_t xQueueHttp;
 extern _BITsconfigECU_u config_ECU ;
 extern _configEngine_t turbine_config ;
 extern _wifi_params_t wifi_params ;
+extern _engine_t turbine ;
 
 esp_err_t save_key_value(char * key, char * value)
 {
@@ -251,45 +263,53 @@ esp_err_t Image2Html(httpd_req_t *req, char * filename, char * type)
 /* HTTP post handler */
 static esp_err_t root_post_handler(httpd_req_t *req)
 {
-	ESP_LOGI(TAG, "root_post_handler req->uri=[%s]", req->uri);
-	ESP_LOGI(TAG, "root_post_handler content length %d", req->content_len);
-	char*  buf = malloc(req->content_len + 1);
-	size_t off = 0;
-	while (off < req->content_len) {
-		/* Read data received in the request */
-		int ret = httpd_req_recv(req, buf + off, req->content_len - off);
-		if (ret <= 0) {
-			if (ret == HTTPD_SOCK_ERR_TIMEOUT) {
-				httpd_resp_send_408(req);
-			}
-			free (buf);
-			return ESP_FAIL;
-		}
-		off += ret;
-		ESP_LOGI(TAG, "root_post_handler recv length %d", ret);
-	}
-	buf[off] = '\0';
-	ESP_LOGI(TAG, "root_post_handler buf=[%s]", buf);
+    /* Destination buffer for content of HTTP POST request.
+     * httpd_req_recv() accepts char* only, but content could
+     * as well be any binary data (needs type casting).
+     * In case of string data, null termination will be absent, and
+     * content length would give length of string */
+    char content[100];
+	char param[30] ;
+	int16_t len ;
 
-	URL_t urlBuf;
-	find_value("input=", buf, urlBuf.url);
-	ESP_LOGI(TAG, "urlBuf.url=[%s]", urlBuf.url);
-	//strcpy(urlBuf.url, "submit4");
-	//strcpy(urlBuf.parameter, &req->uri[9]);
-	strcpy(urlBuf.parameter, buf);
-	if (xQueueSend(xQueueHttp, &urlBuf, portMAX_DELAY) != pdPASS) {
-		ESP_LOGE(TAG, "xQueueSend Fail");
-	}
-	free(buf);
+	ESP_LOGI(TAG,"Post received URI = %s",req->uri) ;
+	ESP_LOGI(TAG,"Post received len = %d",req->content_len) ;
+    /* Truncate if content length larger than the buffer */
+    size_t recv_size = MIN(req->content_len,content);
+	ESP_LOGI(TAG,"Post len = %d",recv_size) ;
+    int ret = httpd_req_recv(req, content, recv_size);
+	content[recv_size] = 0 ;
+    if (ret <= 0) {  /* 0 return value indicates connection closed */
+        /* Check if timeout occurred */
+        if (ret == HTTPD_SOCK_ERR_TIMEOUT) {
+            /* In case of timeout one can choose to retry calling
+             * httpd_req_recv(), but to keep it simple, here we
+             * respond with an HTTP 408 (Request Timeout) error */
+            httpd_resp_send_408(req);
+        }
+        /* In case of error, returning ESP_FAIL will
+         * ensure that the underlying socket is closed */
+        return ESP_FAIL;
+    }
+	len = find_value("pwmSliderValue1=",content,param) ;
+	set_power_func_us(&turbine.pump1.config,atoi(param)) ;
+	len = find_value("pwmSliderValue2=",content,param) ;
+	set_power_func_us(&turbine.pump2.config,atoi(param)) ;
+	len = find_value("pwmSliderValue3=",content,param) ;
+	set_power_func_us(&turbine.starter.config,atoi(param)) ;
+	/*
+	len = find_value("pwmSliderValue4=",content,param) ;
+	turbine.vanne1.set_power(&turbine.vanne1.config,atoi(param)) ;
+	len = find_value("pwmSliderValue5=",content,param) ;
+	turbine.vanne2.set_power(&turbine.vanne2.config,atoi(param)) ;
+	len = find_value("pwmSliderValue6=",content,param) ;
+	turbine.glow.set_power(&turbine.glow.config,atoi(param)) ;*/
 
-	/* Redirect onto root to see the updated file list */
-	httpd_resp_set_status(req, "303 See Other");
-	httpd_resp_set_hdr(req, "Location", "/");
-#ifdef CONFIG_EXAMPLE_HTTPD_CONN_CLOSE_HEADER
-	httpd_resp_set_hdr(req, "Connection", "close");
-#endif
-	httpd_resp_sendstr(req, "post successfully");
-	return ESP_OK;
+	ESP_LOGI(TAG,"%s",content) ;
+    /* Send a simple response */
+    const char resp[] = "URI POST Response";
+    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+    return ESP_OK;
 }
 
 /* favicon get handler */
@@ -642,7 +662,7 @@ static esp_err_t configecu(httpd_req_t *req)
 	httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Pompe 2</b></legend>") ;
 		httpd_resp_sendstr_chunk(req, "<p><input id=\"no_pump2\" name=\"output_pump2\" type=\"radio\" value=\"0\"") ;
 		httpd_resp_sendstr_chunk(req, (config_ECU.output_pump2 == PPM) ? "checked=\"\"" :" " ) ;
-		httpd_resp_sendstr_chunk(req, "><b>Désactivée</b>") ;
+		httpd_resp_sendstr_chunk(req, "><b>Variateur</b>") ;
 
 		httpd_resp_sendstr_chunk(req, "<p><input id=\"output_pump2_pwm\" name=\"output_pump2\" type=\"radio\" value=\"1\"") ;
 		httpd_resp_sendstr_chunk(req, (config_ECU.output_pump2 == PWM) ? "checked=\"\"" :" " ) ;
@@ -650,7 +670,7 @@ static esp_err_t configecu(httpd_req_t *req)
 		
 		httpd_resp_sendstr_chunk(req, "<p><input id=\"output_pump2_ppm\" name=\"output_pump2\" type=\"radio\" value=\"2\"") ;
 		httpd_resp_sendstr_chunk(req, (config_ECU.output_pump2 == NONE) ? "checked=\"\"" :" " ) ;
-		httpd_resp_sendstr_chunk(req, "><b>Variateur</b>") ;
+		httpd_resp_sendstr_chunk(req, "><b>Désactivée</b>") ;
 	httpd_resp_sendstr_chunk(req, "</fieldset><p>") ;
 	/*Voie aux*/
 	httpd_resp_sendstr_chunk(req, "<p><input id=\"use_input2\" type=\"checkbox\"") ;
@@ -848,7 +868,7 @@ static esp_err_t configmoteur(httpd_req_t *req)
 	httpd_resp_sendstr_chunk(req, turbine_config.name);
 	httpd_resp_sendstr_chunk(req, "</h2></div>");
 		
-	httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Paramètres du moteur&nbsp;</b></legend><form method=\"GET\" action=\"configmoteur\"><p>") ;
+	httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Paramètres du moteur&nbsp;</b></legend><form method=\"POST\" action=\"configmoteur\"><p>") ;
 
 	httpd_resp_sendstr_chunk(req, "<b>Nom du moteur</b><br>");
 	httpd_resp_sendstr_chunk(req, "<input id=\"name\" placeholder=\"\" value=\"");
@@ -951,7 +971,9 @@ static esp_err_t slider(httpd_req_t *req)
 	httpd_resp_sendstr_chunk(req, NULL); //fin de la page
 	return ESP_OK;
 }
-#define MIN(A,B) (A<B) ? A: B
+
+
+
 
 static const char* get_path_from_uri(char *dest, const char *uri, size_t destsize)
 {
@@ -1092,7 +1114,7 @@ esp_err_t start_server(const char *base_path, int port)
 
 	/* URI handler for post */
 	httpd_uri_t _root_post_handler = {
-		.uri		 = "/post",
+		.uri		 = "/*",
 		.method		 = HTTP_POST,
 		.handler	 = root_post_handler,
 		//.user_ctx  = server_data	// Pass server data as context

@@ -1,5 +1,5 @@
 /*
-  jf-ecu32.h
+  jf-ecu32.c
 
   Copyright (C) 2022  Joachim Franken
 
@@ -18,6 +18,7 @@
 */
 
 #include "driver/ledc.h"
+#include "driver/mcpwm.h"
 #include <stdio.h>
 #include "esp_system.h"
 #include "esp_system.h"
@@ -40,12 +41,23 @@ static const char *TAG = "ECU";
 void linear_interpolation(uint32_t rpm1,uint32_t pump1,uint32_t rpm2,uint32_t pump2,uint32_t rpm,uint32_t *res) //RPM,PUMP,RPM,PUMP
 {
     *res =  pump1 + ((pump2-pump1)* (rpm - rpm1))/(rpm2-rpm1) ;
-    printf("RPM1 : %d ; pump1 : %d , RPM1 : %d ; pump1 : %d , rpm : %d , res : %d\n",rpm1,pump1,rpm2,pump2,rpm,*res);
+    ESP_LOGI(TAG,"RPM1 : %d ; pump1 : %d , RPM1 : %d ; pump1 : %d , rpm : %d , res : %d",rpm1,pump1,rpm2,pump2,rpm,*res);
 }
 
-void set_power_func(_pwm_config *config ,uint16_t power)
+void set_power_func_us(_pwm_config *config ,int32_t value)
 {
-    ESP_ERROR_CHECK(ledc_set_duty(LEDC_LOW_SPEED_MODE, config->ledc_channel, power));
+    mcpwm_set_duty_in_us(config->MCPWM_UNIT, config->MCPWM_TIMER, config->MCPWM_GEN, value);
+    ESP_LOGI(TAG,"MCPWM_UNIT : %d ; MCPWM_TIMER : %d ; MCPWM_GEN : %d ; value : %d ; pin : %d",config->MCPWM_UNIT,config->MCPWM_TIMER,config->MCPWM_GEN,value,config->gpio_num);
+}
+
+void set_power_func(_pwm_config *config ,float value)
+{
+    mcpwm_set_duty(config->MCPWM_UNIT, config->MCPWM_TIMER, config->MCPWM_GEN, value);
+}
+
+void set_power_ledc(_ledc_config *config ,uint8_t value)
+{
+    ESP_ERROR_CHECK(ledc_set_duty(LEDC_LOW_SPEED_MODE, config->ledc_channel, value));
     printf("Pin : %d\n",config->gpio_num) ;
     ESP_ERROR_CHECK(ledc_update_duty(LEDC_LOW_SPEED_MODE, config->ledc_channel));
 }
@@ -53,11 +65,14 @@ void set_power_func(_pwm_config *config ,uint16_t power)
 ledc_timer_config_t ledc_timer = {
     .speed_mode = LEDC_LOW_SPEED_MODE,
     .timer_num  = LEDC_TIMER_0,
-    .duty_resolution = LEDC_TIMER_10_BIT,
-    .freq_hz = 10000,
+    .duty_resolution = LEDC_TIMER_8_BIT,
+    .freq_hz = 50,
     .clk_cfg = LEDC_AUTO_CLK
 };
-ledc_channel_config_t ledc_channel[5];
+
+ledc_channel_config_t ledc_channel[3];
+mcpwm_config_t pwm_config[2];
+
 
 _engine_t turbine = { 
     .minutes = 0 ,
@@ -68,70 +83,156 @@ _engine_t turbine = {
     .EGT = 0 ,
     .phase_fonctionnement = WAIT ,
     .position_gaz = COUPE ,
-    .pump1.config.gpio_num = 25,
-    .pump1.config.ledc_channel = LEDC_CHANNEL_0,
+
+// Configuration en MCPWM
+    .pump1.config.nbits = _10BITS,
+    .pump1.config.gpio_num = PUMP1_PIN,
+//    .pump1.config.MCPWM_UNIT = MCPWM_UNIT_0,
     .pump1.set_power = set_power_func,
     .pump1.target = 0 ,
     .pump1.new_target = 0 ,
-    .pump2.config.gpio_num = 26,
-    .pump2.config.ledc_channel = LEDC_CHANNEL_1,
+
+    .pump2.config.nbits = _10BITS,
+    .pump2.config.gpio_num = PUMP2_PIN,
+    //.pump2.config.MCPWM_UNIT = MCPWM_UNIT_0,
     .pump2.set_power = set_power_func,
     .pump2.target = 0 ,
     .pump2.new_target = 0 ,
-    .glow.config.gpio_num = 32,
+
+    .starter.config.nbits = _10BITS,
+    .starter.config.gpio_num = STARTER_PIN,
+//    .starter.config.MCPWM_UNIT = MCPWM_UNIT_0,
+    .starter.set_power = set_power_func,    
+
+// Configuration en LEDC
+    .vanne1.config.gpio_num = VANNE1_PIN,
+    .vanne1.config.ledc_channel = LEDC_CHANNEL_0,
+    .vanne1.set_power = set_power_ledc,
+
+    .vanne2.config.gpio_num = VANNE2_PIN,
+    .vanne2.config.ledc_channel = LEDC_CHANNEL_1,
+    .vanne2.set_power = set_power_ledc,
+    
+    .glow.config.gpio_num = GLOW_PIN,    
     .glow.config.ledc_channel = LEDC_CHANNEL_2,
-    .glow.set_power = set_power_func,
-    .vanne1.config.gpio_num = 27,
-    .vanne1.config.ledc_channel = LEDC_CHANNEL_3,
-    .vanne1.set_power = set_power_func,
-    .vanne2.config.gpio_num = 12,
-    .vanne2.config.ledc_channel = LEDC_CHANNEL_4,
-    .vanne2.set_power = set_power_func
+    .glow.set_power = set_power_ledc,
  };
  
  _configEngine_t turbine_config ;
  _BITsconfigECU_u config_ECU ;
 
-
-void init(void)
+void init_pwm_outputs(_pwm_config *config)
 {
-    turbine.secondes = 0 ;
-    turbine.minutes = 0 ;
+    mcpwm_gpio_init(config->MCPWM_UNIT, config->MCPWM, config->gpio_num);   
+    ESP_LOGI(TAG,"MCPWM_UNIT : %d ; MCPWM_TIMER : %d ; MCPWM_GEN : %d ; MCPWM_TIMER : %d ; pin : %d",config->MCPWM_UNIT,config->MCPWM_TIMER,config->MCPWM_GEN,config->MCPWM_TIMER,config->gpio_num); 
+}
 
-    //Init les sortie PWM
-    ESP_ERROR_CHECK(ledc_timer_config(&ledc_timer));
-    ledc_channel[0].channel = turbine.pump1.config.ledc_channel;
-    ledc_channel[0].gpio_num = turbine.pump1.config.gpio_num ;
-    ledc_channel[1].channel = turbine.pump2.config.ledc_channel;
-    ledc_channel[1].gpio_num = turbine.pump2.config.gpio_num ;
+void init_mcpwm(void)
+{
+    printf("initializing mcpwm servo control gpio......\n");
+
+    turbine.pump1.config.MCPWM_GEN = MCPWM_GEN_A ;
+    if(turbine.pump1.config.ppm_pwm == PWM){
+        turbine.pump1.config.MCPWM = MCPWM0A ;
+        turbine.pump1.config.MCPWM_TIMER = PWM_TIMER ;
+        turbine.pump1.config.MCPWM_UNIT = MCPWM_UNIT_0 ;
+    }
+    else{
+        turbine.pump1.config.MCPWM = MCPWM1A ;
+        turbine.pump1.config.MCPWM_TIMER = PPM_TIMER ;
+        turbine.pump1.config.MCPWM_UNIT = MCPWM_UNIT_1 ; 
+    }
+    
+    ESP_LOGI(TAG,"MCPWM_UNIT init outputs") ;
+    if(turbine.pump2.config.ppm_pwm != NONE)
+    {
+        turbine.pump2.config.MCPWM_GEN = MCPWM_GEN_B ;
+        if(turbine.pump2.config.ppm_pwm == PWM )
+        {
+            turbine.pump2.config.MCPWM = MCPWM0B ;
+            turbine.pump2.config.MCPWM_TIMER = PWM_TIMER ;
+            turbine.pump2.config.MCPWM_UNIT = MCPWM_UNIT_0 ;
+        }
+        else if(turbine.pump2.config.ppm_pwm == PPM )
+        {
+            turbine.pump2.config.MCPWM = MCPWM1B ;
+            turbine.pump2.config.MCPWM_TIMER = PPM_TIMER ;
+            turbine.pump2.config.MCPWM_UNIT = MCPWM_UNIT_1 ;
+        }
+        init_pwm_outputs(&turbine.pump2.config) ;
+    }
+    
+    turbine.starter.config.MCPWM_TIMER = MCPWM_TIMER_2 ;
+    turbine.starter.config.MCPWM_GEN = MCPWM_GEN_A ;
+    turbine.starter.config.MCPWM = MCPWM2A ;
+    if(config_ECU.output_starter == PWM)
+        turbine.starter.config.MCPWM_UNIT = MCPWM_UNIT_0 ;
+    else
+        turbine.starter.config.MCPWM_UNIT = MCPWM_UNIT_1 ;
+    
+    init_pwm_outputs(&turbine.pump1.config) ;
+    init_pwm_outputs(&turbine.starter.config) ;
+
+    ledc_channel[0].channel = turbine.vanne1.config.ledc_channel;
+    ledc_channel[0].gpio_num = turbine.vanne1.config.gpio_num ;
+    ledc_channel[1].channel = turbine.vanne2.config.ledc_channel;
+    ledc_channel[1].gpio_num = turbine.vanne2.config.gpio_num ;
     ledc_channel[2].channel = turbine.glow.config.ledc_channel;
     ledc_channel[2].gpio_num = turbine.glow.config.gpio_num ;
-    ledc_channel[3].channel = turbine.vanne1.config.ledc_channel;
-    ledc_channel[3].gpio_num = turbine.vanne1.config.gpio_num ;
-    ledc_channel[4].channel = turbine.vanne2.config.ledc_channel;
-    ledc_channel[4].gpio_num = turbine.vanne2.config.gpio_num ;
+    
+    //2. initial mcpwm configuration
+    printf("Configuring Initial Parameters of mcpwm......\n");
 
-    read_nvs() ;
-    //turbine_config.log_count++ ;
-    //write_nvs_turbine() ;
-
-    for (int i = 0; i < 5; i++)
+    //Config pour PWM
+    pwm_config[0].frequency = 10000;    //frequency = 10000Hz, pour les moteur DC et vannes
+    pwm_config[0].cmpr_a = 0;    //duty cycle of PWMxA = 0  Pompe1
+    pwm_config[0].cmpr_b = 0;    //duty cycle of PWMxb = 0  Pompe2
+    pwm_config[0].counter_mode = MCPWM_UP_COUNTER;
+    pwm_config[0].duty_mode = MCPWM_DUTY_MODE_0;
+    //Config pour PPM
+    pwm_config[1].frequency = 50;    //frequency = 50Hz, pour les variateur et la bougie
+    pwm_config[1].cmpr_a = 0;    //duty cycle of PWMxA = 0 Pompe1
+    pwm_config[1].cmpr_b = 0;    //duty cycle of PWMxb = 0 Pompe2
+    pwm_config[1].counter_mode = MCPWM_UP_COUNTER;
+    pwm_config[1].duty_mode = MCPWM_DUTY_MODE_0;
+    
+    mcpwm_init(MCPWM_UNIT_0, PWM_TIMER, &pwm_config[0]);    //Configure PWM0A (pompe1) & PWM1B (pompe2) 10KHz
+    mcpwm_init(MCPWM_UNIT_1, PPM_TIMER, &pwm_config[1]);    //Configure PWM1A (pompe1) & PWM0B (pompe2) 50Hz
+    if(config_ECU.output_starter == PWM)
+        mcpwm_init(MCPWM_UNIT_0, MCPWM_TIMER_2, &pwm_config[0]);    //Configure PWM2A 10KHz (Starter)
+    else
+        mcpwm_init(MCPWM_UNIT_1, MCPWM_TIMER_2, &pwm_config[1]);    //Configure PWM2A 50KHz (Starter)
+    
+    for (int i = 0; i < 2; i++)
     {   
         ledc_channel[i].speed_mode = LEDC_LOW_SPEED_MODE;
         ledc_channel[i].timer_sel = LEDC_TIMER_0;
         ledc_channel[i].intr_type = LEDC_INTR_DISABLE;
         ledc_channel[i].duty = 0;
         ledc_channel[i].hpoint = 0;
-        
         ESP_ERROR_CHECK(ledc_channel_config(&ledc_channel[i]));
     }
+}
+
+void init(void)
+{
+//    turbine.secondes = 0 ;
+//    turbine.minutes = 0 ;
+    read_nvs() ;
+
+    //Init les sortie PWM
+    turbine.starter.config.ppm_pwm = config_ECU.output_starter ;
+    turbine.pump1.config.ppm_pwm = config_ECU.output_pump1 ;
+    turbine.pump2.config.ppm_pwm = config_ECU.output_pump2 ;
+    init_mcpwm() ;
+
+
     //Set les sortie pour test
-    turbine.pump1.set_power(&turbine.pump1.config,256) ;
-    turbine.pump2.set_power(&turbine.pump2.config,512) ;
-    turbine.glow.set_power(&turbine.glow.config,128) ;
-    turbine.vanne1.set_power(&turbine.vanne1.config,50) ;
-    turbine.vanne2.set_power(&turbine.vanne2.config,100) ;
-    
+//    turbine.pump1.set_power(&turbine.pump1.config,256) ;
+//    turbine.pump2.set_power(&turbine.pump2.config,512) ;
+//    turbine.glow.set_power(&turbine.glow.config,128) ;
+//    turbine.vanne1.set_power(&turbine.vanne1.config,50) ;
+//    turbine.vanne2.set_power(&turbine.vanne2.config,100) ;    
 }
 
 void set_kero_pump_target(uint32_t RPM)
@@ -258,7 +359,7 @@ void vTimer1sCallback( TimerHandle_t pxTimer )
             turbine.secondes = 0 ;
             turbine.minutes++ ;
         }
-        ESP_LOGI(TAG,"%02d:%02d",turbine.minutes,turbine.secondes) ;
+        //ESP_LOGI(TAG,"%02d:%02d",turbine.minutes,turbine.secondes) ;
     }
     xSemaphoreGive(xTimeMutex) ;
     //ESP_LOGI("Time", "%02d:%02d",turbine.minutes,turbine.secondes);

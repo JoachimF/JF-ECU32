@@ -5,32 +5,75 @@
 	<!-- define the style CSS of your page -->
 	<style>
 		html {font-family: Arial; display: inline-block; text-align: center;}
-		h1 {font-size: 2.9rem;}
-		h2 {font-size: 2.1rem;}
-		p {font-size: 1.9rem;}
-		body {max-width: 500px; margin:0px auto; padding-bottom: 30px;}
-		.slider { -webkit-appearance: none; margin: 14px; width: 400px; height: 15px; border-radius: 5px; background: #39a6de; outline: none; -webkit-transition: .2s; transition: opacity .2s;}
+		h1 {font-size: 1.5rem;}
+		h2 {font-size: 1.1rem;}
+		p {font-size: 1rem;}
+		body {max-width: 500px; margin:0px auto; padding-bottom: 30px;text-align:center;font-family:verdana,sans-serif;background:#252525;}
+		.slider { -webkit-appearance: none; margin: 14px; width: 200px; height: 15px; border-radius: 5px; background: #39a6de; outline: none; -webkit-transition: .2s; transition: opacity .2s;}
 		.slider::-webkit-slider-thumb {-webkit-appearance: none; appearance: none; width: 25px; height: 25px; border-radius: 12px; background: #f74d4d; cursor: pointer;}
 		.slider::-moz-range-thumb { width: 25px; height: 25px; border-radius: 12px; background: #F74D4D; cursor: pointer; } 
+		button{border:0;border-radius:0.3rem;background:#db591d;color:#faffff;line-height:2.4rem;font-size:1.2rem;width:100%;-webkit-transition-duration:0.4s;transition-duration:0.4s;cursor:pointer;}
+		button:hover{background:#e74f09;}
+		.bred{background:#ca2323;}
+		.bred:hover{background:#931f1f;}
+		.bgrn{background:#47c266;}
+		.bgrn:hover{background:#5aaf6f;}
 	</style>
+	<script>
+		function updateSliderPWM(element) {
+			var pwmSliderValue1 = document.getElementById("pwmSlider1").value;
+			var pwmSliderValue2 = document.getElementById("pwmSlider2").value;
+			var pwmSliderValue3 = document.getElementById("pwmSlider3").value;
+			var pwmSliderValue4 = document.getElementById("pwmSlider4").value;
+			var pwmSliderValue5 = document.getElementById("pwmSlider5").value;
+			var pwmSliderValue6 = document.getElementById("pwmSlider6").value;
+			document.getElementById("textSliderValue1").innerHTML = pwmSliderValue1;
+			document.getElementById("textSliderValue2").innerHTML = pwmSliderValue2;
+			document.getElementById("textSliderValue3").innerHTML = pwmSliderValue3;
+			document.getElementById("textSliderValue4").innerHTML = pwmSliderValue4;
+			document.getElementById("textSliderValue5").innerHTML = pwmSliderValue5;
+			document.getElementById("textSliderValue6").innerHTML = pwmSliderValue6;
+			console.log(pwmSliderValue1);	
+			var httpRequest = new XMLHttpRequest();
+			httpRequest.open('POST','/post', true);
+			httpRequest.setRequestHeader("Accept", "application/txt");
+			httpRequest.setRequestHeader("Content-Type", "application/txt");
+			httpRequest.onreadystatechange = function () {
+			  if( httpRequest.readyState === 4 ) {
+				console.log(httpRequest.status);
+				console.log(httpRequest.responseText);
+				}
+			};
+			var data =  "pwmSliderValue1="+pwmSliderValue1+"&pwmSliderValue2="+pwmSliderValue2+
+						"&pwmSliderValue3="+pwmSliderValue3+"&pwmSliderValue4="+pwmSliderValue4+
+						"pwmSliderValue5="+pwmSliderValue5+"&pwmSliderValue6="+pwmSliderValue6 ;
+			httpRequest.send(data);
+		}
+	</script>
 </head>
 <body>
 	<h1>PWM Slider Control</h1>
-	
-	<h2>Servo Angle</h2>
-	
 	<!-- Displays the range of the slider from -90 to 90 in steps of 10 -->
-	<p><span id="textSliderValue">1000</span> ms</p>
-	<p><input type="range" onchange="updateSliderPWM(this)" id="pwmSlider" min="1000" max="2000" value="0" step="10" class="slider"></p>
-	<script>
-		function updateSliderPWM(element) {
-			var pwmSliderValue = document.getElementById("pwmSlider").value;
-			document.getElementById("textSliderValue").innerHTML = pwmSliderValue;
-			console.log(pwmSliderValue);
-			var httpRequest = new XMLHttpRequest();
-			httpRequest.open("POST", "/post?value="+pwmSliderValue, true);
-			httpRequest.send();
-		}
-	</script>
+	<h2>Pompe 1</h2>	
+	<p><span id="textSliderValue1">0</span> ms</p>
+	<p><input type="range" onchange="updateSliderPWM(this)" id="pwmSlider1" min="0" max="2000" value="0" step="10" class="slider"></p>
+	<h2>Pompe 2</h2>	
+	<p><span id="textSliderValue2">0</span> ms</p>
+	<p><input type="range" onchange="updateSliderPWM(this)" id="pwmSlider2" min="0" max="2000" value="0" step="10" class="slider"></p>
+	<h2>Starter</h2>	
+	<p><span id="textSliderValue3">0</span> ms</p>
+	<p><input type="range" onchange="updateSliderPWM(this)" id="pwmSlider3" min="0" max="2000" value="0" step="10" class="slider"></p>
+	<h2>Vanne 1</h2>	
+	<p><span id="textSliderValue4">0</span> ms</p>
+	<p><input type="range" onchange="updateSliderPWM(this)" id="pwmSlider4" min="0" max="2000" value="0" step="10" class="slider"></p>
+	<h2>Vanne 2</h2>	
+	<p><span id="textSliderValue5">0</span> ms</p>
+	<p><input type="range" onchange="updateSliderPWM(this)" id="pwmSlider5" min="0" max="2000" value="0" step="10" class="slider"></p>
+	<h2>Bougie</h2>	
+	<p><span id="textSliderValue6">0</span> ms</p>
+	<p><input type="range" onchange="updateSliderPWM(this)" id="pwmSlider6" min="0" max="2000" value="0" step="10" class="slider"></p>
+	
+	<p></p><form action="/" method="get"><button name="">Retour</button></form>
 </body>
+
 </html>
