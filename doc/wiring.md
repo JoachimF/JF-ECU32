@@ -11,7 +11,7 @@
 
 ## ADC batterie ECU
   Entrée analogique - module ADC0
-  - GPIO36
+  - GPIO36 -GPIO_0
 
 ## ADC Courant ECU
   Entrée analogique - module ADC0
