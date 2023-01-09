@@ -133,7 +133,7 @@ typedef struct {
   uint32_t checksum ;
 } _configEngine_t;
 
-typedef struct{
+typedef struct _pwm_config_{
   uint16_t frequency ;
   uint8_t ppm_pwm ;
   uint8_t nbits ;
@@ -144,7 +144,7 @@ typedef struct{
   uint8_t MCPWM_GEN ;
 }_pwm_config ;
 
-typedef struct{
+typedef struct _ledc_config_{
   uint16_t frequency ;
   uint8_t gpio_num ;
   uint8_t ledc_channel ;
@@ -154,18 +154,19 @@ typedef struct _GLOW_{
   uint8_t value;
   bool state;  // On - Off
   _ledc_config config ;
-  void (*set_power)(_ledc_config *config,uint8_t power);
-  uint16_t (*get_power)(struct _GLOW_ * glow);
+  void (*set_power)(_ledc_config *config,uint32_t power);
+  uint32_t (*get_power)(struct _GLOW_ * glow);
   void (*off)(_pwm_config *config);
 } _GLOW_t ;
 
 typedef struct _PUMP_{
   uint32_t target ;
-  uint16_t value ;
+  uint32_t value ;
   bool state; // On - Off
   bool new_target ;
   _pwm_config config ;
   void (*set_power)( _pwm_config *config,float power);
+  void (*set_power_us)( _pwm_config *config,uint32_t power);
   uint16_t (*get_power)(struct _PUMP_ * pump) ;
   void (*off)(_pwm_config *config);
 } _PUMP_t;
@@ -174,19 +175,19 @@ typedef struct _VALVE_{
   uint8_t value;
   bool state;
   _ledc_config config ;
-  void (*set_power)(_ledc_config *config,uint8_t power);
+  void (*set_power)(_ledc_config *config,uint32_t power);
   uint16_t (*get_power)(struct _VALVE_ * valve);
   void (*on)(_pwm_config *config);
   void (*off)(_pwm_config *config);
 } _VALVE_t;
 
-typedef struct {
+typedef struct _engine_ {
   uint8_t minutes ;
   uint8_t secondes ;
-  uint16_t GAZ ;
-  uint16_t Aux ;
+  uint32_t GAZ ;
+  uint32_t Aux ;
   uint32_t RPM ;
-  uint16_t EGT ;
+  uint32_t EGT ;
   _PUMP_t pump1 ;
   _PUMP_t pump2 ;
   _PUMP_t starter ;

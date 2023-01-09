@@ -16,6 +16,7 @@
 #include "esp_log.h"
 #include "mdns.h"
 #include "lwip/dns.h"
+#include "driver/gpio.h"
 
 #include "jf-ecu32.h"
 #include "http_server.h"
@@ -23,8 +24,107 @@
 #include "nvs_ecu.h"
 
 #define TAG	"MAIN"
+#define NUM_OF_SPIN_TASKS   6
+#define SPIN_ITER           500000  //Actual CPU cycles used will depend on compiler optimization
+#define SPIN_TASK_PRIO      2
+#define STATS_TASK_PRIO     3
+#define STATS_TICKS         pdMS_TO_TICKS(1000)
+#define ARRAY_SIZE_OFFSET   5   //Increase this if print_real_time_stats returns ESP_ERR_INVALID_SIZE
+
+static char task_names[NUM_OF_SPIN_TASKS][configMAX_TASK_NAME_LEN];
+static SemaphoreHandle_t sync_spin_task;
+static SemaphoreHandle_t sync_stats_task;
 
 QueueHandle_t xQueueHttp;
+
+static esp_err_t print_real_time_stats(TickType_t xTicksToWait)
+{
+    TaskStatus_t *start_array = NULL, *end_array = NULL;
+    UBaseType_t start_array_size, end_array_size;
+    uint32_t start_run_time, end_run_time;
+    esp_err_t ret;
+
+    //Allocate array to store current task states
+	//ESP_LOGI(TAG, "Allocate array to store current task states") ;
+    start_array_size = uxTaskGetNumberOfTasks() + ARRAY_SIZE_OFFSET;
+    start_array = malloc(sizeof(TaskStatus_t) * start_array_size);
+    if (start_array == NULL) {
+        ret = ESP_ERR_NO_MEM;
+        goto exit;
+    }
+    //Get current task states
+	//ESP_LOGI(TAG, "Get current task states") ;
+    start_array_size = uxTaskGetSystemState(start_array, start_array_size, &start_run_time);
+    if (start_array_size == 0) {
+        ret = ESP_ERR_INVALID_SIZE;
+        goto exit;
+    }
+
+    vTaskDelay(xTicksToWait);
+
+    //Allocate array to store tasks states post delay
+	//ESP_LOGI(TAG, "Allocate array to store tasks states post delay") ;
+    end_array_size = uxTaskGetNumberOfTasks() + ARRAY_SIZE_OFFSET;
+    end_array = malloc(sizeof(TaskStatus_t) * end_array_size);
+    if (end_array == NULL) {
+        ret = ESP_ERR_NO_MEM;
+        goto exit;
+    }
+    //Get post delay task states
+	//ESP_LOGI(TAG, "Get post delay task states") ;
+    end_array_size = uxTaskGetSystemState(end_array, end_array_size, &end_run_time);
+    if (end_array_size == 0) {
+        ret = ESP_ERR_INVALID_SIZE;
+        goto exit;
+    }
+
+    //Calculate total_elapsed_time in units of run time stats clock period.
+	//ESP_LOGI(TAG, "Calculate total_elapsed_time in units of run time stats clock period.") ;
+    uint32_t total_elapsed_time = (end_run_time - start_run_time);
+    if (total_elapsed_time == 0) {
+        ret = ESP_ERR_INVALID_STATE;
+        goto exit;
+    }
+
+    printf("| Task | Run Time | Percentage\n");
+    //Match each task in start_array to those in the end_array
+    for (int i = 0; i < start_array_size; i++) {
+        int k = -1;
+        for (int j = 0; j < end_array_size; j++) {
+            if (start_array[i].xHandle == end_array[j].xHandle) {
+                k = j;
+                //Mark that task have been matched by overwriting their handles
+                start_array[i].xHandle = NULL;
+                end_array[j].xHandle = NULL;
+                break;
+            }
+        }
+        //Check if matching task found
+        if (k >= 0) {
+            uint32_t task_elapsed_time = end_array[k].ulRunTimeCounter - start_array[i].ulRunTimeCounter;
+            uint32_t percentage_time = (task_elapsed_time * 100UL) / (total_elapsed_time * portNUM_PROCESSORS);
+            printf("| %s | %d | %d%%\n", start_array[i].pcTaskName, task_elapsed_time, percentage_time);
+        }
+    }
+
+    //Print unmatched tasks
+    for (int i = 0; i < start_array_size; i++) {
+        if (start_array[i].xHandle != NULL) {
+            printf("| %s | Deleted\n", start_array[i].pcTaskName);
+        }
+    }
+    for (int i = 0; i < end_array_size; i++) {
+        if (end_array[i].xHandle != NULL) {
+            printf("| %s | Created\n", end_array[i].pcTaskName);
+        }
+    }
+    ret = ESP_OK;
+
+exit:    //Common return path
+    free(start_array);
+    free(end_array);
+    return ret;
+}
 
 static void directorySPIFFS(char * path) {
 	DIR* dir = opendir(path);
@@ -73,21 +173,67 @@ esp_err_t mountSPIFFS(char * path, char * label, int max_files) {
 	return ret;
 }
 
+static void stats_task(void *arg)
+{
+    xSemaphoreTake(sync_stats_task, portMAX_DELAY);
+
+    //Start all the spin tasks
+    /*for (int i = 0; i < NUM_OF_SPIN_TASKS; i++) {
+        xSemaphoreGive(sync_spin_task);
+    }*/
+
+    //Print real time stats periodically
+    while (1) {
+        printf("\n\nGetting real time stats over %d ticks\n", STATS_TICKS);
+        if (print_real_time_stats(STATS_TICKS) == ESP_OK) {
+            printf("Real time stats obtained\n");
+        } else {
+            printf("Error getting real time stats\n");
+        }
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+}
+
 void http_server_task(void *pvParameters);
+
+extern _engine_t turbine ;
+long int timer_old,Timer1,time_ecu ;
 
 void app_main()
 {
 	int res ;
+	gpio_pad_select_gpio(STARTER_PIN);
+	gpio_set_direction(STARTER_PIN, GPIO_MODE_OUTPUT);
+	gpio_set_level(STARTER_PIN, 0);
+	gpio_pad_select_gpio(PUMP1_PIN);
+	gpio_set_direction(PUMP1_PIN, GPIO_MODE_OUTPUT);
+	gpio_set_level(PUMP1_PIN, 0);
+	gpio_pad_select_gpio(PUMP2_PIN);
+	gpio_set_direction(PUMP2_PIN, GPIO_MODE_OUTPUT);
+	gpio_set_level(PUMP2_PIN, 0);
+	gpio_pad_select_gpio(VANNE1_PIN);
+	gpio_set_direction(VANNE1_PIN, GPIO_MODE_OUTPUT);
+	gpio_set_level(VANNE1_PIN, 0);
+	gpio_pad_select_gpio(VANNE2_PIN);
+	gpio_set_direction(VANNE2_PIN, GPIO_MODE_OUTPUT);
+	gpio_set_level(VANNE2_PIN, 0);
+	gpio_pad_select_gpio(GLOW_PIN);
+	gpio_set_direction(GLOW_PIN, GPIO_MODE_OUTPUT);
+	gpio_set_level(GLOW_PIN, 0);
+
 	// Initialize NVS
+	ESP_LOGI(TAG, "Initializing NVS");
 	init_nvs() ;
 	// read wifi conf.
+	ESP_LOGI(TAG, "Initializing NVS Wifi");
 	read_nvs_wifi() ;
-	
+	ESP_LOGI(TAG, "Initializing Timer");
 	create_timers() ;
+	ESP_LOGI(TAG, "Initializing Wifi");
 	// Initialize WiFi
 	res = wifi_init_sta();
 	//res = wifi_init_ap() ;
-
+	ESP_LOGI(TAG, "Initializing mDNS");
 	// Initialize mDNS
 	initialise_mdns();
 
@@ -103,8 +249,9 @@ void app_main()
 	}
 
 	// Create Queue
+	/*
 	xQueueHttp = xQueueCreate( 10, sizeof(URL_t) );
-	configASSERT( xQueueHttp );
+	configASSERT( xQueueHttp );*/
 
 	/* Get the local IP address */
 	esp_netif_ip_info_t ip_info;
@@ -124,11 +271,40 @@ void app_main()
 	configASSERT( xlogHandle );
 	vTaskSuspend( xlogHandle ); 
 	
-	xTaskCreatePinnedToCore(ecu_task, "ECU", 1024*6, NULL, ( 1UL | portPRIVILEGE_BIT ), &xecuHandle,1);
+	xTaskCreatePinnedToCore(ecu_task, "ECU", 4096, NULL, ( 1UL | portPRIVILEGE_BIT ), &xecuHandle,1);
 	configASSERT( xecuHandle );
+	vTaskSuspend( xecuHandle ); 
+	
+	sync_spin_task = xSemaphoreCreateCounting(NUM_OF_SPIN_TASKS, 0);
+    sync_stats_task = xSemaphoreCreateBinary();
+	xTaskCreatePinnedToCore(stats_task, "stats", 4096, NULL, STATS_TASK_PRIO, NULL, tskNO_AFFINITY);
+    xSemaphoreGive(sync_stats_task);
+	
+	vTaskDelay(2000 / portTICK_PERIOD_MS);
+	turbine.EGT = 1000 ;
+	turbine.GAZ = 1000 ;
+	Timer1 = esp_timer_get_time();
 
-
-	vTaskDelay(10);
+	//int32_t time =     //printf("Timer: %lld μs\n", Timer1/1000); 
+	while(1){
+	for(int32_t i=0;i<1000;i++)
+	{
+		    turbine.EGT -- ;
+            turbine.GAZ ++ ;
+			time_ecu = esp_timer_get_time() - timer_old ;
+			timer_old = esp_timer_get_time();
+            //ESP_LOGI(TAG,"EGT : %d ; GAZ : %d",turbine.EGT,turbine.GAZ) ;
+    		vTaskDelay(10 / portTICK_PERIOD_MS);
+	}
+	for(int32_t i=0 ; i<1000;i++)
+	{
+        //if( xSemaphoreTake(xTimeMutex,( TickType_t ) 10) == pdTRUE ) {
+            turbine.EGT ++ ;
+            turbine.GAZ -- ;
+            //ESP_LOGI(TAG,"EGT : %d ; GAZ : %d",turbine.EGT,turbine.GAZ) ;
+        //}xSemaphoreGive(xTimeMutex) ;
+    		vTaskDelay(10 / portTICK_PERIOD_MS);
+	}}
 	/*
 	set_kero_pump_target(36000);
 	vTaskDelay(3000 / portTICK_PERIOD_MS);

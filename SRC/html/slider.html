@@ -52,26 +52,26 @@
 	</script>
 </head>
 <body>
-	<h1>PWM Slider Control</h1>
+	<h1>Controle des sorties</h1>
 	<!-- Displays the range of the slider from -90 to 90 in steps of 10 -->
 	<h2>Pompe 1</h2>	
-	<p><span id="textSliderValue1">0</span> ms</p>
-	<p><input type="range" onchange="updateSliderPWM(this)" id="pwmSlider1" min="0" max="2000" value="0" step="10" class="slider"></p>
+	<p><span id="textSliderValue1">0</span> us</p>
+	<p><input type="range" onchange="updateSliderPWM(this)" id="pwmSlider1" min="0" max="2000" value="0" step="1" class="slider"></p>
 	<h2>Pompe 2</h2>	
-	<p><span id="textSliderValue2">0</span> ms</p>
-	<p><input type="range" onchange="updateSliderPWM(this)" id="pwmSlider2" min="0" max="2000" value="0" step="10" class="slider"></p>
+	<p><span id="textSliderValue2">0</span> us</p>
+	<p><input type="range" onchange="updateSliderPWM(this)" id="pwmSlider2" min="0" max="2000" value="0" step="1" class="slider"></p>
 	<h2>Starter</h2>	
-	<p><span id="textSliderValue3">0</span> ms</p>
-	<p><input type="range" onchange="updateSliderPWM(this)" id="pwmSlider3" min="0" max="2000" value="0" step="10" class="slider"></p>
+	<p><span id="textSliderValue3">0</span> us</p>
+	<p><input type="range" onchange="updateSliderPWM(this)" id="pwmSlider3" min="0" max="2000" value="0" step="1" class="slider"></p>
 	<h2>Vanne 1</h2>	
-	<p><span id="textSliderValue4">0</span> ms</p>
-	<p><input type="range" onchange="updateSliderPWM(this)" id="pwmSlider4" min="0" max="2000" value="0" step="10" class="slider"></p>
+	<p><span id="textSliderValue4">0</span></p>
+	<p><input type="range" onchange="updateSliderPWM(this)" id="pwmSlider4" min="0" max="256" value="0" step="1" class="slider"></p>
 	<h2>Vanne 2</h2>	
-	<p><span id="textSliderValue5">0</span> ms</p>
-	<p><input type="range" onchange="updateSliderPWM(this)" id="pwmSlider5" min="0" max="2000" value="0" step="10" class="slider"></p>
+	<p><span id="textSliderValue5">0</span></p>
+	<p><input type="range" onchange="updateSliderPWM(this)" id="pwmSlider5" min="0" max="256" value="0" step="1" class="slider"></p>
 	<h2>Bougie</h2>	
-	<p><span id="textSliderValue6">0</span> ms</p>
-	<p><input type="range" onchange="updateSliderPWM(this)" id="pwmSlider6" min="0" max="2000" value="0" step="10" class="slider"></p>
+	<p><span id="textSliderValue6">0</span></p>
+	<p><input type="range" onchange="updateSliderPWM(this)" id="pwmSlider6" min="0" max="256" value="0" step="1" class="slider"></p>
 	
 	<p></p><form action="/" method="get"><button name="">Retour</button></form>
 </body>

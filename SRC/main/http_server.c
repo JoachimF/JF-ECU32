@@ -31,6 +31,7 @@
 #include "nvs.h"
 #include "esp_http_server.h"
 #include "esp_wifi.h"
+#include "cJSON.h"
 
 #include "jf-ecu32.h"
 #include "nvs_ecu.h"
@@ -126,7 +127,29 @@ static esp_err_t Text2Html(httpd_req_t *req, char * filename) {
 		ESP_LOGE(TAG, "fopen fail. [%s]", filename);
 		return ESP_FAIL;
 	} else {
-		char line[128];
+		char buffer[64];
+			while(1) {
+			size_t bufferSize = fread(buffer, 1, sizeof(buffer), fhtml);
+			ESP_LOGD(TAG, "bufferSize=%d", bufferSize);
+			if (bufferSize > 0) {
+				httpd_resp_send_chunk(req, buffer, bufferSize);
+			} else {
+				break;
+			}
+		}
+		fclose(fhtml);
+	}
+	return ESP_OK;
+}
+
+/*static esp_err_t Text2Html(httpd_req_t *req, char * filename) {
+	ESP_LOGI(TAG, "Reading %s", filename);
+	FILE* fhtml = fopen(filename, "r");
+	if (fhtml == NULL) {
+		ESP_LOGE(TAG, "fopen fail. [%s]", filename);
+		return ESP_FAIL;
+	} else {
+		char line[64];
 		while (fgets(line, sizeof(line), fhtml) != NULL) {
 			size_t linelen = strlen(line);
 			//remove EOL (CR or LF)
@@ -139,7 +162,7 @@ static esp_err_t Text2Html(httpd_req_t *req, char * filename) {
 					break;
 				}
 			}
-			ESP_LOGD(TAG, "line=[%s]", line);
+			ESP_LOGI(TAG, "line=[%s]", line);
 			esp_err_t ret = httpd_resp_sendstr_chunk(req, line);
 			if (ret != ESP_OK) {
 				ESP_LOGE(TAG, "httpd_resp_sendstr_chunk fail %d", ret);
@@ -148,7 +171,7 @@ static esp_err_t Text2Html(httpd_req_t *req, char * filename) {
 		fclose(fhtml);
 	}
 	return ESP_OK;
-}
+}*/
 
 // Calculate the size after conversion to base64
 // http://akabanessa.blog73.fc2.com/blog-entry-83.html
@@ -260,6 +283,17 @@ esp_err_t Image2Html(httpd_req_t *req, char * filename, char * type)
 	return ESP_OK;
 }
 
+static void send_head(httpd_req_t *req)
+{
+	httpd_resp_sendstr_chunk(req, "<!DOCTYPE html><html>");
+	Text2Html(req, "/html/head.html");
+	Text2Html(req, "/html/head2.html");
+
+	httpd_resp_sendstr_chunk(req, "<h2>");
+	httpd_resp_sendstr_chunk(req, turbine_config.name);
+	httpd_resp_sendstr_chunk(req, "</h2>");
+}
+
 /* HTTP post handler */
 static esp_err_t root_post_handler(httpd_req_t *req)
 {
@@ -268,7 +302,7 @@ static esp_err_t root_post_handler(httpd_req_t *req)
      * as well be any binary data (needs type casting).
      * In case of string data, null termination will be absent, and
      * content length would give length of string */
-    char content[100];
+    char content[200];
 	char param[30] ;
 	int16_t len ;
 
@@ -292,18 +326,24 @@ static esp_err_t root_post_handler(httpd_req_t *req)
         return ESP_FAIL;
     }
 	len = find_value("pwmSliderValue1=",content,param) ;
+	if(len > 0)
 	set_power_func_us(&turbine.pump1.config,atoi(param)) ;
 	len = find_value("pwmSliderValue2=",content,param) ;
+	if(len > 0)
 	set_power_func_us(&turbine.pump2.config,atoi(param)) ;
 	len = find_value("pwmSliderValue3=",content,param) ;
+	if(len > 0)
 	set_power_func_us(&turbine.starter.config,atoi(param)) ;
-	/*
+	
 	len = find_value("pwmSliderValue4=",content,param) ;
+	if(len > 0)
 	turbine.vanne1.set_power(&turbine.vanne1.config,atoi(param)) ;
 	len = find_value("pwmSliderValue5=",content,param) ;
+	if(len > 0)
 	turbine.vanne2.set_power(&turbine.vanne2.config,atoi(param)) ;
 	len = find_value("pwmSliderValue6=",content,param) ;
-	turbine.glow.set_power(&turbine.glow.config,atoi(param)) ;*/
+	if(len > 0)
+	turbine.glow.set_power(&turbine.glow.config,atoi(param)) ;
 
 	ESP_LOGI(TAG,"%s",content) ;
     /* Send a simple response */
@@ -432,12 +472,13 @@ static esp_err_t logs(httpd_req_t *req)
 	ESP_LOGI(TAG, "root_get_handler req->uri=[%s]", req->uri);
 
 	// Send HTML header
-	httpd_resp_sendstr_chunk(req, "<!DOCTYPE html><html>");
+	send_head(req) ;
+	/*httpd_resp_sendstr_chunk(req, "<!DOCTYPE html><html>");
 	Text2Html(req, "/html/head.html");
 
 	httpd_resp_sendstr_chunk(req, "<h2>");
 	httpd_resp_sendstr_chunk(req, turbine_config.name);
-	httpd_resp_sendstr_chunk(req, "</h2>");
+	httpd_resp_sendstr_chunk(req, "</h2>");*/
 		
 	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"logs.txt\">");
 	httpd_resp_sendstr_chunk(req, "<button>Log 1</button></form>");
@@ -582,12 +623,13 @@ static esp_err_t configecu(httpd_req_t *req)
 	ESP_LOGI("CONFIG_ECU","use_led : %d",config_ECU.use_led) ;
 
 	// Send HTML header
-	httpd_resp_sendstr_chunk(req, "<!DOCTYPE html><html>");
+	send_head(req) ;
+	/*httpd_resp_sendstr_chunk(req, "<!DOCTYPE html><html>");
 	Text2Html(req, "/html/head.html");
 
 	httpd_resp_sendstr_chunk(req, "<h2>");
 	httpd_resp_sendstr_chunk(req, turbine_config.name);
-	httpd_resp_sendstr_chunk(req, "</h2></div>");
+	httpd_resp_sendstr_chunk(req, "</h2></div>");*/
 	
 	httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Paramètre de l'ECU&nbsp;</b></legend><form method=\"GET\" action=\"configecu\"><p>") ;
 	/*Voie des gaz*/
@@ -816,12 +858,13 @@ static esp_err_t wifi_get_handler(httpd_req_t *req)
 		
 	char tmp[10] ;
 	// Send HTML header
-	httpd_resp_sendstr_chunk(req, "<!DOCTYPE html><html>");
+	send_head(req) ;
+	/*httpd_resp_sendstr_chunk(req, "<!DOCTYPE html><html>");
 	Text2Html(req, "/html/head.html");
 
 	httpd_resp_sendstr_chunk(req, "<h2>");
 	httpd_resp_sendstr_chunk(req, turbine_config.name);
-	httpd_resp_sendstr_chunk(req, "</h2></div>");
+	httpd_resp_sendstr_chunk(req, "</h2></div>");*/
 		
 	httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Paramètres Wifi&nbsp;</b></legend><form method=\"GET\" action=\"wifi\"><p>") ;
 	/*SSID*/
@@ -861,12 +904,13 @@ static esp_err_t configmoteur(httpd_req_t *req)
 		
 	char tmp[10] ;
 	// Send HTML header
-	httpd_resp_sendstr_chunk(req, "<!DOCTYPE html><html>");
+	send_head(req) ;
+	/*httpd_resp_sendstr_chunk(req, "<!DOCTYPE html><html>");
 	Text2Html(req, "/html/head.html");
 
 	httpd_resp_sendstr_chunk(req, "<h2>");
 	httpd_resp_sendstr_chunk(req, turbine_config.name);
-	httpd_resp_sendstr_chunk(req, "</h2></div>");
+	httpd_resp_sendstr_chunk(req, "</h2></div>");*/
 		
 	httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Paramètres du moteur&nbsp;</b></legend><form method=\"POST\" action=\"configmoteur\"><p>") ;
 
@@ -997,11 +1041,56 @@ static const char* get_path_from_uri(char *dest, const char *uri, size_t destsiz
     return dest;
 }
 
+static esp_err_t gauges_get_handler(httpd_req_t *req){
+	httpd_resp_sendstr_chunk(req, "<!DOCTYPE html><html>");
+	Text2Html(req, "/html/head.html");
+	Text2Html(req, "/html/head2.html");
+	httpd_resp_sendstr_chunk(req, "<h2>");
+	httpd_resp_sendstr_chunk(req, turbine_config.name);
+	httpd_resp_sendstr_chunk(req, "</h2>");
+	Text2Html(req, "/html/gauges.html");
+	httpd_resp_sendstr_chunk(req, "<script>") ;
+	Text2Html(req, "/html/gauge.min.js");
+	Text2Html(req, "/html/script_gauges.js");
+	httpd_resp_sendstr_chunk(req, "</script>") ;
+	Text2Html(req, "/html/footer.html");
+	httpd_resp_sendstr_chunk(req, NULL); //fin de la page
+	return ESP_OK;
+}
+
+extern long int time_ecu ;
+static esp_err_t readings_get_handler(httpd_req_t *req){
+	static cJSON *myjson;
+	//ESP_LOGI(TAG, "readings_get_handler req->uri=[%s]", req->uri);
+	myjson = cJSON_CreateObject();
+//	if( xSemaphoreTake(xTimeMutex,( TickType_t ) 10) == pdTRUE ) {
+		cJSON_AddNumberToObject(myjson, "temperature", turbine.GAZ);
+		cJSON_AddNumberToObject(myjson, "humidity", turbine.EGT);
+		cJSON_AddNumberToObject(myjson, "time", time_ecu);
+	
+//	}xSemaphoreGive(xTimeMutex) ;
+	char *my_json_string = cJSON_Print(myjson);
+	httpd_resp_set_type(req, "application/json");
+	httpd_resp_sendstr_chunk(req, my_json_string); //fin de la page
+	httpd_resp_sendstr_chunk(req, NULL); //fin de la page
+	return ESP_OK;
+}
+
+static esp_err_t events_get_handler(httpd_req_t *req){
+//	ESP_LOGI(TAG, "events_get_handler req->uri=[%s]", req->uri);
+	httpd_resp_set_type(req, "text/event-stream");
+	httpd_resp_sendstr_chunk(req, "Alive"); //fin de la page
+	httpd_resp_sendstr_chunk(req, NULL); //fin de la page
+	readings_get_handler(req) ;
+	return ESP_OK;
+}
+
+
 static esp_err_t frontpage(httpd_req_t *req)
 {
-	ESP_LOGI(TAG, "root_get_handler req->uri=[%s]", req->uri);
+//	ESP_LOGI(TAG, "root_get_handler req->uri=[%s]", req->uri);
     char filepath[20];
-    ESP_LOGI(TAG, "URI : %s", req->uri);
+    //ESP_LOGI(TAG, "URI : %s", req->uri);
 
     const char *filename = get_path_from_uri(filepath, req->uri, sizeof(filepath));
     if (!filename) 
@@ -1011,7 +1100,7 @@ static esp_err_t frontpage(httpd_req_t *req)
         httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Filename too long");
         return ESP_FAIL;
     }
-	ESP_LOGI(TAG, "File : %s", filename);
+	//ESP_LOGI(TAG, "File : %s", filename);
 
 	if(strcmp(filename, "/configecu") == 0) 
 		configecu(req) ;
@@ -1032,16 +1121,24 @@ static esp_err_t frontpage(httpd_req_t *req)
 	else if(strcmp(filename, "/stopwifi") == 0) {
 		ESP_ERROR_CHECK(esp_wifi_stop() );
 		vTaskDelete( xWebHandle ); }
+	else if(strcmp(filename, "/gauges") == 0) 
+		gauges_get_handler(req) ;
+	else if(strcmp(filename, "/readings") == 0) 
+		readings_get_handler(req) ;
+	else if(strcmp(filename, "/events") == 0) 
+		events_get_handler(req) ;
 	else if(strcmp(filename, "/") == 0 ) 
 	{
 		// Send HTML header
-	httpd_resp_sendstr_chunk(req, "<!DOCTYPE html><html>");
+	
+	/*httpd_resp_sendstr_chunk(req, "<!DOCTYPE html><html>");
 	Text2Html(req, "/html/head.html");
 
 	httpd_resp_sendstr_chunk(req, "<h2>");
 	httpd_resp_sendstr_chunk(req, turbine_config.name);
-	httpd_resp_sendstr_chunk(req, "</h2>");
-		
+	httpd_resp_sendstr_chunk(req, "</h2>");*/
+	send_head(req) ;
+
 	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"configecu\">");
 	httpd_resp_sendstr_chunk(req, "<button>Paramètres ECU</button></form>");
 	httpd_resp_sendstr_chunk(req, "</form>");
@@ -1072,6 +1169,12 @@ static esp_err_t frontpage(httpd_req_t *req)
 	httpd_resp_sendstr_chunk(req, "</form>");
 	httpd_resp_sendstr_chunk(req, "<p></p>");
 
+	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"gauges\">");
+	httpd_resp_sendstr_chunk(req, "<button>Jauges</button></form>");
+	httpd_resp_sendstr_chunk(req, "</form>");
+	httpd_resp_sendstr_chunk(req, "<p></p>");
+
+
 	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"stopwifi\">");
 	httpd_resp_sendstr_chunk(req, "<button class=\"button bred\">Couper le WiFi</button></form>");
 	httpd_resp_sendstr_chunk(req, "</form>");
@@ -1088,6 +1191,7 @@ esp_err_t start_server(const char *base_path, int port)
 {
 	httpd_handle_t server = NULL;
 	httpd_config_t config = HTTPD_DEFAULT_CONFIG();
+	config.stack_size = 16392 ; // Default 4K -> 20K
 	config.server_port = port;
 
 	/* Use the URI wildcard matching function in order to
@@ -1140,12 +1244,14 @@ void http_server_task(void *pvParameters)
 	
 	URL_t urlBuf;
 	while(1) {
+		vTaskDelay(10 / portTICK_PERIOD_MS);
 		// Waiting for submit
+		/*
 		if (xQueueReceive(xQueueHttp, &urlBuf, portMAX_DELAY) == pdTRUE) {
 			ESP_LOGI(TAG, "url=%s", urlBuf.url);
 			ESP_LOGI(TAG, "parameter=%s", urlBuf.parameter);
 
-			/*
+			
 			// save key & value to NVS
 			esp_err_t err = save_key_value(urlBuf.url, urlBuf.parameter);
 			if (err != ESP_OK) {
@@ -1156,8 +1262,8 @@ void http_server_task(void *pvParameters)
 			err = load_key_value(urlBuf.url, urlBuf.parameter, sizeof(urlBuf.parameter));
 			if (err != ESP_OK) {
 				ESP_LOGE(TAG, "Error (%s) loading to NVS", esp_err_to_name(err));
-			}*/
-		}
+			}
+		}*/
 	}
 
 	// Never reach here

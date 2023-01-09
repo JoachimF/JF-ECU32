@@ -41,13 +41,13 @@ static const char *TAG = "ECU";
 void linear_interpolation(uint32_t rpm1,uint32_t pump1,uint32_t rpm2,uint32_t pump2,uint32_t rpm,uint32_t *res) //RPM,PUMP,RPM,PUMP
 {
     *res =  pump1 + ((pump2-pump1)* (rpm - rpm1))/(rpm2-rpm1) ;
-    ESP_LOGI(TAG,"RPM1 : %d ; pump1 : %d , RPM1 : %d ; pump1 : %d , rpm : %d , res : %d",rpm1,pump1,rpm2,pump2,rpm,*res);
+    //ESP_LOGI(TAG,"RPM1 : %d ; pump1 : %d , RPM1 : %d ; pump1 : %d , rpm : %d , res : %d",rpm1,pump1,rpm2,pump2,rpm,*res);
 }
 
 void set_power_func_us(_pwm_config *config ,int32_t value)
 {
     mcpwm_set_duty_in_us(config->MCPWM_UNIT, config->MCPWM_TIMER, config->MCPWM_GEN, value);
-    ESP_LOGI(TAG,"MCPWM_UNIT : %d ; MCPWM_TIMER : %d ; MCPWM_GEN : %d ; value : %d ; pin : %d",config->MCPWM_UNIT,config->MCPWM_TIMER,config->MCPWM_GEN,value,config->gpio_num);
+    //ESP_LOGI(TAG,"MCPWM_UNIT : %d ; MCPWM_TIMER : %d ; MCPWM_GEN : %d ; value : %d ; pin : %d",config->MCPWM_UNIT,config->MCPWM_TIMER,config->MCPWM_GEN,value,config->gpio_num);
 }
 
 void set_power_func(_pwm_config *config ,float value)
@@ -55,23 +55,23 @@ void set_power_func(_pwm_config *config ,float value)
     mcpwm_set_duty(config->MCPWM_UNIT, config->MCPWM_TIMER, config->MCPWM_GEN, value);
 }
 
-void set_power_ledc(_ledc_config *config ,uint8_t value)
+void set_power_ledc(_ledc_config *config ,uint32_t value)
 {
     ESP_ERROR_CHECK(ledc_set_duty(LEDC_LOW_SPEED_MODE, config->ledc_channel, value));
-    printf("Pin : %d\n",config->gpio_num) ;
     ESP_ERROR_CHECK(ledc_update_duty(LEDC_LOW_SPEED_MODE, config->ledc_channel));
+    //ESP_LOGI(TAG,"ledc_channel %d ; value : %d ; pin : %d",config->ledc_channel,value,config->gpio_num);
 }
 
 ledc_timer_config_t ledc_timer = {
     .speed_mode = LEDC_LOW_SPEED_MODE,
     .timer_num  = LEDC_TIMER_0,
     .duty_resolution = LEDC_TIMER_8_BIT,
-    .freq_hz = 50,
+    .freq_hz = 400,
     .clk_cfg = LEDC_AUTO_CLK
 };
 
-ledc_channel_config_t ledc_channel[3];
-mcpwm_config_t pwm_config[2];
+static ledc_channel_config_t ledc_channel[3];
+static mcpwm_config_t pwm_config[2];
 
 
 _engine_t turbine = { 
@@ -173,12 +173,7 @@ void init_mcpwm(void)
     init_pwm_outputs(&turbine.pump1.config) ;
     init_pwm_outputs(&turbine.starter.config) ;
 
-    ledc_channel[0].channel = turbine.vanne1.config.ledc_channel;
-    ledc_channel[0].gpio_num = turbine.vanne1.config.gpio_num ;
-    ledc_channel[1].channel = turbine.vanne2.config.ledc_channel;
-    ledc_channel[1].gpio_num = turbine.vanne2.config.gpio_num ;
-    ledc_channel[2].channel = turbine.glow.config.ledc_channel;
-    ledc_channel[2].gpio_num = turbine.glow.config.gpio_num ;
+
     
     //2. initial mcpwm configuration
     printf("Configuring Initial Parameters of mcpwm......\n");
@@ -203,7 +198,16 @@ void init_mcpwm(void)
     else
         mcpwm_init(MCPWM_UNIT_1, MCPWM_TIMER_2, &pwm_config[1]);    //Configure PWM2A 50KHz (Starter)
     
-    for (int i = 0; i < 2; i++)
+    ESP_LOGI(TAG,"LEDC init") ;
+    ledc_timer_config(&ledc_timer);
+    ESP_LOGI(TAG,"LEDC init outputs") ;
+    ledc_channel[0].channel = turbine.vanne1.config.ledc_channel;
+    ledc_channel[0].gpio_num = turbine.vanne1.config.gpio_num ;
+    ledc_channel[1].channel = turbine.vanne2.config.ledc_channel;
+    ledc_channel[1].gpio_num = turbine.vanne2.config.gpio_num ;
+    ledc_channel[2].channel = turbine.glow.config.ledc_channel;
+    ledc_channel[2].gpio_num = turbine.glow.config.gpio_num ;
+    for (int i = 0; i < 3; i++)
     {   
         ledc_channel[i].speed_mode = LEDC_LOW_SPEED_MODE;
         ledc_channel[i].timer_sel = LEDC_TIMER_0;
@@ -233,6 +237,8 @@ void init(void)
 //    turbine.glow.set_power(&turbine.glow.config,128) ;
 //    turbine.vanne1.set_power(&turbine.vanne1.config,50) ;
 //    turbine.vanne2.set_power(&turbine.vanne2.config,100) ;    
+    turbine.EGT = 0 ;
+    turbine.GAZ = 1000 ;
 }
 
 void set_kero_pump_target(uint32_t RPM)
@@ -349,6 +355,8 @@ void create_timers(void)
 
     xTimerStart( xTimer1s, 0 ) ;
     xTimerStart( xTimer60s, 0 ) ;
+
+
 }
 
 void vTimer1sCallback( TimerHandle_t pxTimer )
@@ -365,6 +373,7 @@ void vTimer1sCallback( TimerHandle_t pxTimer )
     //ESP_LOGI("Time", "%02d:%02d",turbine.minutes,turbine.secondes);
     //long long int Timer1 = esp_timer_get_time();
     //printf("Timer: %lld μs\n", Timer1/1000);  
+
 }
 
 void vTimer60sCallback( TimerHandle_t pxTimer )

@@ -13,4 +13,11 @@
         "jf-ecu32.h": "c"
     },
     "C_Cpp.errorSquiggles": "enabled"
+
+    {
+        "editor.defaultFormatter": "<another formatter>",
+        "[javascript]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        }
+    }
 }
