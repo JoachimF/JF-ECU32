@@ -1,0 +1,85 @@
+
+(rules PCB jf-ecu32
+  (snap_angle 
+    fortyfive_degree
+  )
+  (autoroute_settings
+    (fanout off)
+    (autoroute on)
+    (postroute on)
+    (vias on)
+    (via_costs 50)
+    (plane_via_costs 5)
+    (start_ripup_costs 100)
+    (start_pass_no 21)
+    (layer_rule F.Cu
+      (active on)
+      (preferred_direction horizontal)
+      (preferred_direction_trace_costs 1.0)
+      (against_preferred_direction_trace_costs 2.5)
+    )
+    (layer_rule B.Cu
+      (active on)
+      (preferred_direction vertical)
+      (preferred_direction_trace_costs 1.0)
+      (against_preferred_direction_trace_costs 1.7)
+    )
+  )
+  (rule
+    (width 250.0)
+    (clear 200.0)
+    (clear 125.0 (type smd_to_turn_gap))
+    (clear 50.0 (type smd-smd))
+  )
+  (padstack "Via[0-1]_800:400_um"
+    (shape
+      (circle F.Cu 800.0 0.0 0.0)
+    )
+    (shape
+      (circle B.Cu 800.0 0.0 0.0)
+    )
+    (attach off)
+  )
+  (via 
+    "Via[0-1]_800:400_um" "Via[0-1]_800:400_um" default
+  )
+  (via 
+    "Via[0-1]_800:400_um-kicad_default" "Via[0-1]_800:400_um" "kicad_default"
+  )
+  (via_rule
+    default "Via[0-1]_800:400_um"
+  )
+  (via_rule
+    "kicad_default" "Via[0-1]_800:400_um-kicad_default"
+  )
+  (class default
+    GND "unconnected-(U1-Pad2)" "Net-(BT1-Pad1)" "unconnected-(U1-Pad9)" "Net-(D3-Pad2)" "unconnected-(U1-Pad11)" "unconnected-(U1-Pad12)" "unconnected-(U1-Pad13)"
+    "unconnected-(U1-Pad14)" "unconnected-(U1-Pad15)" "unconnected-(U1-Pad16)" "unconnected-(U1-Pad17)" "unconnected-(U1-Pad18)" "unconnected-(U1-Pad26)" "unconnected-(U1-Pad30)" "unconnected-(U1-Pad32)"
+    "Net-(D4-Pad1)" "unconnected-(U1-Pad34)" "unconnected-(U1-Pad35)" "Net-(D7-Pad2)" "unconnected-(U2-Pad6)" "unconnected-(U2-Pad7)" "unconnected-(U2-Pad9)" "unconnected-(U2-Pad10)"
+    "unconnected-(U2-Pad11)" "unconnected-(U2-Pad12)" "unconnected-(U2-Pad14)" "unconnected-(U2-Pad15)" +3.3V "unconnected-(U1-Pad19)" "PPM_PWM_PUMP2_3.3" "PPM_PWM_PUMP1_3.3"
+    "PWM_KERO_3.3" "PWM_KEROSTART_3.3" "PWM_GLOW_3.3" "PPM_STARTER_3.3" "PPM_GAZ_5V" "AUX_5V" VDC "Net-(D9-Pad2)"
+    "PWM_GLOW" "PWM_KEROSTART" "PWM_KERO" "PPM_PWM_PUMP1" "PPM_PWM_PUMP2" "unconnected-(J2-Pad2)" "Net-(D10-Pad2)" "unconnected-(J4-Pad2)"
+    "Net-(Q2-Pad3)" "Net-(D13-Pad2)" +BATT "Net-(J10-Pad1)" "Net-(J10-Pad2)" "unconnected-(U1-Pad20)" "unconnected-(U1-Pad21)" "VBAT_ADC"
+    "GLOW_CURRENT" "PPM_GAZ" AUX "unconnected-(U1-Pad22)" "unconnected-(U1-Pad23)" CLK MISO CS
+    RPM TX2 "unconnected-(J12-Pad2)" "unconnected-(U1-Pad24)" "Net-(D14-Pad1)" "Net-(D15-Pad2)" "Net-(D16-Pad1)" "Net-(J3-Pad1)"
+    "PPM_PWM_STARTER" "Net-(J13-Pad1)" "unconnected-(J15-Pad2)" "Net-(J16-Pad1)" "unconnected-(J18-Pad2)" "V_CPU"
+    (clearance_class default)
+    (via_rule default)
+    (rule
+      (width 250.0)
+    )
+    (circuit 
+      (use_layer F.Cu B.Cu)
+    )
+  )
+  (class "kicad_default"
+    (clearance_class "kicad_default")
+    (via_rule "kicad_default")
+    (rule
+      (width 250.0)
+    )
+    (circuit 
+      (use_layer F.Cu B.Cu)
+    )
+  )
+)
