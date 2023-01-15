@@ -1,0 +1,4 @@
+
+
+dependencies:
+  espressif/mdns: "^1.0.7"

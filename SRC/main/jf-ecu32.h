@@ -56,8 +56,8 @@ enum glow_types {
 #define STARTER_PIN 32
 #define PUMP1_PIN   33
 #define PUMP2_PIN   25
-#define VANNE1_PIN  14
-#define VANNE2_PIN  12
+#define VANNE1_PIN  23
+#define VANNE2_PIN  26
 #define GLOW_PIN    27
 
 
@@ -197,18 +197,6 @@ typedef struct _engine_ {
   uint8_t phase_fonctionnement ;
   uint8_t position_gaz ;
 } _engine_t;
-
-//Taches
-TaskHandle_t xlogHandle ;
-TaskHandle_t xWebHandle ;
-TaskHandle_t xecuHandle ;
-
-//Timers
-TimerHandle_t xTimer1s ;
-TimerHandle_t xTimer60s ;
-
-// Semaphores
-SemaphoreHandle_t xTimeMutex;
 
 
 void init(void);

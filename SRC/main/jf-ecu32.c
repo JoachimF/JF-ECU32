@@ -36,6 +36,18 @@
 #define BLINK_GPIO 2
 #define BUFFSIZE 2000
 
+//Taches
+TaskHandle_t xlogHandle ;
+TaskHandle_t xWebHandle ;
+TaskHandle_t xecuHandle ;
+
+//Timers
+TimerHandle_t xTimer1s ;
+TimerHandle_t xTimer60s ;
+
+// Semaphores
+SemaphoreHandle_t xTimeMutex;
+
 static const char *TAG = "ECU";
 
 void linear_interpolation(uint32_t rpm1,uint32_t pump1,uint32_t rpm2,uint32_t pump2,uint32_t rpm,uint32_t *res) //RPM,PUMP,RPM,PUMP
@@ -261,7 +273,7 @@ void set_kero_pump_target(uint32_t RPM)
     linear_interpolation(rpm1,pump1,rpm2,pump2,RPM,&res) ;
     turbine.pump1.target = res ;
     turbine.pump1.new_target = 1 ;
-    ESP_LOGI(TAG,"Target : %d - pump : %d\n",RPM,res) ;
+    //ESP_LOGI(TAG,"Target : %d - pump : %d\n",RPM,res) ;
 }
 
 

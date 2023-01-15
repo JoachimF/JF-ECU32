@@ -35,8 +35,6 @@ static char task_names[NUM_OF_SPIN_TASKS][configMAX_TASK_NAME_LEN];
 static SemaphoreHandle_t sync_spin_task;
 static SemaphoreHandle_t sync_stats_task;
 
-QueueHandle_t xQueueHttp;
-
 static esp_err_t print_real_time_stats(TickType_t xTicksToWait)
 {
     TaskStatus_t *start_array = NULL, *end_array = NULL;
@@ -198,10 +196,22 @@ void http_server_task(void *pvParameters);
 
 extern _engine_t turbine ;
 long int timer_old,Timer1,time_ecu ;
+//Taches
+extern TaskHandle_t xlogHandle ;
+extern TaskHandle_t xWebHandle ;
+extern TaskHandle_t xecuHandle ;
+
+//Timers
+extern TimerHandle_t xTimer1s ;
+extern TimerHandle_t xTimer60s ;
+
+// Semaphores
+extern SemaphoreHandle_t xTimeMutex;
 
 void app_main()
 {
 	int res ;
+	/*
 	gpio_pad_select_gpio(STARTER_PIN);
 	gpio_set_direction(STARTER_PIN, GPIO_MODE_OUTPUT);
 	gpio_set_level(STARTER_PIN, 0);
@@ -220,7 +230,7 @@ void app_main()
 	gpio_pad_select_gpio(GLOW_PIN);
 	gpio_set_direction(GLOW_PIN, GPIO_MODE_OUTPUT);
 	gpio_set_level(GLOW_PIN, 0);
-
+	*/
 	// Initialize NVS
 	ESP_LOGI(TAG, "Initializing NVS");
 	init_nvs() ;
@@ -235,7 +245,7 @@ void app_main()
 	//res = wifi_init_ap() ;
 	ESP_LOGI(TAG, "Initializing mDNS");
 	// Initialize mDNS
-	initialise_mdns();
+	//initialise_mdns();
 
 	//Init ECU
 	init() ;

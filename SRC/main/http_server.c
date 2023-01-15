@@ -47,6 +47,9 @@ extern _BITsconfigECU_u config_ECU ;
 extern _configEngine_t turbine_config ;
 extern _wifi_params_t wifi_params ;
 extern _engine_t turbine ;
+extern TaskHandle_t xlogHandle ;
+extern TaskHandle_t xWebHandle ;
+//extern TaskHandle_t xecuHandle ;
 
 esp_err_t save_key_value(char * key, char * value)
 {
@@ -220,7 +223,7 @@ esp_err_t Image2Base64(char * imageFileName, char * base64FileName)
 
 	// Allocate base64 memory
 	int32_t base64Size = calcBase64EncodedSize(st.st_size);
-	ESP_LOGI(TAG, "base64Size=%d", base64Size);
+	//ESP_LOGI(TAG, "base64Size=%d", base64Size);
 
 	unsigned char* base64_buffer = NULL;
 	size_t base64_buffer_len = base64Size + 1;

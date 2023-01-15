@@ -45,6 +45,7 @@
 static EventGroupHandle_t s_wifi_event_group ;
 static int s_retry_num = 0 ;
 _wifi_params_t wifi_params ;
+extern TimerHandle_t xTimer60s ;
 
 /* The event group allows multiple bits for each event, but we only care about two events:
  * - we are connected to the AP with an IP
@@ -80,13 +81,13 @@ static void wifi_event_handler(void* arg, esp_event_base_t event_base,
 {
     if (event_id == WIFI_EVENT_AP_STACONNECTED) {
         wifi_event_ap_staconnected_t* event = (wifi_event_ap_staconnected_t*) event_data;
-        ESP_LOGI(TAG, "station "MACSTR" join, AID=%d",
-                 MAC2STR(event->mac), event->aid);
-        xTimerStop( xTimer60s,0) ;
+ //       ESP_LOGI(TAG, "station " & MACSTR &" join, AID=%d",
+ //                MAC2STR(event->mac), event->aid);
+ //       xTimerStop( xTimer60s,0) ;
     } else if (event_id == WIFI_EVENT_AP_STADISCONNECTED) {
         wifi_event_ap_stadisconnected_t* event = (wifi_event_ap_stadisconnected_t*) event_data;
-        ESP_LOGI(TAG, "station "MACSTR" leave, AID=%d",
-                 MAC2STR(event->mac), event->aid);
+ //       ESP_LOGI(TAG, "station " & MACSTR & " leave, AID=%d",
+  //               MAC2STR(event->mac), event->aid);
     }
 }
 
@@ -205,6 +206,7 @@ int wifi_init_sta()
 	ESP_LOGI(TAG, "Got IP Address.");
     return 1 ;
 }
+
 
 void initialise_mdns(void)
 {

@@ -11,3 +11,5 @@ project(JF-ECU32)
 # the target with 'idf.py -p PORT flash
 # Création de la partition de log et html
 spiffs_create_partition_image(storage html FLASH_IN_PROJECT)
+
+idf_build_set_property(COMPILE_OPTIONS "-Wno-error=format" APPEND)

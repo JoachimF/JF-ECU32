@@ -1,6 +1,6 @@
-2023-01-05 02:05:12,320 - Debug Adapter (main) - CRITICAL - Debug adapter -> Extension: DEBUG_ADAPTER_STARTED
-2023-01-05 02:05:12,332 - Debug Adapter (main) - CRITICAL - Debug adapter -> Extension: DEBUG_ADAPTER_READY2CONNECT
-2023-01-05 02:06:52,488 - Debug Adapter (main) - ERROR - Failed to connect to "remote 127.0.0.1:3333"!
+2023-01-10 02:21:53,818 - Debug Adapter (main) - CRITICAL - Debug adapter -> Extension: DEBUG_ADAPTER_STARTED
+2023-01-10 02:21:53,821 - Debug Adapter (main) - CRITICAL - Debug adapter -> Extension: DEBUG_ADAPTER_READY2CONNECT
+2023-01-10 02:23:55,811 - Debug Adapter (main) - ERROR - Failed to connect to "remote 127.0.0.1:3333"!
 Traceback (most recent call last):
   File "c:\Users\Boby\.vscode\extensions\espressif.esp-idf-extension-1.5.1\esp_debug_adapter\debug_adapter\command_processor.py", line 52, in __call__
     on_request(protocol_message)
@@ -21,4 +21,4 @@ Traceback (most recent call last):
   File "c:\Users\Boby\.vscode\extensions\espressif.esp-idf-extension-1.5.1\esp_debug_adapter\debug_adapter\debug_backend\debug_backend\gdb.py", line 258, in target_select
     raise DebuggerError('Failed to connect to "%s %s"!' % (tgt_type, tgt_params))
 debug_adapter.debug_backend.debug_backend.defs.DebuggerError: Failed to connect to "remote 127.0.0.1:3333"!
-2023-01-05 02:06:52,526 - Debug Adapter (main) - CRITICAL - Debug adapter -> Extension: DEBUG_ADAPTER_STOPPED
+2023-01-10 02:23:55,844 - Debug Adapter (main) - CRITICAL - Debug adapter -> Extension: DEBUG_ADAPTER_STOPPED
