@@ -32,6 +32,7 @@
 #include "esp_http_server.h"
 #include "esp_wifi.h"
 #include "cJSON.h"
+#include "esp_heap_trace.h"
 
 #include "jf-ecu32.h"
 #include "nvs_ecu.h"
@@ -41,6 +42,8 @@
 static const char *TAG = "HTTP";
 
 #define STORAGE_NAMESPACE "storage"
+
+SemaphoreHandle_t http_task_start;
 
 extern QueueHandle_t xQueueHttp;
 extern _BITsconfigECU_u config_ECU ;
@@ -1076,6 +1079,7 @@ static esp_err_t readings_get_handler(httpd_req_t *req){
 	httpd_resp_set_type(req, "application/json");
 	httpd_resp_sendstr_chunk(req, my_json_string); //fin de la page
 	httpd_resp_sendstr_chunk(req, NULL); //fin de la page
+	cJSON_Delete(myjson) ;
 	return ESP_OK;
 }
 
@@ -1093,9 +1097,11 @@ static esp_err_t frontpage(httpd_req_t *req)
 {
 //	ESP_LOGI(TAG, "root_get_handler req->uri=[%s]", req->uri);
     char filepath[20];
+	static int i=0 ;
     //ESP_LOGI(TAG, "URI : %s", req->uri);
-
+	ESP_ERROR_CHECK( heap_trace_start(HEAP_TRACE_LEAKS) );
     const char *filename = get_path_from_uri(filepath, req->uri, sizeof(filepath));
+	
     if (!filename) 
     {
         ESP_LOGE(TAG, "Filename is too long");
@@ -1186,6 +1192,14 @@ static esp_err_t frontpage(httpd_req_t *req)
 	Text2Html(req, "/html/footer.html");
 	httpd_resp_sendstr_chunk(req, NULL); //fin de la page
 	}
+	
+	i++ ;
+	if(i>10)
+	{
+		ESP_ERROR_CHECK( heap_trace_stop() );
+		heap_trace_dump();
+		i = 0 ;
+	}
 	return ESP_OK;
 }
 
@@ -1237,6 +1251,8 @@ esp_err_t start_server(const char *base_path, int port)
 void http_server_task(void *pvParameters)
 {
 	char *task_parameter = (char *)pvParameters;
+	ESP_LOGI(TAG, "Take semaphore") ;
+	xSemaphoreTake(http_task_start, portMAX_DELAY) ;
 	ESP_LOGI(TAG, "Start task_parameter=%s", task_parameter);
 	char url[64];
 	sprintf(url, "http://%s:%d", task_parameter, CONFIG_WEB_PORT);

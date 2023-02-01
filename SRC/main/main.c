@@ -17,6 +17,7 @@
 #include "mdns.h"
 #include "lwip/dns.h"
 #include "driver/gpio.h"
+#include "esp_heap_trace.h"
 
 #include "jf-ecu32.h"
 #include "http_server.h"
@@ -34,6 +35,11 @@
 static char task_names[NUM_OF_SPIN_TASKS][configMAX_TASK_NAME_LEN];
 static SemaphoreHandle_t sync_spin_task;
 static SemaphoreHandle_t sync_stats_task;
+
+extern SemaphoreHandle_t http_task_start;
+extern SemaphoreHandle_t log_task_start;
+extern SemaphoreHandle_t ecu_task_start;
+
 
 static esp_err_t print_real_time_stats(TickType_t xTicksToWait)
 {
@@ -208,6 +214,9 @@ extern TimerHandle_t xTimer60s ;
 // Semaphores
 extern SemaphoreHandle_t xTimeMutex;
 
+#define NUM_RECORDS 100
+static heap_trace_record_t trace_record[NUM_RECORDS]; // This buffer must be in internal RAM
+
 void app_main()
 {
 	int res ;
@@ -232,6 +241,8 @@ void app_main()
 	gpio_set_level(GLOW_PIN, 0);
 	*/
 	// Initialize NVS
+	ESP_ERROR_CHECK( heap_trace_init_standalone(trace_record, NUM_RECORDS) );
+
 	ESP_LOGI(TAG, "Initializing NVS");
 	init_nvs() ;
 	// read wifi conf.
@@ -270,6 +281,24 @@ void app_main()
 	else
 		ESP_ERROR_CHECK(esp_netif_get_ip_info(esp_netif_get_handle_from_ifkey("WIFI_AP_DEF"), &ip_info));
 	
+	/*Semaphore de démarrage*/
+	ESP_LOGI(TAG, "Initializing Semaphores");
+	ecu_task_start = xSemaphoreCreateBinary() ;
+	if(ecu_task_start == NULL)
+		ESP_LOGI(TAG, "ecu_task_start Semaphore fail");
+	//configASSERT(ecu_task_start) ;
+	http_task_start = xSemaphoreCreateBinary() ;
+	if(http_task_start == NULL)
+		ESP_LOGI(TAG, "http_task_start Semaphore fail");
+
+	//configASSERT(http_task_start) ;
+	log_task_start = xSemaphoreCreateBinary() ;
+	if(log_task_start == NULL)
+		ESP_LOGI(TAG, "log_task_start Semaphore fail");
+
+	//configASSERT(log_task_start) ;
+
+	ESP_LOGI(TAG, "Initializing Task HTTP");
 	char cparam0[64];
 	sprintf(cparam0, IPSTR, IP2STR(&ip_info.ip));
 	xTaskCreate(http_server_task, "HTTP", 1024*6, (void *)cparam0, 2, &xWebHandle);
@@ -277,18 +306,28 @@ void app_main()
 	
 	head_logs_file();
 	
+	ESP_LOGI(TAG, "Initializing Task Log");
 	xTaskCreate(log_task, "LOG", 1024*6, NULL, 2, &xlogHandle);
 	configASSERT( xlogHandle );
-	vTaskSuspend( xlogHandle ); 
+	//vTaskSuspend( xlogHandle ); 
 	
+	ESP_LOGI(TAG, "Initializing Task ECU");
 	xTaskCreatePinnedToCore(ecu_task, "ECU", 4096, NULL, ( 1UL | portPRIVILEGE_BIT ), &xecuHandle,1);
 	configASSERT( xecuHandle );
-	vTaskSuspend( xecuHandle ); 
+	//vTaskSuspend( xecuHandle ); 
 	
+	/* Htop */
+	ESP_LOGI(TAG, "Initializing Task Htop");
 	sync_spin_task = xSemaphoreCreateCounting(NUM_OF_SPIN_TASKS, 0);
     sync_stats_task = xSemaphoreCreateBinary();
 	xTaskCreatePinnedToCore(stats_task, "stats", 4096, NULL, STATS_TASK_PRIO, NULL, tskNO_AFFINITY);
-    xSemaphoreGive(sync_stats_task);
+    //xSemaphoreGive(sync_stats_task);
+	/* Htop */
+
+	/* Demarrage des taches*/
+	//xSemaphoreGive(ecu_task_start) ;
+	xSemaphoreGive(http_task_start) ;
+	//xSemaphoreGive(log_task_start) ;
 	
 	vTaskDelay(2000 / portTICK_PERIOD_MS);
 	turbine.EGT = 1000 ;

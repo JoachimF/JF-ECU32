@@ -11,7 +11,7 @@
     (via_costs 50)
     (plane_via_costs 5)
     (start_ripup_costs 100)
-    (start_pass_no 9)
+    (start_pass_no 10)
     (layer_rule F.Cu
       (active on)
       (preferred_direction horizontal)
@@ -47,9 +47,6 @@
     "Via[0-1]_800:400_um-kicad_default" "Via[0-1]_800:400_um" "kicad_default"
   )
   (via 
-    "Via[0-1]_800:400_um-2MM" "Via[0-1]_800:400_um" 2MM
-  )
-  (via 
     "Via[0-1]_800:400_um-3.3V" "Via[0-1]_800:400_um" 3.3V
   )
   (via 
@@ -65,9 +62,6 @@
     "kicad_default" "Via[0-1]_800:400_um-kicad_default"
   )
   (via_rule
-    2MM "Via[0-1]_800:400_um-2MM"
-  )
-  (via_rule
     3.3V "Via[0-1]_800:400_um-3.3V"
   )
   (via_rule
@@ -77,14 +71,15 @@
     Batt "Via[0-1]_800:400_um-Batt"
   )
   (class default
-    GND "unconnected-(U1-Pad16)" "unconnected-(U1-Pad17)" "unconnected-(U1-Pad18)" "Net-(BOOT1-Pad1)" "unconnected-(U1-Pad32)" "Net-(D4-Pad1)" "unconnected-(U2-Pad6)"
-    "unconnected-(U2-Pad7)" "unconnected-(U2-Pad9)" "unconnected-(U2-Pad10)" "unconnected-(U2-Pad11)" "unconnected-(U2-Pad12)" "unconnected-(U2-Pad14)" "unconnected-(U2-Pad15)" "unconnected-(U1-Pad19)"
-    "PPM_PWM_PUMP2_3.3" "PPM_PWM_PUMP1_3.3" "PWM_KERO_3.3" "PWM_KEROSTART_3.3" "PWM_GLOW_3.3" "PPM_STARTER_3.3" "PPM_GAZ_5V" "AUX_5V"
-    "PWM_GLOW" "PWM_KEROSTART" "PWM_KERO" "PPM_PWM_PUMP1" "PPM_PWM_PUMP2" "unconnected-(J2-Pad2)" "unconnected-(J4-Pad2)" "Net-(J10-Pad1)"
-    "Net-(J10-Pad2)" "unconnected-(U1-Pad20)" "unconnected-(U1-Pad21)" "VBAT_ADC" "GLOW_CURRENT" "PPM_GAZ" AUX "unconnected-(U1-Pad22)"
-    CLK MISO CS RPM TX2 "unconnected-(J12-Pad2)" "unconnected-(U1-Pad24)" "Net-(D14-Pad1)"
-    "Net-(D16-Pad1)" "Net-(J3-Pad1)" "PPM_PWM_STARTER" "Net-(J13-Pad1)" "unconnected-(J15-Pad2)" "Net-(J16-Pad1)" "unconnected-(J18-Pad2)" "Net-(C7-Pad1)"
-    "Net-(J19-Pad1)" "unconnected-(U1-Pad6)" "unconnected-(U1-Pad7)" "Net-(J19-Pad2)" "Net-(R14-Pad1)" "unconnected-(U1-Pad23)" "unconnected-(U1-Pad26)" MOSI
+    GND "Net-(BT1-Pad1)" "unconnected-(U1-Pad16)" "unconnected-(U1-Pad17)" "unconnected-(U1-Pad18)" "unconnected-(U1-Pad30)" "unconnected-(U1-Pad32)" "Net-(D4-Pad1)"
+    "unconnected-(U2-Pad6)" "unconnected-(U2-Pad7)" "unconnected-(U2-Pad9)" "unconnected-(U2-Pad10)" "unconnected-(U2-Pad11)" "unconnected-(U2-Pad12)" "unconnected-(U2-Pad14)" "unconnected-(U2-Pad15)"
+    "unconnected-(U1-Pad19)" "PPM_PWM_PUMP2_3.3" "PPM_PWM_PUMP1_3.3" "PWM_KERO_3.3" "PWM_KEROSTART_3.3" "PWM_GLOW_3.3" "PPM_STARTER_3.3" "PPM_GAZ_5V"
+    "AUX_5V" "PWM_GLOW" "PWM_KEROSTART" "PWM_KERO" "PPM_PWM_PUMP1" "PPM_PWM_PUMP2" "unconnected-(J2-Pad2)" "unconnected-(J4-Pad2)"
+    "Net-(Q2-Pad3)" "Net-(J10-Pad1)" "Net-(J10-Pad2)" "unconnected-(U1-Pad20)" "unconnected-(U1-Pad21)" "VBAT_ADC" "GLOW_CURRENT" "PPM_GAZ"
+    AUX "unconnected-(U1-Pad22)" CLK MISO CS RPM TX2 "unconnected-(J12-Pad2)"
+    "unconnected-(U1-Pad24)" "Net-(D14-Pad1)" "Net-(D16-Pad1)" "Net-(J3-Pad1)" "PPM_PWM_STARTER" "Net-(J13-Pad1)" "unconnected-(J15-Pad2)" "Net-(J16-Pad1)"
+    "unconnected-(J18-Pad2)" "unconnected-(U1-Pad4)" "unconnected-(U1-Pad5)" "unconnected-(U1-Pad6)" "unconnected-(U1-Pad7)" "Net-(U1-Pad25)" "Net-(U1-Pad3)" "Net-(U1-Pad35)"
+    "Net-(U1-Pad34)" "Net-(U1-Pad27)"
     (clearance_class default)
     (via_rule default)
     (rule
@@ -104,19 +99,8 @@
       (use_layer F.Cu B.Cu)
     )
   )
-  (class 2MM
-    "Net-(Q2-Pad3)"
-    (clearance_class 2MM)
-    (via_rule 2MM)
-    (rule
-      (width 2000.0)
-    )
-    (circuit 
-      (use_layer F.Cu B.Cu)
-    )
-  )
   (class 3.3V
-    VDC "V_CPU"
+    +3.3V VDC "V_CPU"
     (clearance_class 3.3V)
     (via_rule 3.3V)
     (rule

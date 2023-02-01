@@ -18,7 +18,8 @@
 */
 
 #include "driver/ledc.h"
-#include "driver/mcpwm.h"
+#include "driver/mcpwm.h" //IDF 4.3.4
+//#include "driver/mcpwm_prelude.h" // IDF 5.0
 #include <stdio.h>
 #include "esp_system.h"
 #include "esp_system.h"
@@ -47,6 +48,8 @@ TimerHandle_t xTimer60s ;
 
 // Semaphores
 SemaphoreHandle_t xTimeMutex;
+SemaphoreHandle_t log_task_start;
+SemaphoreHandle_t ecu_task_start;
 
 static const char *TAG = "ECU";
 
@@ -83,7 +86,9 @@ ledc_timer_config_t ledc_timer = {
 };
 
 static ledc_channel_config_t ledc_channel[3];
-static mcpwm_config_t pwm_config[2];
+static mcpwm_config_t pwm_config[2]; //IDF 4.3.4
+//mcpwm_timer_handle_t timer[2] = NULL; //IDF 5.0
+//mcpwm_timer_config_t timer_config[2] = NULL ;
 
 
 _engine_t turbine = { 
@@ -139,7 +144,8 @@ void init_pwm_outputs(_pwm_config *config)
     ESP_LOGI(TAG,"MCPWM_UNIT : %d ; MCPWM_TIMER : %d ; MCPWM_GEN : %d ; MCPWM_TIMER : %d ; pin : %d",config->MCPWM_UNIT,config->MCPWM_TIMER,config->MCPWM_GEN,config->MCPWM_TIMER,config->gpio_num); 
 }
 
-void init_mcpwm(void)
+// IDF 4.3.4
+void init_mcpwm(void) // IDF 4.3.4
 {
     printf("initializing mcpwm servo control gpio......\n");
 
@@ -336,6 +342,7 @@ void update_logs_file(void)
 
 void log_task( void * pvParameters )
 {
+    xSemaphoreTake(log_task_start, portMAX_DELAY);
  	ESP_LOGI(TAG, "Start Logtask");
     while(1) {
         //ESP_LOGI("LOG", "New Log");
@@ -399,6 +406,8 @@ void vTimer60sCallback( TimerHandle_t pxTimer )
 
 void ecu_task(void * pvParameters ) 
 {
+    xSemaphoreTake(ecu_task_start, portMAX_DELAY);
+    ESP_LOGI(TAG, "Start ECU Task");
     while(1)
     {
         vTaskDelay(100 / portTICK_PERIOD_MS);

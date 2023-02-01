@@ -13,6 +13,6 @@
     "idf.pythonBinPathWin": "C:\\Users\\Boby\\.espressif5\\python_env\\idf5.0_py3.8_env\\Scripts\\python.exe",
     "idf.toolsPathWin": "C:\\Users\\Boby\\.espressif5",
     "idf.gitPathWin": "\\Git\\cmd\\git.exe",
-    "idf.flashType": "JTAG",
+    "idf.flashType": "UART",
     "idf.svdFilePath": "${workspaceFolder}/esp32.svd"
 }

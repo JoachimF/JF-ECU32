@@ -116,6 +116,7 @@ typedef union {
 typedef struct {
   char name[21] ; // Nom du moteur
   uint8_t log_count ; //Numéro du log dans le fichier
+  uint32_t horametre ; // nombre de secondes de fonctionnement du moteur
   uint8_t glow_power ; // Puissance de la bougie gas ou kero
   uint32_t jet_full_power_rpm ; // trs/min plein gaz
   uint32_t jet_idle_rpm ; // trs/min ralenti
