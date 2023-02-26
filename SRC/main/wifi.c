@@ -71,6 +71,7 @@ static void event_handler(void* arg, esp_event_base_t event_base,
 		ip_event_got_ip_t* event = (ip_event_got_ip_t*) event_data;
 		ESP_LOGI(TAG, "got ip:" IPSTR, IP2STR(&event->ip_info.ip));
 		s_retry_num = 0;
+		ESP_LOGI(TAG, "Stop Timer");
 		xTimerStop( xTimer60s,0) ;
         xEventGroupSetBits(s_wifi_event_group, WIFI_CONNECTED_BIT);
 	}
@@ -217,6 +218,8 @@ void initialise_mdns(void)
 	ESP_LOGI(TAG, "mdns hostname set to: [%s]", CONFIG_MDNS_HOSTNAME);
 
 	//set default mDNS instance name
-	ESP_ERROR_CHECK( mdns_instance_name_set("ESP32 with mDNS") );
-    ESP_ERROR_CHECK( mdns_service_add("jf-ecu32.wifi", "_http", "_tcp", 80, NULL, 0) );
+	ESP_ERROR_CHECK( mdns_service_add(NULL, "_http", "_tcp", 80, NULL, 0) );
+	ESP_ERROR_CHECK( mdns_service_instance_name_set("_http", "_tcp","JF-ECU32 with mDNS") );
+	mdns_hostname_set("jf-ecu32");
+	mdns_instance_name_set("JF-ECU32");
 }

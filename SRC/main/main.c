@@ -18,6 +18,7 @@
 #include "lwip/dns.h"
 #include "driver/gpio.h"
 #include "esp_heap_trace.h"
+#include <esp_ota_ops.h>
 
 #include "jf-ecu32.h"
 #include "http_server.h"
@@ -240,6 +241,8 @@ void app_main()
 	gpio_set_direction(GLOW_PIN, GPIO_MODE_OUTPUT);
 	gpio_set_level(GLOW_PIN, 0);
 	*/
+	const esp_partition_t *partition = esp_ota_get_running_partition();
+	printf("Currently running partition: %s\r\n", partition->label);
 	// Initialize NVS
 	ESP_ERROR_CHECK( heap_trace_init_standalone(trace_record, NUM_RECORDS) );
 
@@ -256,7 +259,7 @@ void app_main()
 	//res = wifi_init_ap() ;
 	ESP_LOGI(TAG, "Initializing mDNS");
 	// Initialize mDNS
-	//initialise_mdns();
+	initialise_mdns();
 
 	//Init ECU
 	init() ;

@@ -401,6 +401,7 @@ void vTimer60sCallback( TimerHandle_t pxTimer )
         ESP_LOGI(TAG,"Wifi STOP") ;
         vTaskDelete( xWebHandle );
         ESP_LOGI(TAG,"Server STOP") ;
+        mdns_free(void);
 
 }
 

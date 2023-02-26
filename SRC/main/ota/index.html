@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<style type="text/css">
+			input{width:100%;box-sizing:border-box;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;background:#dddddd;color:#000000;}
+			fieldset{background:#4f4f4f;}
+			textarea{resize:vertical;width:98%;height:318px;padding:5px;overflow:auto;background:#1f1f1f;color:#65c115;}
+			body{text-align:center;font-family:verdana,sans-serif;background:#252525;}
+			td{padding:0px;}
+			button{border:0;border-radius:0.3rem;background:#db591d;color:#faffff;line-height:2.4rem;font-size:1.2rem;width:100%;-webkit-transition-duration:0.4s;transition-duration:0.4s;cursor:pointer;}
+			button:hover{background:#e74f09;}
+			.bred{background:#ca2323;}
+			.bred:hover{background:#931f1f;}
+			.bgrn{background:#47c266;}
+			.bgrn:hover{background:#5aaf6f;}
+			a{color:#1fa3ec;text-decoration:none;}
+			.p{float:left;text-align:left;}
+			.q{float:right;text-align:right;}
+			.r{border-radius:0.3em;padding:2px;margin:6px 2px;}
+			</style>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<title>ESP32 OTA Update</title>
+		<script>
+			function startUpload() {
+				var otafile = document.getElementById("otafile").files;
+
+				if (otafile.length == 0) {
+					alert("No file selected!");
+				} else {
+					document.getElementById("otafile").disabled = true;
+					document.getElementById("upload").disabled = true;
+
+					var file = otafile[0];
+					var xhr = new XMLHttpRequest();
+					xhr.onreadystatechange = function() {
+						if (xhr.readyState == 4) {
+							if (xhr.status == 200) {
+								document.open();
+								document.write(xhr.responseText);
+								document.close();
+							} else if (xhr.status == 0) {
+								alert("Server closed the connection abruptly!");
+								location.reload()
+							} else {
+								alert(xhr.status + " Error!\n" + xhr.responseText);
+								location.reload()
+							}
+						}
+					};
+
+					xhr.upload.onprogress = function (e) {
+						var progress = document.getElementById("progress");
+						progress.textContent = "Progress: " + (e.loaded / e.total * 100).toFixed(0) + "%";
+					};
+					xhr.open("POST", "/update", true);
+					xhr.send(file);
+				}
+			}
+		</script>
+	</head>
+	<body>
+		<div style='text-align:left;display:inline-block;color:#eaeaea;min-width:340px;'>
+			<div style='text-align:center;color:#eaeaea;'>
+				<noscript>Pour utiliser JF-ECU32, activez JavaScript<br></noscript>
+				<h3>JF-ECU32 OTA Firmware Update</h3>
+				<div>
+					<label for="otafile">Firmware file:</label> <p></p>
+					<input type="file" id="otafile" name="otafile" /> <p></p>
+				</div>
+				<div>
+					<button id="upload" type="button" onclick="startUpload()">Upload</button><p></p>
+				</div>
+				<div id="progress">
+				</div>
+		
+				<div style="text-align:right;font-size:11px;">
+					<hr>
+					<a href="https://github.com/JoachimF/JF-ECU32" target="_blank" style="color:#aaa;">JF-ECU32 0.1 par Joachim Franken</a>
+				</div>
+				
+			</div>
+		</div>
+	</body>
+</html>

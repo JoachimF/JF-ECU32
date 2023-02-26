@@ -14,5 +14,11 @@
     "idf.toolsPathWin": "C:\\Users\\Boby\\.espressif5",
     "idf.gitPathWin": "\\Git\\cmd\\git.exe",
     "idf.flashType": "UART",
-    "idf.svdFilePath": "${workspaceFolder}/esp32.svd"
+    "idf.svdFilePath": "${workspaceFolder}/esp32.svd",
+    "files.associations": {
+        "*.cps": "javascript",
+        "jf-ecu32.h": "c",
+        "esp_ota_ops.h": "c",
+        "esp_partition.h": "c"
+    }
 }

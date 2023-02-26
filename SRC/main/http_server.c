@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
+#include "sys/param.h" //Fonction MIN()
 #include <mbedtls/base64.h>
 
 #include "freertos/FreeRTOS.h"
@@ -33,6 +34,8 @@
 #include "esp_wifi.h"
 #include "cJSON.h"
 #include "esp_heap_trace.h"
+
+#include <esp_ota_ops.h>
 
 #include "jf-ecu32.h"
 #include "nvs_ecu.h"
@@ -107,22 +110,22 @@ int find_value(char * key, char * parameter, char * value)
 	//char * addr1;
 	char * addr1 = strstr(parameter, key);
 	if (addr1 == NULL) return 0;
-	//ESP_LOGI(TAG, "addr1=%s", addr1);
+//	ESP_LOGI(TAG, "addr1=%s", addr1);
 
 	char * addr2 = addr1 + strlen(key);
-	//ESP_LOGI(TAG, "addr2=[%s]", addr2);
+//	ESP_LOGI(TAG, "addr2=[%s]", addr2);
 
 	char * addr3 = strstr(addr2, "&");
-	//ESP_LOGI(TAG, "addr3=%p", addr3);
+//	ESP_LOGI(TAG, "addr3=%p", addr3);
 	if (addr3 == NULL) {
 		strcpy(value, addr2);
 	} else {
 		int length = addr3-addr2;
-		ESP_LOGI(TAG, "addr2=%p addr3=%p length=%d", addr2, addr3, length);
+//		ESP_LOGI(TAG, "addr2=%p addr3=%p length=%d", addr2, addr3, length);
 		strncpy(value, addr2, length);
 		value[length] = 0;
 	}
-	//ESP_LOGI(TAG, "key=[%s] value=[%s]", key, value);
+	ESP_LOGI(TAG, "key=[%s] value=[%s]", key, value);
 	return strlen(value);
 }
 
@@ -300,6 +303,51 @@ static void send_head(httpd_req_t *req)
 	httpd_resp_sendstr_chunk(req, "</h2>");
 }
 
+esp_err_t update_post_handler(httpd_req_t *req)
+{
+	char buf[1000];
+	esp_ota_handle_t ota_handle;
+	int remaining = req->content_len;
+
+	const esp_partition_t *ota_partition = esp_ota_get_next_update_partition(NULL);
+	ESP_ERROR_CHECK(esp_ota_begin(ota_partition, OTA_SIZE_UNKNOWN, &ota_handle));
+
+	while (remaining > 0) {
+		int recv_len = httpd_req_recv(req, buf, MIN(remaining, sizeof(buf)));
+
+		// Timeout Error: Just retry
+		if (recv_len == HTTPD_SOCK_ERR_TIMEOUT) {
+			continue;
+
+		// Serious Error: Abort OTA
+		} else if (recv_len <= 0) {
+			httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Protocol Error");
+			return ESP_FAIL;
+		}
+
+		// Successful Upload: Flash firmware chunk
+		if (esp_ota_write(ota_handle, (const void *)buf, recv_len) != ESP_OK) {
+			httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Flash Error");
+			return ESP_FAIL;
+		}
+
+		remaining -= recv_len;
+	}
+
+	// Validate and switch to new OTA image and reboot
+	if (esp_ota_end(ota_handle) != ESP_OK || esp_ota_set_boot_partition(ota_partition) != ESP_OK) {
+			httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Validation / Activation Error");
+			return ESP_FAIL;
+	}
+
+	httpd_resp_sendstr(req, "Firmware update complete, rebooting now!\n");
+
+	vTaskDelay(500 / portTICK_PERIOD_MS);
+	esp_restart();
+
+	return ESP_OK;
+}
+
 /* HTTP post handler */
 static esp_err_t root_post_handler(httpd_req_t *req)
 {
@@ -308,53 +356,66 @@ static esp_err_t root_post_handler(httpd_req_t *req)
      * as well be any binary data (needs type casting).
      * In case of string data, null termination will be absent, and
      * content length would give length of string */
-    char content[200];
+    char filepath[20];
+	char content[200];
 	char param[30] ;
 	int16_t len ;
 
-	ESP_LOGI(TAG,"Post received URI = %s",req->uri) ;
-	ESP_LOGI(TAG,"Post received len = %d",req->content_len) ;
-    /* Truncate if content length larger than the buffer */
-    size_t recv_size = MIN(req->content_len,content);
-	ESP_LOGI(TAG,"Post len = %d",recv_size) ;
-    int ret = httpd_req_recv(req, content, recv_size);
-	content[recv_size] = 0 ;
-    if (ret <= 0) {  /* 0 return value indicates connection closed */
-        /* Check if timeout occurred */
-        if (ret == HTTPD_SOCK_ERR_TIMEOUT) {
-            /* In case of timeout one can choose to retry calling
-             * httpd_req_recv(), but to keep it simple, here we
-             * respond with an HTTP 408 (Request Timeout) error */
-            httpd_resp_send_408(req);
-        }
-        /* In case of error, returning ESP_FAIL will
-         * ensure that the underlying socket is closed */
+	const char *filename = get_path_from_uri(filepath, req->uri, sizeof(filepath));
+    if (!filename) 
+    {
+        ESP_LOGE(TAG, "Filename is too long");
+        // retourne une erreur 500 (Internal Server Error)
+        httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Filename too long");
         return ESP_FAIL;
     }
-	len = find_value("pwmSliderValue1=",content,param) ;
-	if(len > 0)
-	set_power_func_us(&turbine.pump1.config,atoi(param)) ;
-	len = find_value("pwmSliderValue2=",content,param) ;
-	if(len > 0)
-	set_power_func_us(&turbine.pump2.config,atoi(param)) ;
-	len = find_value("pwmSliderValue3=",content,param) ;
-	if(len > 0)
-	set_power_func_us(&turbine.starter.config,atoi(param)) ;
-	
-	len = find_value("pwmSliderValue4=",content,param) ;
-	if(len > 0)
-	turbine.vanne1.set_power(&turbine.vanne1.config,atoi(param)) ;
-	len = find_value("pwmSliderValue5=",content,param) ;
-	if(len > 0)
-	turbine.vanne2.set_power(&turbine.vanne2.config,atoi(param)) ;
-	len = find_value("pwmSliderValue6=",content,param) ;
-	if(len > 0)
-	turbine.glow.set_power(&turbine.glow.config,atoi(param)) ;
+	if(strcmp(filename, "/update") == 0) 
+		update_post_handler(req) ;
+	else {
+		ESP_LOGI(TAG,"Post received URI = %s",req->uri) ;
+		ESP_LOGI(TAG,"Post received len = %d",req->content_len) ;
+		/* Truncate if content length larger than the buffer */
+		size_t recv_size = MIN(req->content_len,sizeof(content));
+		ESP_LOGI(TAG,"Post len = %d",recv_size) ;
+		int ret = httpd_req_recv(req, content, recv_size);
+		content[recv_size-1] = 0 ;
+		if (ret <= 0) {  /* 0 return value indicates connection closed */
+			/* Check if timeout occurred */
+			if (ret == HTTPD_SOCK_ERR_TIMEOUT) {
+				/* In case of timeout one can choose to retry calling
+				* httpd_req_recv(), but to keep it simple, here we
+				* respond with an HTTP 408 (Request Timeout) error */
+				httpd_resp_send_408(req);
+			}
+			/* In case of error, returning ESP_FAIL will
+			* ensure that the underlying socket is closed */
+			return ESP_FAIL;
+		}
+		len = find_value("pwmSliderValue1=",content,param) ;
+		if(len > 0)
+		set_power_func_us(&turbine.pump1.config,atoi(param)) ;
+		len = find_value("pwmSliderValue2=",content,param) ;
+		if(len > 0)
+		set_power_func_us(&turbine.pump2.config,atoi(param)) ;
+		len = find_value("pwmSliderValue3=",content,param) ;
+		if(len > 0)
+		set_power_func_us(&turbine.starter.config,atoi(param)) ;
+		
+		len = find_value("pwmSliderValue4=",content,param) ;
+		if(len > 0)
+		turbine.vanne1.set_power(&turbine.vanne1.config,atoi(param)) ;
+		len = find_value("pwmSliderValue5=",content,param) ;
+		if(len > 0)
+		turbine.vanne2.set_power(&turbine.vanne2.config,atoi(param)) ;
+		len = find_value("pwmSliderValue6=",content,param) ;
+		if(len > 0)
+		turbine.glow.set_power(&turbine.glow.config,atoi(param)) ;
 
-	ESP_LOGI(TAG,"%s",content) ;
-    /* Send a simple response */
-    const char resp[] = "URI POST Response";
-    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+		ESP_LOGI(TAG,"%s",content) ;
+		/* Send a simple response */
+		const char resp[] = "URI POST Response";
+		httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+	}
     return ESP_OK;
 }
 
@@ -828,28 +889,30 @@ void save_configturbine(httpd_req_t *req)
 void save_configwifi(httpd_req_t *req)
 {
 	char *buf = malloc(strlen(req->uri)+1) ;
-	char param[30] ;
+	char param[15] ;
 	int len;
 
 	strcpy(buf,req->uri) ;
 	ESP_LOGI(TAG, "Sauvegarde config wifi");
 	/*SSID*/
 	len = find_value("ssid=",buf,param) ;
-	ESP_LOGI(TAG, "ssid=%c len=%d",*param,len);
+//	ESP_LOGI(TAG, "ssid=%c len=%d",*param,len);
 	if(len>1) {
 		strcpy(wifi_params.ssid,param) ;
 	}
 	/*Password*/
-	len = find_value("pasword=",buf,param) ;
-	ESP_LOGI(TAG, "pasword=%c len=%d",*param,len);
+	len = find_value("password=",buf,param) ;
+//	ESP_LOGI(TAG, "password=%c len=%d",*param,len);
 	if(len>1) {
 		strcpy(wifi_params.password,param) ;
 	}
 		/*Min pump2*/
 	len = find_value("retry=",buf,param) ;
-	ESP_LOGI(TAG, "retry=%c len=%d",*param,len);
-	if(len>1) {
-		wifi_params.retry = atoi(param) ;		
+//	ESP_LOGI(TAG, "retry=%c len=%d",*param,len);
+	if(len>0) {
+		wifi_params.retry = atoi(param) ;
+//		ESP_LOGI(TAG, "retry=%d",wifi_params.retry);
+
 	}
 	write_nvs_wifi() ;
 	free(buf) ;
@@ -1092,6 +1155,23 @@ static esp_err_t events_get_handler(httpd_req_t *req){
 	return ESP_OK;
 }
 
+/*esp_err_t upgrade_get_handler(httpd_req_t *req)
+{
+	ESP_LOGI(TAG, "Reboot to factory partition");
+	esp_partition_t *factory_partition = esp_partition_find_first(ESP_PARTITION_TYPE_ANY,ESP_PARTITION_SUBTYPE_ANY,"factory") ;
+	esp_ota_set_boot_partition(factory_partition) ;
+	vTaskDelay(500 / portTICK_PERIOD_MS);
+	esp_restart();
+}*/
+extern const uint8_t index_html_start[] asm("_binary_index_html_start");
+extern const uint8_t index_html_end[] asm("_binary_index_html_end");
+esp_err_t upgrade_get_handler(httpd_req_t *req)
+{
+	httpd_resp_send(req, (const char *) index_html_start, index_html_end - index_html_start);
+	return ESP_OK;
+}
+
+
 
 static esp_err_t frontpage(httpd_req_t *req)
 {
@@ -1136,6 +1216,8 @@ static esp_err_t frontpage(httpd_req_t *req)
 		readings_get_handler(req) ;
 	else if(strcmp(filename, "/events") == 0) 
 		events_get_handler(req) ;
+	else if(strcmp(filename, "/upgrade") == 0) 
+		upgrade_get_handler(req) ;
 	else if(strcmp(filename, "/") == 0 ) 
 	{
 		// Send HTML header
@@ -1183,6 +1265,10 @@ static esp_err_t frontpage(httpd_req_t *req)
 	httpd_resp_sendstr_chunk(req, "</form>");
 	httpd_resp_sendstr_chunk(req, "<p></p>");
 
+	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"upgrade\">");
+	httpd_resp_sendstr_chunk(req, "<button class=\"button bred\">Mise à jour</button></form>");
+	httpd_resp_sendstr_chunk(req, "</form>");
+	httpd_resp_sendstr_chunk(req, "<p></p>");
 
 	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"stopwifi\">");
 	httpd_resp_sendstr_chunk(req, "<button class=\"button bred\">Couper le WiFi</button></form>");
@@ -1261,7 +1347,7 @@ void http_server_task(void *pvParameters)
 	ESP_LOGI(TAG, "Starting server on %s", url);
 	ESP_ERROR_CHECK(start_server("/spiffs", CONFIG_WEB_PORT));
 	
-	URL_t urlBuf;
+	//URL_t urlBuf;
 	while(1) {
 		vTaskDelay(10 / portTICK_PERIOD_MS);
 		// Waiting for submit
