@@ -436,8 +436,7 @@
           "+BATT",
           "Net-(D10-Pad2)",
           "Net-(D13-Pad2)",
-          "Net-(D15-Pad2)",
-          "Net-(D3-Pad2)"
+          "Net-(D15-Pad2)"
         ],
         "pcb_color": "rgba(0, 0, 0, 0.000)",
         "schematic_color": "rgba(0, 0, 0, 0.000)",
