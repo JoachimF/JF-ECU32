@@ -84,7 +84,7 @@ static void wifi_event_handler(void* arg, esp_event_base_t event_base,
         wifi_event_ap_staconnected_t* event = (wifi_event_ap_staconnected_t*) event_data;
  //       ESP_LOGI(TAG, "station " & MACSTR &" join, AID=%d",
  //                MAC2STR(event->mac), event->aid);
- //       xTimerStop( xTimer60s,0) ;
+        xTimerStop( xTimer60s,0) ;
     } else if (event_id == WIFI_EVENT_AP_STADISCONNECTED) {
         wifi_event_ap_stadisconnected_t* event = (wifi_event_ap_stadisconnected_t*) event_data;
  //       ESP_LOGI(TAG, "station " & MACSTR & " leave, AID=%d",

@@ -17,8 +17,10 @@
 #include "mdns.h"
 #include "lwip/dns.h"
 #include "driver/gpio.h"
-#include "esp_heap_trace.h"
+//#include "esp_heap_trace.h"
 #include <esp_ota_ops.h>
+#include <esp_chip_info.h>
+
 
 #include "jf-ecu32.h"
 #include "http_server.h"
@@ -108,7 +110,7 @@ static esp_err_t print_real_time_stats(TickType_t xTicksToWait)
         if (k >= 0) {
             uint32_t task_elapsed_time = end_array[k].ulRunTimeCounter - start_array[i].ulRunTimeCounter;
             uint32_t percentage_time = (task_elapsed_time * 100UL) / (total_elapsed_time * portNUM_PROCESSORS);
-            printf("| %s | %d | %d%%\n", start_array[i].pcTaskName, task_elapsed_time, percentage_time);
+            printf("| %s | %ld | %ld%%\n", start_array[i].pcTaskName, task_elapsed_time, percentage_time);
         }
     }
 
@@ -189,7 +191,7 @@ static void stats_task(void *arg)
 
     //Print real time stats periodically
     while (1) {
-        printf("\n\nGetting real time stats over %d ticks\n", STATS_TICKS);
+        printf("\n\nGetting real time stats over %ld ticks\n", STATS_TICKS);
         if (print_real_time_stats(STATS_TICKS) == ESP_OK) {
             printf("Real time stats obtained\n");
         } else {
@@ -201,22 +203,10 @@ static void stats_task(void *arg)
 
 void http_server_task(void *pvParameters);
 
-extern _engine_t turbine ;
 long int timer_old,Timer1,time_ecu ;
-//Taches
-extern TaskHandle_t xlogHandle ;
-extern TaskHandle_t xWebHandle ;
-extern TaskHandle_t xecuHandle ;
 
-//Timers
-extern TimerHandle_t xTimer1s ;
-extern TimerHandle_t xTimer60s ;
-
-// Semaphores
-extern SemaphoreHandle_t xTimeMutex;
-
-#define NUM_RECORDS 100
-static heap_trace_record_t trace_record[NUM_RECORDS]; // This buffer must be in internal RAM
+//#define NUM_RECORDS 100
+//static heap_trace_record_t trace_record[NUM_RECORDS]; // This buffer must be in internal RAM
 
 void app_main()
 {
@@ -242,9 +232,18 @@ void app_main()
 	gpio_set_level(GLOW_PIN, 0);
 	*/
 	const esp_partition_t *partition = esp_ota_get_running_partition();
+	esp_chip_info_t chip_info;
+	esp_chip_info(&chip_info);
+	printf("This is %s chip with %d CPU cores, WiFi%s%s, ",
+			CONFIG_IDF_TARGET,
+			chip_info.cores,
+			(chip_info.features & CHIP_FEATURE_BT) ? "/BT" : "",
+			(chip_info.features & CHIP_FEATURE_BLE) ? "/BLE" : "");
+
+	printf("silicon revision %d, ", chip_info.revision);
 	printf("Currently running partition: %s\r\n", partition->label);
 	// Initialize NVS
-	ESP_ERROR_CHECK( heap_trace_init_standalone(trace_record, NUM_RECORDS) );
+	//ESP_ERROR_CHECK( heap_trace_init_standalone(trace_record, NUM_RECORDS) );
 
 	ESP_LOGI(TAG, "Initializing NVS");
 	init_nvs() ;
@@ -263,6 +262,7 @@ void app_main()
 
 	//Init ECU
 	init() ;
+	start_timers() ;
 
 	// Initialize SPIFFS
 	ESP_LOGI(TAG, "Initializing SPIFFS");
@@ -319,6 +319,10 @@ void app_main()
 	configASSERT( xecuHandle );
 	//vTaskSuspend( xecuHandle ); 
 	
+	ESP_LOGI(TAG, "Initializing Task Inputs");
+	xTaskCreatePinnedToCore(inputs_task, "INPUTS", 4096, NULL, ( 1UL | portPRIVILEGE_BIT ), &xinputsHandle,1);
+	configASSERT( xinputsHandle );
+
 	/* Htop */
 	ESP_LOGI(TAG, "Initializing Task Htop");
 	sync_spin_task = xSemaphoreCreateCounting(NUM_OF_SPIN_TASKS, 0);
@@ -342,7 +346,7 @@ void app_main()
 	for(int32_t i=0;i<1000;i++)
 	{
 		    turbine.EGT -- ;
-            turbine.GAZ ++ ;
+            //turbine.GAZ ++ ;
 			time_ecu = esp_timer_get_time() - timer_old ;
 			timer_old = esp_timer_get_time();
             //ESP_LOGI(TAG,"EGT : %d ; GAZ : %d",turbine.EGT,turbine.GAZ) ;
@@ -352,7 +356,7 @@ void app_main()
 	{
         //if( xSemaphoreTake(xTimeMutex,( TickType_t ) 10) == pdTRUE ) {
             turbine.EGT ++ ;
-            turbine.GAZ -- ;
+            //turbine.GAZ -- ;
             //ESP_LOGI(TAG,"EGT : %d ; GAZ : %d",turbine.EGT,turbine.GAZ) ;
         //}xSemaphoreGive(xTimeMutex) ;
     		vTaskDelay(10 / portTICK_PERIOD_MS);

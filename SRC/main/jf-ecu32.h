@@ -56,8 +56,8 @@ enum glow_types {
 #define STARTER_PIN 32
 #define PUMP1_PIN   33
 #define PUMP2_PIN   25
-#define VANNE1_PIN  23
-#define VANNE2_PIN  26
+#define VANNE1_PIN  12
+#define VANNE2_PIN  14
 #define GLOW_PIN    27
 
 
@@ -199,6 +199,26 @@ typedef struct _engine_ {
   uint8_t position_gaz ;
 } _engine_t;
 
+//Taches
+extern TaskHandle_t xlogHandle ;
+extern TaskHandle_t xWebHandle ;
+extern TaskHandle_t xecuHandle ;
+extern TaskHandle_t xinputsHandle ;
+
+//Timers
+extern TimerHandle_t xTimer1s ;
+extern TimerHandle_t xTimer60s ;
+
+// Semaphores
+extern SemaphoreHandle_t xTimeMutex;
+extern SemaphoreHandle_t xRPMmutex;
+extern SemaphoreHandle_t xGAZmutex;
+extern SemaphoreHandle_t log_task_start;
+extern SemaphoreHandle_t ecu_task_start;
+
+extern _engine_t turbine ;
+extern _configEngine_t turbine_config ;
+extern _BITsconfigECU_u config_ECU ;
 
 void init(void);
 void linear_interpolation(uint32_t x0,uint32_t y0,uint32_t x1,uint32_t y1,uint32_t rpm,uint32_t *res) ;
@@ -208,10 +228,14 @@ void update_curve_file(void) ;
 void head_logs_file(void) ;
 void log_task( void * pvParameters ) ;
 void create_timers(void) ;
+void start_timers(void) ;
 void vTimer1sCallback( TimerHandle_t pxTimer ) ;
 void vTimer60sCallback( TimerHandle_t pxTimer ) ;
 void ecu_task(void * pvParameters ) ;
+void inputs_task(void * pvParameters) ;
 void init_mcpwm(void) ;
 void set_power_func_us(_pwm_config *config ,int32_t value) ;
+void set_power_func(_pwm_config *config ,float value) ;
+
 
 #endif

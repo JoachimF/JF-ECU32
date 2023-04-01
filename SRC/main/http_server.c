@@ -33,7 +33,7 @@
 #include "esp_http_server.h"
 #include "esp_wifi.h"
 #include "cJSON.h"
-#include "esp_heap_trace.h"
+//#include "esp_heap_trace.h"
 
 #include <esp_ota_ops.h>
 
@@ -42,6 +42,7 @@
 #include "http_server.h"
 #include "wifi.h"
 
+extern TimerHandle_t xTimer60s ;
 static const char *TAG = "HTTP";
 
 #define STORAGE_NAMESPACE "storage"
@@ -49,12 +50,12 @@ static const char *TAG = "HTTP";
 SemaphoreHandle_t http_task_start;
 
 extern QueueHandle_t xQueueHttp;
-extern _BITsconfigECU_u config_ECU ;
-extern _configEngine_t turbine_config ;
+//extern _BITsconfigECU_u config_ECU ;
+//extern _configEngine_t turbine_config ;
 extern _wifi_params_t wifi_params ;
-extern _engine_t turbine ;
-extern TaskHandle_t xlogHandle ;
-extern TaskHandle_t xWebHandle ;
+//extern _engine_t turbine ;
+//extern TaskHandle_t xlogHandle ;
+//extern TaskHandle_t xWebHandle ;
 //extern TaskHandle_t xecuHandle ;
 
 esp_err_t save_key_value(char * key, char * value)
@@ -110,22 +111,22 @@ int find_value(char * key, char * parameter, char * value)
 	//char * addr1;
 	char * addr1 = strstr(parameter, key);
 	if (addr1 == NULL) return 0;
-//	ESP_LOGI(TAG, "addr1=%s", addr1);
+	//ESP_LOGI(TAG, "addr1=%s", addr1);
 
 	char * addr2 = addr1 + strlen(key);
-//	ESP_LOGI(TAG, "addr2=[%s]", addr2);
+	//ESP_LOGI(TAG, "addr2=[%s]", addr2);
 
 	char * addr3 = strstr(addr2, "&");
-//	ESP_LOGI(TAG, "addr3=%p", addr3);
+	//ESP_LOGI(TAG, "addr3=%p", addr3);
 	if (addr3 == NULL) {
 		strcpy(value, addr2);
 	} else {
 		int length = addr3-addr2;
-//		ESP_LOGI(TAG, "addr2=%p addr3=%p length=%d", addr2, addr3, length);
+		//ESP_LOGI(TAG, "addr2=%p addr3=%p length=%d", addr2, addr3, length);
 		strncpy(value, addr2, length);
 		value[length] = 0;
 	}
-	ESP_LOGI(TAG, "key=[%s] value=[%s]", key, value);
+	//ESP_LOGI(TAG, "key=[%s] value=[%s]", key, value);
 	return strlen(value);
 }
 
@@ -372,11 +373,11 @@ static esp_err_t root_post_handler(httpd_req_t *req)
 	if(strcmp(filename, "/update") == 0) 
 		update_post_handler(req) ;
 	else {
-		ESP_LOGI(TAG,"Post received URI = %s",req->uri) ;
-		ESP_LOGI(TAG,"Post received len = %d",req->content_len) ;
+		//ESP_LOGI(TAG,"Post received URI = %s",req->uri) ;
+		//ESP_LOGI(TAG,"Post received len = %d",req->content_len) ;
 		/* Truncate if content length larger than the buffer */
 		size_t recv_size = MIN(req->content_len,sizeof(content));
-		ESP_LOGI(TAG,"Post len = %d",recv_size) ;
+		//ESP_LOGI(TAG,"Post len = %d",recv_size) ;
 		int ret = httpd_req_recv(req, content, recv_size);
 		content[recv_size-1] = 0 ;
 		if (ret <= 0) {  /* 0 return value indicates connection closed */
@@ -393,14 +394,31 @@ static esp_err_t root_post_handler(httpd_req_t *req)
 		}
 		len = find_value("pwmSliderValue1=",content,param) ;
 		if(len > 0)
-		set_power_func_us(&turbine.pump1.config,atoi(param)) ;
+		{
+			if(turbine.pump1.config.ppm_pwm == PPM)
+				set_power_func_us(&turbine.pump1.config,atoi(param)) ;
+			else
+				set_power_func(&turbine.pump1.config,atof(param)/20) ;
+		}
+
 		len = find_value("pwmSliderValue2=",content,param) ;
 		if(len > 0)
-		set_power_func_us(&turbine.pump2.config,atoi(param)) ;
+		{
+			if(turbine.pump2.config.ppm_pwm == PPM)
+				set_power_func_us(&turbine.pump2.config,atoi(param)) ;
+			else
+				set_power_func(&turbine.pump2.config,atof(param)/20) ;
+		}
+
 		len = find_value("pwmSliderValue3=",content,param) ;
 		if(len > 0)
-		set_power_func_us(&turbine.starter.config,atoi(param)) ;
-		
+		{
+			if(turbine.pump2.config.ppm_pwm == PPM)
+				set_power_func_us(&turbine.starter.config,atoi(param)) ;
+			else
+				set_power_func(&turbine.starter.config,atof(param)/20) ;
+		}
+
 		len = find_value("pwmSliderValue4=",content,param) ;
 		if(len > 0)
 		turbine.vanne1.set_power(&turbine.vanne1.config,atoi(param)) ;
@@ -411,7 +429,7 @@ static esp_err_t root_post_handler(httpd_req_t *req)
 		if(len > 0)
 		turbine.glow.set_power(&turbine.glow.config,atoi(param)) ;
 
-		ESP_LOGI(TAG,"%s",content) ;
+		//ESP_LOGI(TAG,"%s",content) ;
 		/* Send a simple response */
 		const char resp[] = "URI POST Response";
 		httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
@@ -677,7 +695,19 @@ static esp_err_t configecu(httpd_req_t *req)
 	ESP_LOGI(TAG, "config ECU req->uri=[%s]", req->uri);
 	char * addr1 = strstr(req->uri, "save=");
 	
-	if (addr1 != NULL) save_configecu(req) ; // Paramètres a sauvagarder
+	if (addr1 != NULL){
+		 save_configecu(req) ; // Paramètres a sauvagarder
+		 send_head(req) ;
+		 httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Paramètre de l'ECU&nbsp;</b></legend><form method=\"GET\" action=\"configecu\"><p>") ;
+	/*Voie des gaz*/
+		 httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Redémarrage...</b></legend>") ;
+		httpd_resp_sendstr_chunk(req, "</fieldset><p>") ;
+		httpd_resp_sendstr_chunk(req, "</fieldset><p>") ;
+		Text2Html(req, "/html/footer.html");
+		httpd_resp_sendstr_chunk(req, NULL); //fin de la page
+		vTaskDelay(1000 / portTICK_PERIOD_MS);
+		esp_restart() ;
+	}	
 
 	ESP_LOGI("CONFIG_ECU","input : %d",config_ECU.input_type) ;
 	ESP_LOGI("CONFIG_ECU","glow_type : %d",config_ECU.glow_type) ;	
@@ -920,7 +950,7 @@ void save_configwifi(httpd_req_t *req)
 
 static esp_err_t wifi_get_handler(httpd_req_t *req)
 {
-	ESP_LOGI(TAG, "root_get_handler req->uri=[%s]", req->uri);
+	//ESP_LOGI(TAG, "root_get_handler req->uri=[%s]", req->uri);
 
 	char * addr1 = strstr(req->uri, "save=");
 	if (addr1 != NULL) save_configwifi(req) ; // Paramètres a sauvagarder
@@ -1079,7 +1109,7 @@ static esp_err_t configmoteur(httpd_req_t *req)
 
 static esp_err_t slider(httpd_req_t *req)
 {
-	ESP_LOGI(TAG, "slider_get_handler req->uri=[%s]", req->uri);
+	//ESP_LOGI(TAG, "slider_get_handler req->uri=[%s]", req->uri);
 	Text2Html(req, "/html/slider.html");
 	httpd_resp_sendstr_chunk(req, NULL); //fin de la page
 	return ESP_OK;
@@ -1128,13 +1158,23 @@ static esp_err_t gauges_get_handler(httpd_req_t *req){
 }
 
 extern long int time_ecu ;
+
 static esp_err_t readings_get_handler(httpd_req_t *req){
 	static cJSON *myjson;
+	uint32_t rpm = 0 ;
 	//ESP_LOGI(TAG, "readings_get_handler req->uri=[%s]", req->uri);
 	myjson = cJSON_CreateObject();
 //	if( xSemaphoreTake(xTimeMutex,( TickType_t ) 10) == pdTRUE ) {
 		cJSON_AddNumberToObject(myjson, "temperature", turbine.GAZ);
-		cJSON_AddNumberToObject(myjson, "humidity", turbine.EGT);
+		cJSON_AddNumberToObject(myjson, "egt", turbine.EGT);
+	    if( xSemaphoreTake(xRPMmutex,( TickType_t ) 100 ) == pdTRUE )
+		{
+			rpm = turbine.RPM ;
+		}
+		else
+	        turbine.RPM = 0 ;
+		xSemaphoreGive(xRPMmutex) ;
+		cJSON_AddNumberToObject(myjson, "rpm", rpm);
 		cJSON_AddNumberToObject(myjson, "time", time_ecu);
 	
 //	}xSemaphoreGive(xTimeMutex) ;
@@ -1143,6 +1183,7 @@ static esp_err_t readings_get_handler(httpd_req_t *req){
 	httpd_resp_sendstr_chunk(req, my_json_string); //fin de la page
 	httpd_resp_sendstr_chunk(req, NULL); //fin de la page
 	cJSON_Delete(myjson) ;
+	//heap_caps_free(my_json_string) ;
 	return ESP_OK;
 }
 
@@ -1179,7 +1220,7 @@ static esp_err_t frontpage(httpd_req_t *req)
     char filepath[20];
 	static int i=0 ;
     //ESP_LOGI(TAG, "URI : %s", req->uri);
-	ESP_ERROR_CHECK( heap_trace_start(HEAP_TRACE_LEAKS) );
+	xTimerStop( xTimer60s,0) ;
     const char *filename = get_path_from_uri(filepath, req->uri, sizeof(filepath));
 	
     if (!filename) 
@@ -1211,7 +1252,17 @@ static esp_err_t frontpage(httpd_req_t *req)
 		ESP_ERROR_CHECK(esp_wifi_stop() );
 		vTaskDelete( xWebHandle ); }
 	else if(strcmp(filename, "/gauges") == 0) 
+	{
+//		ESP_ERROR_CHECK( heap_trace_start(HEAP_TRACE_LEAKS) );
 		gauges_get_handler(req) ;
+/*		i++ ;
+		if(i>10)
+		{
+			ESP_ERROR_CHECK( heap_trace_stop() );
+			heap_trace_dump();
+			i = 0 ;
+		}*/
+	}
 	else if(strcmp(filename, "/readings") == 0) 
 		readings_get_handler(req) ;
 	else if(strcmp(filename, "/events") == 0) 
@@ -1279,13 +1330,7 @@ static esp_err_t frontpage(httpd_req_t *req)
 	httpd_resp_sendstr_chunk(req, NULL); //fin de la page
 	}
 	
-	i++ ;
-	if(i>10)
-	{
-		ESP_ERROR_CHECK( heap_trace_stop() );
-		heap_trace_dump();
-		i = 0 ;
-	}
+
 	return ESP_OK;
 }
 

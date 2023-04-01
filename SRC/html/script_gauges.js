@@ -36,7 +36,7 @@ var gaugeRC = new LinearGauge({
     needleWidth:3 ,
     colorNeedle:"#222", 
     colorNeedleend:"#222", 
-    animationDuration:100, 
+    animationDuration:50, 
     animationRule:"linear" ,
     animationTarget:"plate"    
 }).draw();
@@ -75,14 +75,14 @@ var gaugeTemp = new LinearGauge({
 	needleCircleSize: 7,
 	needleCircleOuter: true,
 	needleCircleInner: false,
-	animationDuration: 100,
+	animationDuration: 10,
 	animationRule: "linear",
-	barWidth: 10,
+	barWidth: 50,
 }).draw();
 
-// Create Humidity Gauge
-var gaugeHum = new RadialGauge({
-	renderTo: "gauge-humidity",
+// Create EGT Gauge
+var gaugeEGT = new RadialGauge({
+	renderTo: "gauge-EGT",
 	width: 300,
 	height: 300,
 	units: "EGT °C",
@@ -114,7 +114,45 @@ var gaugeHum = new RadialGauge({
 	colorNeedleCircleOuter: "#007F80",
 	needleCircleOuter: true,
 	needleCircleInner: false,
-	animationDuration: 250,
+	animationDuration: 50,
+	animationRule: "linear",
+}).draw();
+
+// Create RPM Gauge
+var gaugeRPM = new RadialGauge({
+	renderTo: "gauge-RPM",
+	width: 300,
+	height: 300,
+	units: "RPM x1000",
+	minValue: 0,
+	maxValue: 200000,
+	colorValueBoxRect: "#049faa",
+	colorValueBoxRectEnd: "#049faa",
+	colorValueBoxBackground: "#f1fbfc",
+    valueDec: 0,
+	valueInt: 3,
+	majorTicks: ["0", "25", "50","75", "100","125", "150","175", "200"],
+	minorTicks: 4,
+	strokeTicks: true,
+	highlights: [
+		{
+			from: 160000,
+			to: 200000,
+			color: "rgba(200, 50, 50, .75)",
+		},
+	],
+	colorPlate: "#fff",
+	borderShadowWidth: 0,
+	borders: false,
+	needleType: "line",
+	colorNeedle: "#007F80",
+	colorNeedleEnd: "#007F80",
+	needleWidth: 2,
+	needleCircleSize: 3,
+	colorNeedleCircleOuter: "#007F80",
+	needleCircleOuter: true,
+	needleCircleInner: false,
+	animationDuration: 50,
 	animationRule: "linear",
 }).draw();
 
@@ -126,16 +164,18 @@ function getReadings() {
 			var myObj = JSON.parse(this.responseText);
 			console.log(myObj);
 			var temp = myObj.temperature;
-			var hum = myObj.humidity;
+			var egt = myObj.egt;
+			var rpm = myObj.rpm;
 			gaugeTemp.value = temp;
-			gaugeHum.value = hum;
+			gaugeEGT.value = egt;
+			gaugeRPM.value = rpm;
             gaugeRC.value = temp ;
 		}
 	};
 	xhr.open("GET", "/readings", true);
 	xhr.send();
 }
-setInterval(getReadings,500) ;
+setInterval(getReadings,200) ;
 
 /*
 if (!!window.EventSource) {

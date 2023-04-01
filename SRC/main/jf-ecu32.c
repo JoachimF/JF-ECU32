@@ -30,17 +30,25 @@
 #include "esp_err.h"
 #include "esp_vfs.h"
 #include "esp_spiffs.h"
+#include "driver/pulse_cnt.h"
+#include "freertos/semphr.h"
+#include "mdns.h"
+#include "driver/rmt_rx.h"
 
 #include "jf-ecu32.h"
 #include "nvs_ecu.h"
+#include "inputs.h"
 
-#define BLINK_GPIO 2
+
+
+//#define BLINK_GPIO 2
 #define BUFFSIZE 2000
 
 //Taches
 TaskHandle_t xlogHandle ;
 TaskHandle_t xWebHandle ;
 TaskHandle_t xecuHandle ;
+TaskHandle_t xinputsHandle ;
 
 //Timers
 TimerHandle_t xTimer1s ;
@@ -48,6 +56,8 @@ TimerHandle_t xTimer60s ;
 
 // Semaphores
 SemaphoreHandle_t xTimeMutex;
+SemaphoreHandle_t xRPMmutex;
+SemaphoreHandle_t xGAZmutex;
 SemaphoreHandle_t log_task_start;
 SemaphoreHandle_t ecu_task_start;
 
@@ -247,8 +257,9 @@ void init(void)
     turbine.pump1.config.ppm_pwm = config_ECU.output_pump1 ;
     turbine.pump2.config.ppm_pwm = config_ECU.output_pump2 ;
     init_mcpwm() ;
-
-
+    // Entrées
+    init_inputs() ;
+    
     //Set les sortie pour test
 //    turbine.pump1.set_power(&turbine.pump1.config,256) ;
 //    turbine.pump2.set_power(&turbine.pump2.config,512) ;
@@ -256,7 +267,7 @@ void init(void)
 //    turbine.vanne1.set_power(&turbine.vanne1.config,50) ;
 //    turbine.vanne2.set_power(&turbine.vanne2.config,100) ;    
     turbine.EGT = 0 ;
-    turbine.GAZ = 1000 ;
+//    turbine.GAZ = 1000 ;
 }
 
 void set_kero_pump_target(uint32_t RPM)
@@ -290,11 +301,11 @@ void update_curve_file(void)
 	char FileName[] = "/html/curves.txt" ;
     fd = fopen(FileName, "w");
 	if (!fd) {
-       ESP_LOGI("File", "Failed to read existing file : logs.txt");
+       ESP_LOGI("File", "Failed to open file : curves.txt");
     }
     fprintf(fd,"RPM;Pompe\n");
     for (int i=0;i<50;i++) {
-		fprintf(fd,"%d;%d\n", turbine_config.power_table.RPM[i],turbine_config.power_table.pump[i]);
+		fprintf(fd,"%ld;%ld\n", turbine_config.power_table.RPM[i],turbine_config.power_table.pump[i]);
 	}
     fclose(fd);
 }
@@ -333,7 +344,7 @@ void update_logs_file(void)
     if (!fd) {
         ESP_LOGI("File", "Failed to read existing file : logs.txt");
     }
-    fprintf(fd,"%d;%02d:%02d;%06d;%03d;%04d;%04d;%04d;%03d;%03d;%03d;%04d;%04d\n", turbine_config.log_count,minutes,secondes,turbine.RPM,turbine.EGT,
+    fprintf(fd,"%d;%02d:%02d;%06ld;%03ld;%04ld;%04ld;%04ld;%03d;%03d;%03d;%04ld;%04ld\n", turbine_config.log_count,minutes,secondes,turbine.RPM,turbine.EGT,
                                                                                             turbine.pump1.value,turbine.pump1.target,turbine.pump2.value,turbine.glow.value,
                                                                                             turbine.vanne1.value,turbine.vanne2.value,turbine.GAZ,turbine.Aux);   
 
@@ -358,6 +369,8 @@ void log_task( void * pvParameters )
 void create_timers(void)
 {
     xTimeMutex = xSemaphoreCreateMutex() ;
+    xRPMmutex = xSemaphoreCreateMutex() ;
+    xGAZmutex = xSemaphoreCreateMutex() ;
     xTimer1s = xTimerCreate("Timer1s",       // Just a text name, not used by the kernel.
                             ( 1000 /portTICK_PERIOD_MS ),   // The timer period in ticks.
                             pdTRUE,        // The timers will auto-reload themselves when they expire.
@@ -372,10 +385,13 @@ void create_timers(void)
                             vTimer60sCallback // Each timer calls the same callback when it expires.
                             );
 
+
+}
+
+void start_timers(void)
+{
     xTimerStart( xTimer1s, 0 ) ;
     xTimerStart( xTimer60s, 0 ) ;
-
-
 }
 
 void vTimer1sCallback( TimerHandle_t pxTimer )
@@ -389,7 +405,8 @@ void vTimer1sCallback( TimerHandle_t pxTimer )
         //ESP_LOGI(TAG,"%02d:%02d",turbine.minutes,turbine.secondes) ;
     }
     xSemaphoreGive(xTimeMutex) ;
-    //ESP_LOGI("Time", "%02d:%02d",turbine.minutes,turbine.secondes);
+    //ESP_LOGI("wifi", "free Heap:%d,%d", esp_get_free_heap_size(), heap_caps_get_free_size(MALLOC_CAP_8BIT));
+    ESP_LOGI("Time", "%02d:%02d",turbine.minutes,turbine.secondes);
     //long long int Timer1 = esp_timer_get_time();
     //printf("Timer: %lld μs\n", Timer1/1000);  
 
@@ -397,12 +414,11 @@ void vTimer1sCallback( TimerHandle_t pxTimer )
 
 void vTimer60sCallback( TimerHandle_t pxTimer )
 {
-        ESP_ERROR_CHECK(esp_wifi_stop() );
-        ESP_LOGI(TAG,"Wifi STOP") ;
-        vTaskDelete( xWebHandle );
-        ESP_LOGI(TAG,"Server STOP") ;
-        mdns_free(void);
-
+    ESP_ERROR_CHECK(esp_wifi_stop() );
+    ESP_LOGI(TAG,"Wifi STOP") ;
+    //vTaskDelete( xWebHandle );
+    ESP_LOGI(TAG,"Server STOP") ;
+    mdns_free();
 }
 
 void ecu_task(void * pvParameters ) 
@@ -497,4 +513,104 @@ void ecu_task(void * pvParameters )
             }
     }
 
+}
+
+void inputs_task(void * pvParameters)
+{
+    unsigned long long time1,time2,time3 ;
+    unsigned long rpm ;
+
+    while(1)
+    {
+        unsigned long long timer ;
+        gptimer_get_raw_count(gptimer, &timer) ;
+        //RPM
+        if(xQueueReceive(rpm_evt_queue, &time1, ( TickType_t ) 10) == pdTRUE)
+        {
+            
+            if(time1 > 0)
+            {
+                rpm = 600000 / (time1/10) ;
+                //ESP_LOGI("RPM", "%ldtrs/min",rpm);
+                if( xSemaphoreTake(xRPMmutex,( TickType_t ) 10 ) == pdTRUE )
+                    turbine.RPM = (rpm + (3*turbine.RPM))/4 ; //filtre
+                xSemaphoreGive(xRPMmutex) ;
+            }
+            else
+                turbine.RPM = 0 ;
+        }
+        else
+        {
+            turbine.RPM = 0 ;
+        }
+
+        //PPM Voie Gaz
+        /*if(xQueueReceive(gpio_gaz_evt_queue, &time2, ( TickType_t ) 2) == pdTRUE )
+        {
+            if(time2 > 0)
+            {
+                if( xSemaphoreTake(xGAZmutex,( TickType_t ) 2 ) == pdTRUE )
+                    turbine.GAZ = time2 ;
+                xSemaphoreGive(xGAZmutex) ;
+            }
+            else
+                turbine.GAZ = 0 ;
+        }
+        else
+        {
+            turbine.GAZ = 0 ;
+        }*/
+            // wait for RX done signal
+        rmt_rx_done_event_data_t rx_data;
+        if(xQueueReceive(receive_queue, &rx_data, ( TickType_t ) 2)== pdTRUE)
+        {
+            if(rx_data.received_symbols[0].level0 == 1)
+            {
+                if( xSemaphoreTake(xGAZmutex,( TickType_t ) 2 ) == pdTRUE )
+                    turbine.GAZ = rx_data.received_symbols[0].duration0 ;
+                xSemaphoreGive(xGAZmutex) ;
+            }else{
+                if( xSemaphoreTake(xGAZmutex,( TickType_t ) 2 ) == pdTRUE )
+                    turbine.GAZ = rx_data.received_symbols[0].duration1 ;
+                xSemaphoreGive(xGAZmutex) ;
+            }
+            /*ESP_LOGI("PPM", "Symbols : %ld",rx_data.num_symbols) ;
+            for(int ii=0; ii<rx_data.num_symbols; ii++)
+            {
+            ESP_LOGI("PPM", "Time Up : %ld",rx_data.received_symbols[ii].duration0) ;
+            ESP_LOGI("PPM", "Time Up : %ld",rx_data.received_symbols[ii].level0) ;
+            ESP_LOGI("PPM", "Time Up : %ld",rx_data.received_symbols[ii].duration1) ;
+            ESP_LOGI("PPM", "Time Up : %ld",rx_data.received_symbols[ii].level1) ;
+            }*/
+        }
+        else 
+        {
+            turbine.GAZ = 0 ;
+        }
+         //   ESP_LOGI("Time","XQ not rx");
+        //PPM Voie 2
+        if(xQueueReceive(gpio_aux_evt_queue, &time3, ( TickType_t ) 2) == pdTRUE) 
+        {
+        //    ESP_LOGI("Time","XQ rx");
+            if(time3 > 0)
+            {
+                if( xSemaphoreTake(xGAZmutex,( TickType_t ) 2 ) == pdTRUE )
+                    turbine.Aux = time3 ;
+                xSemaphoreGive(xGAZmutex) ;
+            }
+            else
+                turbine.Aux = 0 ;
+        }
+        else
+        {
+        //    ESP_LOGI("Time","XQ not rx");
+            turbine.Aux = 0 ;
+        }
+        //EGT
+        //ESP_LOGI("RPM", "%ldtrs/min",turbine.RPM);
+        //ESP_LOGI("PPM Gaz Time", "%ldµS",turbine.GAZ);
+        //ESP_LOGI("PPM Aux Time", "%ldµS",turbine.Aux);
+        //ESP_LOGI("PPM Timer", "%lldµS",timer);
+        vTaskDelay( 10 / portTICK_PERIOD_MS );
+    }
 }
