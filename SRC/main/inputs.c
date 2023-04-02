@@ -34,11 +34,7 @@
 
 static const char *TAG = "ppmrx";
 
-#define RMT_RX_CHANNEL    0     /*!< RMT channel for receiver */
-#define RMT_RX_GPIO_NUM  26     /*!< GPIO number for receiver */
-#define RMT_CLK_DIV      10    /*!< RMT counter clock divider */
-#define RMT_TICK_US    (80000000/RMT_CLK_DIV/1000000)   /*!< RMT counter value for 10 us.(Source clock is APB clock) */
-#define PPM_IMEOUT_US  3500   /*!< RMT receiver timeout value(us) */
+
 
 // Timer
 gptimer_handle_t gptimer = NULL;
@@ -51,27 +47,38 @@ gptimer_config_t timer_config = {
 // RPM
 QueueHandle_t rpm_evt_queue = NULL;
 QueueHandle_t receive_queue = NULL ;
+QueueHandle_t receive_queue_aux = NULL ;
 
-rmt_symbol_word_t raw_symbols[10]; // 64 symbols should be sufficient for a standard NEC frame
+rmt_symbol_word_t raw_symbols[64]; // 
+rmt_symbol_word_t aux_raw_symbols[64]; // 
 rmt_receive_config_t receive_config ;
- rmt_channel_handle_t rx_chan = NULL;
+rmt_channel_handle_t rx_ppm_chan = NULL;
+rmt_channel_handle_t rx_ppm_aux_chan = NULL;
+
 
 static void IRAM_ATTR gpio_isr_handler(void* arg)
 {
     static unsigned long long time ;
     static unsigned long long time_prec ;
     static unsigned long long period ;
+    //BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    unsigned long rpm ;
 
     uint32_t gpio_num = (uint32_t) arg;
     gptimer_get_raw_count(gptimer, &time) ;
     period = time - time_prec ;
     time_prec = time ;
-    xQueueOverwrite(rpm_evt_queue,&period);
+    if(period > 0)
+    {
+        rpm = 600000 / (period/10) ;
+        turbine.RPM = (rpm + (3*turbine.RPM))/4 ; //filtre
+    }
+    //xQueueOverwriteFromISR(rpm_evt_queue,&period,&xHigherPriorityTaskWoken);
 }
 
 //PPMs
-QueueHandle_t gpio_gaz_evt_queue = NULL;
-QueueHandle_t gpio_aux_evt_queue = NULL;
+//QueueHandle_t gpio_gaz_evt_queue = NULL;
+//QueueHandle_t gpio_aux_evt_queue = NULL;
 
 /*static void IRAM_ATTR gpio_gaz_isr_handler(void* arg)
 {
@@ -92,7 +99,7 @@ QueueHandle_t gpio_aux_evt_queue = NULL;
               break ;
     }
 }*/
-
+/*
 static void IRAM_ATTR gpio_aux_isr_handler(void* arg)
 {
     static unsigned long long time ;
@@ -111,17 +118,26 @@ static void IRAM_ATTR gpio_aux_isr_handler(void* arg)
       case 1 : time_prec = time ;
               break ;
     }
-}
+}*/
 
 
-static bool ppm_rmt_rx_done_callback(rmt_channel_handle_t channel, const rmt_rx_done_event_data_t *edata, void *user_data)
+static bool IRAM_ATTR ppm_rmt_rx_done_callback(rmt_channel_handle_t channel, const rmt_rx_done_event_data_t *edata, void *user_data)
 {
-    BaseType_t high_task_wakeup = pdFALSE;
+    BaseType_t high_task_wakeup = pdTRUE;
     QueueHandle_t receive_queue2 = (QueueHandle_t)user_data;
     // send the received RMT symbols to the parser task
-    xQueueSendFromISR(receive_queue2, edata, &high_task_wakeup);
-    // Redemarre la lecture
-    ESP_ERROR_CHECK(rmt_receive(rx_chan, raw_symbols, sizeof(raw_symbols), &receive_config));
+    xQueueOverwriteFromISR(receive_queue2, edata, &high_task_wakeup);
+
+    // return whether any task is woken up
+    return high_task_wakeup == pdTRUE;
+}
+
+static bool IRAM_ATTR ppm_rmt_aux_done_callback(rmt_channel_handle_t channel, const rmt_rx_done_event_data_t *edata, void *user_data)
+{
+    BaseType_t high_task_wakeup = pdTRUE;
+    QueueHandle_t receive_queue3 = (QueueHandle_t)user_data;
+    // send the received RMT symbols to the parser task
+    xQueueOverwriteFromISR(receive_queue3, edata, &high_task_wakeup);
     // return whether any task is woken up
     return high_task_wakeup == pdTRUE;
 }
@@ -147,8 +163,8 @@ void init_inputs(void)
 
     ESP_LOGI("PPM","Init PPM");
 
-    gpio_gaz_evt_queue = xQueueCreate(1, sizeof(unsigned long long ));
-    gpio_aux_evt_queue = xQueueCreate(1, sizeof(unsigned long long ));
+    //gpio_gaz_evt_queue = xQueueCreate(1, sizeof(unsigned long long ));
+    //gpio_aux_evt_queue = xQueueCreate(1, sizeof(unsigned long long ));
 
     /*gpio_set_direction(PPM_GAZ_PIN, GPIO_MODE_INPUT);
     gpio_pulldown_en(PPM_GAZ_PIN);
@@ -158,56 +174,55 @@ void init_inputs(void)
     gpio_isr_handler_add(PPM_GAZ_PIN, gpio_gaz_isr_handler, (void *)PPM_GAZ_PIN);
     gpio_intr_enable(PPM_GAZ_PIN) ;*/
 
-    /*rmt_rx_channel_config_t  rmt_rx;
-    rmt_rx.channel = RMT_RX_CHANNEL;
-    rmt_rx.gpio_num = RMT_RX_GPIO_NUM;
-    rmt_rx.clk_div = RMT_CLK_DIV;
-    rmt_rx.mem_block_num = 1;
-    rmt_rx.rmt_mode = RMT_MODE_RX;
-    rmt_rx.rx_config.filter_en = true;
-    rmt_rx.rx_config.filter_ticks_thresh = 100;
-    rmt_rx.rx_config.idle_threshold = PPM_IMEOUT_US * (RMT_TICK_US);
-    rmt_config(&rmt_rx);
-    rmt_driver_install(rmt_rx.channel, 1000, 0);*/
+    //voie des gaz
 
-   
     rmt_rx_channel_config_t rmt_rx = {
-    .clk_src = RMT_CLK_SRC_DEFAULT,       // select source clock
-    .resolution_hz = 1 * 1000 * 1000, // 1MHz tick resolution, i.e. 1 tick = 1us
-    .mem_block_symbols = 64,          // memory block size, 64 * 4 = 256Bytes
-    .gpio_num = RMT_RX_GPIO_NUM,                    // GPIO number
-    .flags.invert_in = false,         // don't invert input signal
-    .flags.with_dma = false,          // don't need DMA backend
+        .clk_src = RMT_CLK_SRC_DEFAULT,       // select source clock
+        .resolution_hz = 1 * 1000 * 1000, // 1MHz tick resolution, i.e. 1 tick = 1us
+        .mem_block_symbols = 64,          // memory block size, 64 * 4 = 256Bytes
+        .gpio_num = RMT_RX_GPIO_NUM,                    // GPIO number
+        .flags.invert_in = false,         // don't invert input signal
+        .flags.with_dma = false,          // don't need DMA backend
     };
-    ESP_ERROR_CHECK(rmt_new_rx_channel(&rmt_rx, &rx_chan));
 
+    ESP_ERROR_CHECK(rmt_new_rx_channel(&rmt_rx, &rx_ppm_chan));
+    ESP_LOGI(TAG, "PPM RX initialized\n");
+    //Voie aux
+    rmt_rx.gpio_num = RMT_AUX_GPIO_NUM ;
+    ESP_ERROR_CHECK(rmt_new_rx_channel(&rmt_rx, &rx_ppm_aux_chan));
     //xTaskCreate(ppm_rx_task, "ppm_rx_task", 2048, NULL, 10, NULL);
-	ESP_LOGI(TAG, "PPM RX initialized\n");
-
+    ESP_LOGI(TAG, "PPM AUX RX initialized\n");
+/*
     gpio_set_direction(PPM_AUX_PIN, GPIO_MODE_INPUT);
     gpio_pulldown_en(PPM_AUX_PIN);
     gpio_pullup_dis(PPM_AUX_PIN);
     gpio_set_intr_type(PPM_AUX_PIN, GPIO_INTR_ANYEDGE);    
 
     gpio_isr_handler_add(PPM_AUX_PIN, gpio_aux_isr_handler, (void *)PPM_AUX_PIN);
-    gpio_intr_enable(PPM_AUX_PIN) ;
+    gpio_intr_enable(PPM_AUX_PIN) ;*/
 
     receive_queue = xQueueCreate(1, sizeof(rmt_rx_done_event_data_t));
+    receive_queue_aux = xQueueCreate(1, sizeof(rmt_rx_done_event_data_t));
 
     rmt_rx_event_callbacks_t cbs = {
         .on_recv_done = ppm_rmt_rx_done_callback,
     };
-    ESP_ERROR_CHECK(rmt_rx_register_event_callbacks(rx_chan, &cbs, receive_queue));
+    rmt_rx_event_callbacks_t cbs_aux = {
+        .on_recv_done = ppm_rmt_aux_done_callback,
+    };
+
+    ESP_ERROR_CHECK(rmt_rx_register_event_callbacks(rx_ppm_chan, &cbs, receive_queue));
+    ESP_ERROR_CHECK(rmt_rx_register_event_callbacks(rx_ppm_aux_chan, &cbs_aux, receive_queue_aux));
 
     // the following timing requirement is based on NEC protocol
- 
-        receive_config.signal_range_min_ns = 700000;     // the shortest duration for NEC signal is 560us, 1250ns < 560us, valid signal won't be treated as noise
-        receive_config.signal_range_max_ns = 10000000; // the longest duration for NEC signal is 9000us, 12000000ns > 9000us, the receive won't stop early
+    receive_config.signal_range_min_ns = 700000;     // the shortest duration for NEC signal is 560us, 1250ns < 560us, valid signal won't be treated as noise
+    receive_config.signal_range_max_ns = 10000000; // the longest duration for NEC signal is 9000us, 12000000ns > 9000us, the receive won't stop early
     
 
     // ready to receive
-    ESP_ERROR_CHECK(rmt_enable(rx_chan)) ;
-    ESP_ERROR_CHECK(rmt_receive(rx_chan, raw_symbols, sizeof(raw_symbols), &receive_config));
-
+    ESP_ERROR_CHECK(rmt_enable(rx_ppm_chan)) ;
+    ESP_ERROR_CHECK(rmt_receive(rx_ppm_chan, raw_symbols, sizeof(raw_symbols), &receive_config));
+    ESP_ERROR_CHECK(rmt_enable(rx_ppm_aux_chan)) ;
+    ESP_ERROR_CHECK(rmt_receive(rx_ppm_aux_chan, aux_raw_symbols, sizeof(aux_raw_symbols), &receive_config));
 }
 

@@ -315,12 +315,12 @@ void app_main()
 	//vTaskSuspend( xlogHandle ); 
 	
 	ESP_LOGI(TAG, "Initializing Task ECU");
-	xTaskCreatePinnedToCore(ecu_task, "ECU", 4096, NULL, ( 1UL | portPRIVILEGE_BIT ), &xecuHandle,1);
+	xTaskCreatePinnedToCore(ecu_task, "ECU", 4096, NULL, (configMAX_PRIORITIES -2 )	|( 1UL | portPRIVILEGE_BIT ), &xecuHandle,1);
 	configASSERT( xecuHandle );
 	//vTaskSuspend( xecuHandle ); 
 	
 	ESP_LOGI(TAG, "Initializing Task Inputs");
-	xTaskCreatePinnedToCore(inputs_task, "INPUTS", 4096, NULL, ( 1UL | portPRIVILEGE_BIT ), &xinputsHandle,1);
+	xTaskCreatePinnedToCore(inputs_task, "INPUTS", 4096, NULL, (configMAX_PRIORITIES -1 )|( 1UL | portPRIVILEGE_BIT ), &xinputsHandle,1);
 	configASSERT( xinputsHandle );
 
 	/* Htop */

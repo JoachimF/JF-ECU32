@@ -2,6 +2,6 @@
 nvs,      data, nvs,     ,  0x4000
 otadata,  data, ota,     ,  0x2000
 phy_init, data, phy,     ,  0x1000
-factory,  app,  factory, ,  1500K
 ota_0,    app,  ota_0,   ,  1500K
+ota_1,    app,  ota_1,   ,  1500K
 storage,  data, spiffs,  ,  0xe0000

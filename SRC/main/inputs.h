@@ -28,17 +28,20 @@
 #include "driver/rmt_rx.h"
 
 #define RPM_PIN 21
-#define PPM_GAZ_PIN 26
-#define PPM_AUX_PIN 22
+#define RMT_RX_GPIO_NUM  26     /*!< GPIO number for receiver */
+#define RMT_AUX_GPIO_NUM 22
 
 extern gptimer_handle_t gptimer ;
 extern gptimer_config_t timer_config ;
 
 extern QueueHandle_t rpm_evt_queue ;
-extern QueueHandle_t gpio_gaz_evt_queue ;
-extern QueueHandle_t gpio_aux_evt_queue ;
 extern QueueHandle_t receive_queue ;
+extern QueueHandle_t receive_queue_aux ;
+extern rmt_channel_handle_t rx_ppm_chan ;
+extern rmt_channel_handle_t rx_ppm_aux_chan ;
 
+extern rmt_symbol_word_t raw_symbols[64]; // 
+extern rmt_symbol_word_t aux_raw_symbols[64]; // 
 extern rmt_receive_config_t receive_config ;
 
 void init_inputs(void)  ;

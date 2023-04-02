@@ -298,7 +298,7 @@ void read_nvs(void)
                 ESP_LOGI(TAG,"max_pump1 = %d", turbine_config.max_pump1);
                 ESP_LOGI(TAG,"min_pump1= %d", turbine_config.min_pump1);
                 ESP_LOGI(TAG,"max_pump2 = %d", turbine_config.max_pump2);
-                ESP_LOGI(TAG,"min_pump2= %d", turbine_config.jet_min_rpm);
+                ESP_LOGI(TAG,"min_pump2= %ld", turbine_config.jet_min_rpm);
                 /*for(int i=0;i<50;i++)
                 {
                     ESP_LOGI(TAG,"pump = %d - ", turbine_config.power_table.pump[i]);

@@ -9,8 +9,9 @@ window.addEventListener("load", getReadings);
 //Create Temperature Gauge
 var gaugeRC = new LinearGauge({
     renderTo: "rc-gauge",
+	units: "µS",
     width:400 ,
-    height:150 ,
+    height:100 ,
     minValue:1000 ,
     maxValue:2000,
     majorTicks: ["1000","1250","1500","1750","2000" ],
@@ -41,44 +42,41 @@ var gaugeRC = new LinearGauge({
     animationTarget:"plate"    
 }).draw();
 
-var gaugeTemp = new LinearGauge({
-	renderTo: "gauge-temperature",
-	width: 120,
-	height: 400,
-	units: "Gaz RC",
-	minValue: 950,
-	startAngle: 90,
-	ticksAngle: 180,
-	maxValue: 2000,
-	colorValueBoxRect: "#049faa",
-	colorValueBoxRectEnd: "#049faa",
-	colorValueBoxBackground: "#f1fbfc",
-	valueDec: 0,
-	valueInt: 4,
-	majorTicks: ["950", "1250", "1500", "1750", "2000"],
-	minorTicks: 4,
-	strokeTicks: true,
-	highlights: [
+var gaugeRC_aux = new LinearGauge({
+    renderTo: "rc-aux-gauge",
+	units: "µS",
+    width:400 ,
+    height:100 ,
+    minValue:1000 ,
+    maxValue:2000,
+    majorTicks: ["1000","1250","1500","1750","2000" ],
+    minorTicks:2 ,
+    ticksAngle: 180,
+    strokTicks:true, 
+    highlights: [
 		{
 			from: 1000,
 			to: 1100,
-			color: "#03C0C1",
+			color: "rgba(0, 50, 200, .75)",
 		},
-	],
-	colorPlate: "#fff",
-	colorBarProgress: "#CC2936",
-	colorBarProgressEnd: "#049faa",
-	borderShadowWidth: 0,
-	borders: false,
-	needleType: "arrow",
-	needleWidth: 2,
-	needleCircleSize: 7,
-	needleCircleOuter: true,
-	needleCircleInner: false,
-	animationDuration: 10,
-	animationRule: "linear",
-	barWidth: 50,
+    ],
+    colorPlate:"#fff" ,
+    borderShadowWidth:0 ,
+    borders:false ,
+    barBeginCircle:false ,
+    barWidth:10 ,
+    tickSide:"left", 
+    numberSide:"left", 
+    needleSide:"left" ,
+    needleType:"line" ,
+    needleWidth:3 ,
+    colorNeedle:"#222", 
+    colorNeedleend:"#222", 
+    animationDuration:50, 
+    animationRule:"linear" ,
+    animationTarget:"plate"    
 }).draw();
+
 
 // Create EGT Gauge
 var gaugeEGT = new RadialGauge({
@@ -163,13 +161,14 @@ function getReadings() {
 		if (this.readyState == 4 && this.status == 200) {
 			var myObj = JSON.parse(this.responseText);
 			console.log(myObj);
-			var temp = myObj.temperature;
+			var ppm_gaz = myObj.ppm_gaz;
+			var ppm_aux = myObj.ppm_aux;
 			var egt = myObj.egt;
 			var rpm = myObj.rpm;
-			gaugeTemp.value = temp;
+			gaugeRC.value = ppm_gaz;
+			gaugeRC_aux.value = ppm_aux;
 			gaugeEGT.value = egt;
 			gaugeRPM.value = rpm;
-            gaugeRC.value = temp ;
 		}
 	};
 	xhr.open("GET", "/readings", true);

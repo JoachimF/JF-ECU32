@@ -242,7 +242,7 @@ void init_mcpwm(void) // IDF 4.3.4
         ledc_channel[i].intr_type = LEDC_INTR_DISABLE;
         ledc_channel[i].duty = 0;
         ledc_channel[i].hpoint = 0;
-        ESP_ERROR_CHECK(ledc_channel_config(&ledc_channel[i]));
+        //ESP_ERROR_CHECK(ledc_channel_config(&ledc_channel[i]));
     }
 }
 
@@ -272,7 +272,7 @@ void init(void)
 
 void set_kero_pump_target(uint32_t RPM)
 {
-    uint32_t rpm1,pump1,pump2,rpm2,res ;
+    uint32_t rpm1=0,pump1=0,pump2=0,rpm2=0,res=0 ;
     for(int i = 0;i<50;i++)
     {
         if(RPM >= turbine_config.power_table.RPM[i])
@@ -517,17 +517,16 @@ void ecu_task(void * pvParameters )
 
 void inputs_task(void * pvParameters)
 {
-    unsigned long long time1,time2,time3 ;
-    unsigned long rpm ;
-
+    //unsigned long long time1; //,time2,time3 ;
+    
+    unsigned long long timer,timer_prec = 0 ;
     while(1)
     {
-        unsigned long long timer ;
+        
         gptimer_get_raw_count(gptimer, &timer) ;
         //RPM
-        if(xQueueReceive(rpm_evt_queue, &time1, ( TickType_t ) 10) == pdTRUE)
+        /*if(xQueueReceive(rpm_evt_queue, &time1, ( TickType_t ) 0) == pdTRUE)
         {
-            
             if(time1 > 0)
             {
                 rpm = 600000 / (time1/10) ;
@@ -542,28 +541,15 @@ void inputs_task(void * pvParameters)
         else
         {
             turbine.RPM = 0 ;
-        }
+        }*/
 
         //PPM Voie Gaz
-        /*if(xQueueReceive(gpio_gaz_evt_queue, &time2, ( TickType_t ) 2) == pdTRUE )
-        {
-            if(time2 > 0)
-            {
-                if( xSemaphoreTake(xGAZmutex,( TickType_t ) 2 ) == pdTRUE )
-                    turbine.GAZ = time2 ;
-                xSemaphoreGive(xGAZmutex) ;
-            }
-            else
-                turbine.GAZ = 0 ;
-        }
-        else
-        {
-            turbine.GAZ = 0 ;
-        }*/
-            // wait for RX done signal
+        // wait for RX done signal
         rmt_rx_done_event_data_t rx_data;
         if(xQueueReceive(receive_queue, &rx_data, ( TickType_t ) 2)== pdTRUE)
         {
+            // Redemarre la lecture
+            ESP_ERROR_CHECK(rmt_receive(rx_ppm_chan, raw_symbols, sizeof(raw_symbols), &receive_config));
             if(rx_data.received_symbols[0].level0 == 1)
             {
                 if( xSemaphoreTake(xGAZmutex,( TickType_t ) 2 ) == pdTRUE )
@@ -589,7 +575,35 @@ void inputs_task(void * pvParameters)
         }
          //   ESP_LOGI("Time","XQ not rx");
         //PPM Voie 2
-        if(xQueueReceive(gpio_aux_evt_queue, &time3, ( TickType_t ) 2) == pdTRUE) 
+        rmt_rx_done_event_data_t aux_rx_data;
+        if(xQueueReceive(receive_queue_aux, &aux_rx_data, ( TickType_t ) 2)== pdTRUE)
+        {
+            // Redemarre la lecture
+            ESP_ERROR_CHECK(rmt_receive(rx_ppm_aux_chan, aux_raw_symbols, sizeof(aux_raw_symbols), &receive_config));
+            if(aux_rx_data.received_symbols[0].level0 == 1)
+            {
+                if( xSemaphoreTake(xGAZmutex,( TickType_t ) 2 ) == pdTRUE )
+                    turbine.Aux = aux_rx_data.received_symbols[0].duration0 ;
+                xSemaphoreGive(xGAZmutex) ;
+            }else{
+                if( xSemaphoreTake(xGAZmutex,( TickType_t ) 2 ) == pdTRUE )
+                    turbine.Aux = aux_rx_data.received_symbols[0].duration1 ;
+                xSemaphoreGive(xGAZmutex) ;
+            }
+            /*ESP_LOGI("PPM", "Symbols : %ld",rx_data.num_symbols) ;
+            for(int ii=0; ii<rx_data.num_symbols; ii++)
+            {
+            ESP_LOGI("PPM", "Time Up : %ld",rx_data.received_symbols[ii].duration0) ;
+            ESP_LOGI("PPM", "Time Up : %ld",rx_data.received_symbols[ii].level0) ;
+            ESP_LOGI("PPM", "Time Up : %ld",rx_data.received_symbols[ii].duration1) ;
+            ESP_LOGI("PPM", "Time Up : %ld",rx_data.received_symbols[ii].level1) ;
+            }*/
+        }
+        else 
+        {
+            turbine.Aux = 0 ;
+        }    
+        /*if(xQueueReceive(gpio_aux_evt_queue, &time3, ( TickType_t ) 2) == pdTRUE) 
         {
         //    ESP_LOGI("Time","XQ rx");
             if(time3 > 0)
@@ -605,12 +619,13 @@ void inputs_task(void * pvParameters)
         {
         //    ESP_LOGI("Time","XQ not rx");
             turbine.Aux = 0 ;
-        }
+        }*/
         //EGT
         //ESP_LOGI("RPM", "%ldtrs/min",turbine.RPM);
         //ESP_LOGI("PPM Gaz Time", "%ldµS",turbine.GAZ);
         //ESP_LOGI("PPM Aux Time", "%ldµS",turbine.Aux);
-        //ESP_LOGI("PPM Timer", "%lldµS",timer);
-        vTaskDelay( 10 / portTICK_PERIOD_MS );
+        ESP_LOGI("PPM Timer", "%lldµS",timer-timer_prec);
+        timer_prec = timer ;
+        //vTaskDelay( 10 / portTICK_PERIOD_MS );
     }
 }

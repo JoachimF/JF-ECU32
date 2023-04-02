@@ -1165,7 +1165,8 @@ static esp_err_t readings_get_handler(httpd_req_t *req){
 	//ESP_LOGI(TAG, "readings_get_handler req->uri=[%s]", req->uri);
 	myjson = cJSON_CreateObject();
 //	if( xSemaphoreTake(xTimeMutex,( TickType_t ) 10) == pdTRUE ) {
-		cJSON_AddNumberToObject(myjson, "temperature", turbine.GAZ);
+		cJSON_AddNumberToObject(myjson, "ppm_gaz", turbine.GAZ);
+		cJSON_AddNumberToObject(myjson, "ppm_aux", turbine.Aux);
 		cJSON_AddNumberToObject(myjson, "egt", turbine.EGT);
 	    if( xSemaphoreTake(xRPMmutex,( TickType_t ) 100 ) == pdTRUE )
 		{

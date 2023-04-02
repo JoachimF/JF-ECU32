@@ -9,7 +9,7 @@ int wifi_init_sta() ;
 void initialise_mdns(void) ;
 
 typedef struct {
-    char ssid[33] ;
+    char ssid[32] ;
     char password[64] ;
     uint8_t retry ;
     uint32_t checksum ;    
