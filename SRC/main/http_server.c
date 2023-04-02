@@ -1168,14 +1168,7 @@ static esp_err_t readings_get_handler(httpd_req_t *req){
 		cJSON_AddNumberToObject(myjson, "ppm_gaz", turbine.GAZ);
 		cJSON_AddNumberToObject(myjson, "ppm_aux", turbine.Aux);
 		cJSON_AddNumberToObject(myjson, "egt", turbine.EGT);
-	    if( xSemaphoreTake(xRPMmutex,( TickType_t ) 100 ) == pdTRUE )
-		{
-			rpm = turbine.RPM ;
-		}
-		else
-	        turbine.RPM = 0 ;
-		xSemaphoreGive(xRPMmutex) ;
-		cJSON_AddNumberToObject(myjson, "rpm", rpm);
+		cJSON_AddNumberToObject(myjson, "rpm", turbine.RPM);
 		cJSON_AddNumberToObject(myjson, "time", time_ecu);
 	
 //	}xSemaphoreGive(xTimeMutex) ;
@@ -1184,7 +1177,7 @@ static esp_err_t readings_get_handler(httpd_req_t *req){
 	httpd_resp_sendstr_chunk(req, my_json_string); //fin de la page
 	httpd_resp_sendstr_chunk(req, NULL); //fin de la page
 	cJSON_Delete(myjson) ;
-	//heap_caps_free(my_json_string) ;
+	free(my_json_string) ; 
 	return ESP_OK;
 }
 

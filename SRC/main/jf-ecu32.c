@@ -34,6 +34,7 @@
 #include "freertos/semphr.h"
 #include "mdns.h"
 #include "driver/rmt_rx.h"
+//#include "esp_heap_trace.h"
 
 #include "jf-ecu32.h"
 #include "nvs_ecu.h"
@@ -405,8 +406,10 @@ void vTimer1sCallback( TimerHandle_t pxTimer )
         //ESP_LOGI(TAG,"%02d:%02d",turbine.minutes,turbine.secondes) ;
     }
     xSemaphoreGive(xTimeMutex) ;
-    //ESP_LOGI("wifi", "free Heap:%d,%d", esp_get_free_heap_size(), heap_caps_get_free_size(MALLOC_CAP_8BIT));
+    
+    ESP_LOGI("wifi", "free Heap:%d,%d", esp_get_free_heap_size(), heap_caps_get_free_size(MALLOC_CAP_8BIT));
     ESP_LOGI("Time", "%02d:%02d",turbine.minutes,turbine.secondes);
+    //heap_trace_dump();
     //long long int Timer1 = esp_timer_get_time();
     //printf("Timer: %lld μs\n", Timer1/1000);  
 
@@ -517,35 +520,19 @@ void ecu_task(void * pvParameters )
 
 void inputs_task(void * pvParameters)
 {
-    //unsigned long long time1; //,time2,time3 ;
-    
     unsigned long long timer,timer_prec = 0 ;
+
+    rmt_rx_done_event_data_t rx_data;
+    rmt_rx_done_event_data_t aux_rx_data;
     while(1)
     {
         
+        //ESP_ERROR_CHECK( heap_trace_start(HEAP_TRACE_LEAKS) );
         gptimer_get_raw_count(gptimer, &timer) ;
         //RPM
-        /*if(xQueueReceive(rpm_evt_queue, &time1, ( TickType_t ) 0) == pdTRUE)
-        {
-            if(time1 > 0)
-            {
-                rpm = 600000 / (time1/10) ;
-                //ESP_LOGI("RPM", "%ldtrs/min",rpm);
-                if( xSemaphoreTake(xRPMmutex,( TickType_t ) 10 ) == pdTRUE )
-                    turbine.RPM = (rpm + (3*turbine.RPM))/4 ; //filtre
-                xSemaphoreGive(xRPMmutex) ;
-            }
-            else
-                turbine.RPM = 0 ;
-        }
-        else
-        {
-            turbine.RPM = 0 ;
-        }*/
 
         //PPM Voie Gaz
         // wait for RX done signal
-        rmt_rx_done_event_data_t rx_data;
         if(xQueueReceive(receive_queue, &rx_data, ( TickType_t ) 2)== pdTRUE)
         {
             // Redemarre la lecture
@@ -575,7 +562,6 @@ void inputs_task(void * pvParameters)
         }
          //   ESP_LOGI("Time","XQ not rx");
         //PPM Voie 2
-        rmt_rx_done_event_data_t aux_rx_data;
         if(xQueueReceive(receive_queue_aux, &aux_rx_data, ( TickType_t ) 2)== pdTRUE)
         {
             // Redemarre la lecture
@@ -603,29 +589,13 @@ void inputs_task(void * pvParameters)
         {
             turbine.Aux = 0 ;
         }    
-        /*if(xQueueReceive(gpio_aux_evt_queue, &time3, ( TickType_t ) 2) == pdTRUE) 
-        {
-        //    ESP_LOGI("Time","XQ rx");
-            if(time3 > 0)
-            {
-                if( xSemaphoreTake(xGAZmutex,( TickType_t ) 2 ) == pdTRUE )
-                    turbine.Aux = time3 ;
-                xSemaphoreGive(xGAZmutex) ;
-            }
-            else
-                turbine.Aux = 0 ;
-        }
-        else
-        {
-        //    ESP_LOGI("Time","XQ not rx");
-            turbine.Aux = 0 ;
-        }*/
-        //EGT
         //ESP_LOGI("RPM", "%ldtrs/min",turbine.RPM);
         //ESP_LOGI("PPM Gaz Time", "%ldµS",turbine.GAZ);
         //ESP_LOGI("PPM Aux Time", "%ldµS",turbine.Aux);
-        ESP_LOGI("PPM Timer", "%lldµS",timer-timer_prec);
+        //ESP_LOGI("PPM Timer", "%lldµS",timer-timer_prec);
         timer_prec = timer ;
         //vTaskDelay( 10 / portTICK_PERIOD_MS );
+        //ESP_ERROR_CHECK( heap_trace_stop() );
+		
     }
 }

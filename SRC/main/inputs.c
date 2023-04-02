@@ -31,8 +31,9 @@
 #include "driver/rmt_rx.h"
 #include "esp_log.h"
 #include "esp_err.h"
+#include <max31855.h>
 
-static const char *TAG = "ppmrx";
+static const char *TAG = "INPUTS";
 
 
 
@@ -76,70 +77,62 @@ static void IRAM_ATTR gpio_isr_handler(void* arg)
     //xQueueOverwriteFromISR(rpm_evt_queue,&period,&xHigherPriorityTaskWoken);
 }
 
-//PPMs
-//QueueHandle_t gpio_gaz_evt_queue = NULL;
-//QueueHandle_t gpio_aux_evt_queue = NULL;
-
-/*static void IRAM_ATTR gpio_gaz_isr_handler(void* arg)
-{
-    static unsigned long long time ;
-    static unsigned long long time_prec ;
-    static unsigned long long period ;
-
-    uint32_t gpio_num = (uint32_t) arg;
-    int pin_state ;
-    pin_state = gpio_get_level(PPM_GAZ_PIN) ;
-    gptimer_get_raw_count(gptimer, &time) ;
-    switch(pin_state)
-    {
-      case 0 : period = time - time_prec ;
-              xQueueOverwrite(gpio_gaz_evt_queue,&period);
-              break ;
-      case 1 : time_prec = time ;
-              break ;
-    }
-}*/
-/*
-static void IRAM_ATTR gpio_aux_isr_handler(void* arg)
-{
-    static unsigned long long time ;
-    static unsigned long long time_prec ;
-    static unsigned long long period ;
-
-    uint32_t gpio_num = (uint32_t) arg;
-    int pin_state ;
-    pin_state = gpio_get_level(PPM_AUX_PIN) ;
-    gptimer_get_raw_count(gptimer, &time) ; 
-    switch(pin_state)
-    {
-      case 0 : period = time - time_prec ;
-              xQueueOverwrite(gpio_aux_evt_queue,&period);
-              break ;
-      case 1 : time_prec = time ;
-              break ;
-    }
-}*/
-
-
+BaseType_t high_task_wakeup = pdTRUE;
 static bool IRAM_ATTR ppm_rmt_rx_done_callback(rmt_channel_handle_t channel, const rmt_rx_done_event_data_t *edata, void *user_data)
 {
-    BaseType_t high_task_wakeup = pdTRUE;
     QueueHandle_t receive_queue2 = (QueueHandle_t)user_data;
     // send the received RMT symbols to the parser task
     xQueueOverwriteFromISR(receive_queue2, edata, &high_task_wakeup);
-
     // return whether any task is woken up
     return high_task_wakeup == pdTRUE;
 }
 
 static bool IRAM_ATTR ppm_rmt_aux_done_callback(rmt_channel_handle_t channel, const rmt_rx_done_event_data_t *edata, void *user_data)
 {
-    BaseType_t high_task_wakeup = pdTRUE;
     QueueHandle_t receive_queue3 = (QueueHandle_t)user_data;
     // send the received RMT symbols to the parser task
     xQueueOverwriteFromISR(receive_queue3, edata, &high_task_wakeup);
     // return whether any task is woken up
     return high_task_wakeup == pdTRUE;
+}
+
+static void task_egt(void *pvParameter)
+{
+    max31855_t dev = { 0 };
+    // Configure SPI bus
+    spi_bus_config_t cfg = {
+       .mosi_io_num = -1,
+       .miso_io_num = MISO_GPIO_NUM,
+       .sclk_io_num = CLK_GPIO_NUM,
+       .quadwp_io_num = -1,
+       .quadhd_io_num = -1,
+       .max_transfer_sz = 0,
+       .flags = 0
+    };
+    ESP_ERROR_CHECK(spi_bus_initialize(HOST, &cfg, 1));
+
+    // Init device
+    ESP_ERROR_CHECK(max31855_init_desc(&dev, HOST, MAX31855_MAX_CLOCK_SPEED_HZ, CS_GPIO_NUM));
+
+    float tc_t, cj_t;
+    bool scv, scg, oc;
+    while (1)
+    {
+        esp_err_t res = max31855_get_temperature(&dev, &tc_t, &cj_t, &scv, &scg, &oc);
+        if (res != ESP_OK)
+            ESP_LOGE(TAG, "Failed to measure: %d (%s)", res, esp_err_to_name(res));
+        else
+        {
+            if (scv) ESP_LOGW(TAG, "Thermocouple shorted to VCC!");
+            if (scg) ESP_LOGW(TAG, "Thermocouple shorted to GND!");
+            if (oc) ESP_LOGW(TAG, "No connection to thermocouple!");
+            //ESP_LOGI(TAG, "Temperature: %.2f°C, cold junction temperature: %.4f°C", tc_t, cj_t);
+            //ESP_LOGI("wifi", "free Heap:%d,%d", esp_get_free_heap_size(), heap_caps_get_free_size(MALLOC_CAP_8BIT));
+            turbine.EGT = tc_t ;
+        }
+
+        vTaskDelay(pdMS_TO_TICKS(200));
+    }
 }
 
 void init_inputs(void) 
@@ -163,17 +156,6 @@ void init_inputs(void)
 
     ESP_LOGI("PPM","Init PPM");
 
-    //gpio_gaz_evt_queue = xQueueCreate(1, sizeof(unsigned long long ));
-    //gpio_aux_evt_queue = xQueueCreate(1, sizeof(unsigned long long ));
-
-    /*gpio_set_direction(PPM_GAZ_PIN, GPIO_MODE_INPUT);
-    gpio_pulldown_en(PPM_GAZ_PIN);
-    gpio_pullup_dis(PPM_GAZ_PIN);
-    gpio_set_intr_type(PPM_GAZ_PIN, GPIO_INTR_ANYEDGE) ; //GPIO_INTR_ANYEDGE);    
-
-    gpio_isr_handler_add(PPM_GAZ_PIN, gpio_gaz_isr_handler, (void *)PPM_GAZ_PIN);
-    gpio_intr_enable(PPM_GAZ_PIN) ;*/
-
     //voie des gaz
 
     rmt_rx_channel_config_t rmt_rx = {
@@ -190,16 +172,8 @@ void init_inputs(void)
     //Voie aux
     rmt_rx.gpio_num = RMT_AUX_GPIO_NUM ;
     ESP_ERROR_CHECK(rmt_new_rx_channel(&rmt_rx, &rx_ppm_aux_chan));
-    //xTaskCreate(ppm_rx_task, "ppm_rx_task", 2048, NULL, 10, NULL);
-    ESP_LOGI(TAG, "PPM AUX RX initialized\n");
-/*
-    gpio_set_direction(PPM_AUX_PIN, GPIO_MODE_INPUT);
-    gpio_pulldown_en(PPM_AUX_PIN);
-    gpio_pullup_dis(PPM_AUX_PIN);
-    gpio_set_intr_type(PPM_AUX_PIN, GPIO_INTR_ANYEDGE);    
 
-    gpio_isr_handler_add(PPM_AUX_PIN, gpio_aux_isr_handler, (void *)PPM_AUX_PIN);
-    gpio_intr_enable(PPM_AUX_PIN) ;*/
+    ESP_LOGI(TAG, "PPM AUX RX initialized\n");
 
     receive_queue = xQueueCreate(1, sizeof(rmt_rx_done_event_data_t));
     receive_queue_aux = xQueueCreate(1, sizeof(rmt_rx_done_event_data_t));
@@ -224,5 +198,8 @@ void init_inputs(void)
     ESP_ERROR_CHECK(rmt_receive(rx_ppm_chan, raw_symbols, sizeof(raw_symbols), &receive_config));
     ESP_ERROR_CHECK(rmt_enable(rx_ppm_aux_chan)) ;
     ESP_ERROR_CHECK(rmt_receive(rx_ppm_aux_chan, aux_raw_symbols, sizeof(aux_raw_symbols), &receive_config));
+    
+    ESP_LOGI(TAG, "MAX31855 initialized\n");
+    xTaskCreate(task_egt, TAG, configMINIMAL_STACK_SIZE * 8, NULL, 5, NULL);
 }
 

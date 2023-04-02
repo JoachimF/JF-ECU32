@@ -337,13 +337,13 @@ void app_main()
 	//xSemaphoreGive(log_task_start) ;
 	
 	vTaskDelay(2000 / portTICK_PERIOD_MS);
-	turbine.EGT = 1000 ;
-	turbine.GAZ = 1000 ;
+	//turbine.EGT = 1000 ;
+	//turbine.GAZ = 1000 ;
 	Timer1 = esp_timer_get_time();
 
 	//int32_t time =     //printf("Timer: %lld μs\n", Timer1/1000); 
 	while(1){
-	for(int32_t i=0;i<1000;i++)
+	/*for(int32_t i=0;i<1000;i++)
 	{
 		    turbine.EGT -- ;
             //turbine.GAZ ++ ;
@@ -360,7 +360,7 @@ void app_main()
             //ESP_LOGI(TAG,"EGT : %d ; GAZ : %d",turbine.EGT,turbine.GAZ) ;
         //}xSemaphoreGive(xTimeMutex) ;
     		vTaskDelay(10 / portTICK_PERIOD_MS);
-	}}
+	}}*/
 	/*
 	set_kero_pump_target(36000);
 	vTaskDelay(3000 / portTICK_PERIOD_MS);
@@ -372,4 +372,6 @@ void app_main()
 	vTaskDelay(3000 / portTICK_PERIOD_MS);
     set_kero_pump_target(143000);
 	vTaskDelay(3000 / portTICK_PERIOD_MS);*/
+	vTaskDelay(100 / portTICK_PERIOD_MS);
+	}
 }
