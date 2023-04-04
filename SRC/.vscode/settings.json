@@ -31,6 +31,16 @@
         "esp_chip_info.h": "c",
         "esp_spi_flash.h": "c",
         "spi_flash_mmap.h": "c",
-        "esp_flash.h": "c"
+        "esp_flash.h": "c",
+        "optional": "c",
+        "istream": "c",
+        "ostream": "c",
+        "ratio": "c",
+        "system_error": "c",
+        "array": "c",
+        "functional": "c",
+        "tuple": "c",
+        "type_traits": "c",
+        "utility": "c"
     }
 }

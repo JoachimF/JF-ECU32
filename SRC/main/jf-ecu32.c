@@ -39,6 +39,7 @@
 #include "jf-ecu32.h"
 #include "nvs_ecu.h"
 #include "inputs.h"
+#include "error.h"
 
 
 
@@ -70,15 +71,17 @@ void linear_interpolation(uint32_t rpm1,uint32_t pump1,uint32_t rpm2,uint32_t pu
     //ESP_LOGI(TAG,"RPM1 : %d ; pump1 : %d , RPM1 : %d ; pump1 : %d , rpm : %d , res : %d",rpm1,pump1,rpm2,pump2,rpm,*res);
 }
 
-void set_power_func_us(_pwm_config *config ,int32_t value)
+void set_power_func_us(_PUMP_t *config ,int32_t value)
 {
-    mcpwm_set_duty_in_us(config->MCPWM_UNIT, config->MCPWM_TIMER, config->MCPWM_GEN, value);
+    mcpwm_set_duty_in_us(config->config.MCPWM_UNIT, config->config.MCPWM_TIMER, config->config.MCPWM_GEN, value);
+    config->value = value ;
     //ESP_LOGI(TAG,"MCPWM_UNIT : %d ; MCPWM_TIMER : %d ; MCPWM_GEN : %d ; value : %d ; pin : %d",config->MCPWM_UNIT,config->MCPWM_TIMER,config->MCPWM_GEN,value,config->gpio_num);
 }
 
-void set_power_func(_pwm_config *config ,float value)
+void set_power_func(_PUMP_t *config ,float value)
 {
-    mcpwm_set_duty(config->MCPWM_UNIT, config->MCPWM_TIMER, config->MCPWM_GEN, value);
+    mcpwm_set_duty(config->config.MCPWM_UNIT, config->config.MCPWM_TIMER, config->config.MCPWM_GEN, value);
+    config->value = value ;
 }
 
 void set_power_ledc(_ledc_config *config ,uint32_t value)
@@ -119,6 +122,7 @@ _engine_t turbine = {
     .pump1.set_power = set_power_func,
     .pump1.target = 0 ,
     .pump1.new_target = 0 ,
+    .pump1.value = 0 ,
 
     .pump2.config.nbits = _10BITS,
     .pump2.config.gpio_num = PUMP2_PIN,
@@ -126,24 +130,29 @@ _engine_t turbine = {
     .pump2.set_power = set_power_func,
     .pump2.target = 0 ,
     .pump2.new_target = 0 ,
+    .pump2.value = 0 ,
 
     .starter.config.nbits = _10BITS,
     .starter.config.gpio_num = STARTER_PIN,
 //    .starter.config.MCPWM_UNIT = MCPWM_UNIT_0,
     .starter.set_power = set_power_func,    
+    .starter.value = 0 ,
 
 // Configuration en LEDC
     .vanne1.config.gpio_num = VANNE1_PIN,
     .vanne1.config.ledc_channel = LEDC_CHANNEL_0,
     .vanne1.set_power = set_power_ledc,
+    .vanne1.value = 0 ,
 
     .vanne2.config.gpio_num = VANNE2_PIN,
     .vanne2.config.ledc_channel = LEDC_CHANNEL_1,
     .vanne2.set_power = set_power_ledc,
+    .vanne2.value = 0 ,
     
     .glow.config.gpio_num = GLOW_PIN,    
     .glow.config.ledc_channel = LEDC_CHANNEL_2,
     .glow.set_power = set_power_ledc,
+    .glow.value = 0 ,
  };
  
  _configEngine_t turbine_config ;
@@ -260,6 +269,7 @@ void init(void)
     init_mcpwm() ;
     // Entrées
     init_inputs() ;
+    init_errors() ;
     
     //Set les sortie pour test
 //    turbine.pump1.set_power(&turbine.pump1.config,256) ;
@@ -267,7 +277,7 @@ void init(void)
 //    turbine.glow.set_power(&turbine.glow.config,128) ;
 //    turbine.vanne1.set_power(&turbine.vanne1.config,50) ;
 //    turbine.vanne2.set_power(&turbine.vanne2.config,100) ;    
-    turbine.EGT = 0 ;
+//    turbine.EGT = 0 ;
 //    turbine.GAZ = 1000 ;
 }
 
@@ -294,7 +304,30 @@ void set_kero_pump_target(uint32_t RPM)
     //ESP_LOGI(TAG,"Target : %d - pump : %d\n",RPM,res) ;
 }
 
-
+void phase_to_str(char *status)
+{
+    switch(turbine.phase_fonctionnement)
+    {
+        case WAIT : strcpy(status,"WAIT") ;
+                    break ;
+        case START : strcpy(status,"START") ;
+                    break ;
+        case GLOW : strcpy(status,"GLOW") ;
+                    break ;
+        case KEROSTART : strcpy(status,"KEROSTART") ;
+                    break ;
+        case PREHEAT : strcpy(status,"PREHEAT") ;
+                    break ;
+        case RAMP : strcpy(status,"RAMP") ;
+                    break ;
+        case IDLE : strcpy(status,"IDLE") ;
+                    break ;
+        case PURGE : strcpy(status,"PURGE") ;
+                    break ;
+        case COOL : strcpy(status,"COOL") ;
+                    break ;
+    }
+}
 
 void update_curve_file(void)
 {
@@ -406,9 +439,11 @@ void vTimer1sCallback( TimerHandle_t pxTimer )
         //ESP_LOGI(TAG,"%02d:%02d",turbine.minutes,turbine.secondes) ;
     }
     xSemaphoreGive(xTimeMutex) ;
+    check_errors() ;
     
-    ESP_LOGI("wifi", "free Heap:%d,%d", esp_get_free_heap_size(), heap_caps_get_free_size(MALLOC_CAP_8BIT));
-    ESP_LOGI("Time", "%02d:%02d",turbine.minutes,turbine.secondes);
+    //ESP_LOGI("wifi", "free Heap:%d,%d", esp_get_free_heap_size(), heap_caps_get_free_size(MALLOC_CAP_8BIT));
+    //ESP_LOGI("Time", "%02d:%02d",turbine.minutes,turbine.secondes);
+
     //heap_trace_dump();
     //long long int Timer1 = esp_timer_get_time();
     //printf("Timer: %lld μs\n", Timer1/1000);  
@@ -559,6 +594,8 @@ void inputs_task(void * pvParameters)
         else 
         {
             turbine.GAZ = 0 ;
+            add_error_msg(E_RC_SIGNAL,"Thr signal lost");
+
         }
          //   ESP_LOGI("Time","XQ not rx");
         //PPM Voie 2
@@ -588,6 +625,7 @@ void inputs_task(void * pvParameters)
         else 
         {
             turbine.Aux = 0 ;
+            add_error_msg(E_AUX_SIGNAL,"Aux signal lost");
         }    
         //ESP_LOGI("RPM", "%ldtrs/min",turbine.RPM);
         //ESP_LOGI("PPM Gaz Time", "%ldµS",turbine.GAZ);
@@ -599,3 +637,4 @@ void inputs_task(void * pvParameters)
 		
     }
 }
+

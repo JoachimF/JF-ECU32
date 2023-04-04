@@ -1,4 +1,5 @@
-/*  http_server.h
+/*  
+  error.h
 
   Copyright (C) 2022  Joachim Franken
 
@@ -16,16 +17,34 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __HTTP_SERVER_H_
-#define __HTTP_SERVER_H_
+#ifndef _ERROR_H_
+#define _ERROR_H_
 
-typedef struct {
-	char url[32];
-	char parameter[128];
-} URL_t;
+#include <string.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/timers.h"
 
-//#define MIN(iA,iB)  ((iA)<(iB) ? (iA) : (iB))
-static const char* get_path_from_uri(char *dest, const char *uri, size_t destsize) ;
-//const char* get_path_from_uri(char *dest, const char *uri, size_t destsize) ;
+typedef enum _error_sources_ {
+    E_K,E_RPM,E_RC_SIGNAL,E_AUX_SIGNAL,E_EGT,E_GLOW
+}_error_sources_t ;
+
+typedef struct _error_
+{
+    char *msg ;
+    uint64_t time ;
+    _error_sources_t id ;
+}_error_t;
+
+typedef struct _errors_
+{
+    _error_t *error[5] ;
+    int nb_error ;
+}_errors_t;
+
+
+void add_error_msg(_error_sources_t id,const char *) ;
+void check_errors(void) ;
+void init_errors(void) ;
+void get_errors(char *output) ;
 
 #endif

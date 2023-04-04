@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _INUTS_H_
-#define _INUTS_H_
+#ifndef _INPUTS_H_
+#define _INPUTS_H_
 
 #include "driver/gptimer.h"
 #include <stdio.h>

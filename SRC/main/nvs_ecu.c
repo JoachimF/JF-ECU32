@@ -108,7 +108,7 @@ static int test_checksum_wifi(_wifi_params_t *params,uint32_t *checksum)
     {
         check += ptr[i]  ;
     }
-    ESP_LOGI(TAG, "Checksum calculé = %d",check);
+    ESP_LOGI(TAG, "Checksum calculé = %ld",check);
     if(check == *checksum){
         ESP_LOGI(TAG, "Checkum OK");
         return(1) ;

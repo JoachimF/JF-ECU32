@@ -1,4 +1,11 @@
     <div class="topnav">
+      <h1 id="status">Status</h1>
+    </div>
+    <div>
+      <h2 id="error" style="color:#FF0000";>
+          Erreur
+      </h2>
+      <p id="time"></p>
     </div>
     <div class="content">
       <div class="card-grid">
@@ -9,6 +16,38 @@
         <div class="card">
           <p class="card-title">RPM</p>
           <canvas id="gauge-RPM"></canvas>
+        </div>
+        <div class="card">
+          <table>
+            <tbody>
+                <tr>
+                    <td>Pompe 1</td>
+                    <td>Pompe 2</td>
+                </tr>
+                <tr>
+                    <td id=pump1>0</td>
+                    <td id=pump2>0</td>
+                </tr>
+                <tr>
+                    <td>Vanne 1</td>
+                    <td>Vanne 2</td>
+                </tr>
+                <tr>
+                    <td id=vanne1>0</td>
+                    <td id=vanne2>0</td>
+                </tr>
+            </tbody>
+          </table>
+          <table>
+            <tbody>
+              <tr>
+                    <td>Bougie</th>
+                </tr>
+                <tr>
+                    <td id=glow>0</td>
+                </tr>
+            </tbody>
+          </table>
         </div>
         <div class="card">
             <p class="card-title">RC</p>

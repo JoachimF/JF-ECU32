@@ -168,7 +168,7 @@ typedef struct _PUMP_{
   _pwm_config config ;
   void (*set_power)( _pwm_config *config,float power);
   void (*set_power_us)( _pwm_config *config,uint32_t power);
-  uint16_t (*get_power)(struct _PUMP_ * pump) ;
+  uint16_t (*get_power)(struct _PUMP_ * config) ;
   void (*off)(_pwm_config *config);
 } _PUMP_t;
 
@@ -197,6 +197,7 @@ typedef struct _engine_ {
   _VALVE_t vanne2 ; //Vanne KERO
   uint8_t phase_fonctionnement ;
   uint8_t position_gaz ;
+  char error_message[50] ;
 } _engine_t;
 
 //Taches
@@ -234,8 +235,9 @@ void vTimer60sCallback( TimerHandle_t pxTimer ) ;
 void ecu_task(void * pvParameters ) ;
 void inputs_task(void * pvParameters) ;
 void init_mcpwm(void) ;
-void set_power_func_us(_pwm_config *config ,int32_t value) ;
-void set_power_func(_pwm_config *config ,float value) ;
+void set_power_func_us(_PUMP_t *config ,int32_t value) ;
+void set_power_func(_PUMP_t *config ,float value) ;
+void phase_to_str(char *status) ;
 
 
 #endif

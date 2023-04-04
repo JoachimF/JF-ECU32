@@ -41,6 +41,7 @@
 #include "nvs_ecu.h"
 #include "http_server.h"
 #include "wifi.h"
+#include "error.h"
 
 extern TimerHandle_t xTimer60s ;
 static const char *TAG = "HTTP";
@@ -396,27 +397,27 @@ static esp_err_t root_post_handler(httpd_req_t *req)
 		if(len > 0)
 		{
 			if(turbine.pump1.config.ppm_pwm == PPM)
-				set_power_func_us(&turbine.pump1.config,atoi(param)) ;
+				set_power_func_us(&turbine.pump1,atoi(param)) ;
 			else
-				set_power_func(&turbine.pump1.config,atof(param)/20) ;
+				set_power_func(&turbine.pump1,atof(param)/20) ;
 		}
 
 		len = find_value("pwmSliderValue2=",content,param) ;
 		if(len > 0)
 		{
 			if(turbine.pump2.config.ppm_pwm == PPM)
-				set_power_func_us(&turbine.pump2.config,atoi(param)) ;
+				set_power_func_us(&turbine.pump2,atoi(param)) ;
 			else
-				set_power_func(&turbine.pump2.config,atof(param)/20) ;
+				set_power_func(&turbine.pump2,atof(param)/20) ;
 		}
 
 		len = find_value("pwmSliderValue3=",content,param) ;
 		if(len > 0)
 		{
 			if(turbine.pump2.config.ppm_pwm == PPM)
-				set_power_func_us(&turbine.starter.config,atoi(param)) ;
+				set_power_func_us(&turbine.starter,atoi(param)) ;
 			else
-				set_power_func(&turbine.starter.config,atof(param)/20) ;
+				set_power_func(&turbine.starter,atof(param)/20) ;
 		}
 
 		len = find_value("pwmSliderValue4=",content,param) ;
@@ -1011,7 +1012,7 @@ static esp_err_t configmoteur(httpd_req_t *req)
 	httpd_resp_sendstr_chunk(req, turbine_config.name);
 	httpd_resp_sendstr_chunk(req, "</h2></div>");*/
 		
-	httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Paramètres du moteur&nbsp;</b></legend><form method=\"POST\" action=\"configmoteur\"><p>") ;
+	httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Paramètres du moteur&nbsp;</b></legend><form method=\"GET\" action=\"configmoteur\"><p>") ;
 
 	httpd_resp_sendstr_chunk(req, "<b>Nom du moteur</b><br>");
 	httpd_resp_sendstr_chunk(req, "<input id=\"name\" placeholder=\"\" value=\"");
@@ -1161,15 +1162,27 @@ extern long int time_ecu ;
 
 static esp_err_t readings_get_handler(httpd_req_t *req){
 	static cJSON *myjson;
+	char status[50] ;
+	char errors[200] ;
 	uint32_t rpm = 0 ;
 	//ESP_LOGI(TAG, "readings_get_handler req->uri=[%s]", req->uri);
 	myjson = cJSON_CreateObject();
 //	if( xSemaphoreTake(xTimeMutex,( TickType_t ) 10) == pdTRUE ) {
+		phase_to_str(status) ;
 		cJSON_AddNumberToObject(myjson, "ppm_gaz", turbine.GAZ);
 		cJSON_AddNumberToObject(myjson, "ppm_aux", turbine.Aux);
 		cJSON_AddNumberToObject(myjson, "egt", turbine.EGT);
 		cJSON_AddNumberToObject(myjson, "rpm", turbine.RPM);
-		cJSON_AddNumberToObject(myjson, "time", time_ecu);
+		cJSON_AddNumberToObject(myjson, "pump1", turbine.pump1.value);
+		cJSON_AddNumberToObject(myjson, "pump2", turbine.pump2.value);
+		cJSON_AddNumberToObject(myjson, "vanne1", turbine.vanne1.value);
+		cJSON_AddNumberToObject(myjson, "vanne2", turbine.vanne2.value);
+		cJSON_AddNumberToObject(myjson, "glow", turbine.glow.value);
+		cJSON_AddStringToObject(myjson, "status", status);
+		get_errors(errors); 
+		cJSON_AddStringToObject(myjson, "error", errors);
+		sprintf(status,"%02d:%02d",turbine.minutes,turbine.secondes);
+		cJSON_AddStringToObject(myjson, "time", status);
 	
 //	}xSemaphoreGive(xTimeMutex) ;
 	char *my_json_string = cJSON_Print(myjson);

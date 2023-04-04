@@ -342,36 +342,47 @@ void app_main()
 	Timer1 = esp_timer_get_time();
 
 	//int32_t time =     //printf("Timer: %lld μs\n", Timer1/1000); 
+	strcpy(turbine.error_message,"OVERHEAT");
 	while(1){
-	/*for(int32_t i=0;i<1000;i++)
-	{
-		    turbine.EGT -- ;
-            //turbine.GAZ ++ ;
+		for(int32_t i=0;i<100;i++)
+		{
+			turbine.pump1.value+=1;
+			turbine.pump2.value+=2;
+			turbine.vanne1.value+=1;
+			turbine.vanne2.value+=1;
+			turbine.glow.value+=2;
+			//turbine.EGT -- ;
+			//turbine.GAZ ++ ;
 			time_ecu = esp_timer_get_time() - timer_old ;
 			timer_old = esp_timer_get_time();
-            //ESP_LOGI(TAG,"EGT : %d ; GAZ : %d",turbine.EGT,turbine.GAZ) ;
-    		vTaskDelay(10 / portTICK_PERIOD_MS);
-	}
-	for(int32_t i=0 ; i<1000;i++)
-	{
-        //if( xSemaphoreTake(xTimeMutex,( TickType_t ) 10) == pdTRUE ) {
-            turbine.EGT ++ ;
-            //turbine.GAZ -- ;
-            //ESP_LOGI(TAG,"EGT : %d ; GAZ : %d",turbine.EGT,turbine.GAZ) ;
-        //}xSemaphoreGive(xTimeMutex) ;
-    		vTaskDelay(10 / portTICK_PERIOD_MS);
-	}}*/
-	/*
-	set_kero_pump_target(36000);
-	vTaskDelay(3000 / portTICK_PERIOD_MS);
-    set_kero_pump_target(54000);
-	vTaskDelay(3000 / portTICK_PERIOD_MS);
-    set_kero_pump_target(70000);
-	vTaskDelay(3000 / portTICK_PERIOD_MS);
-    set_kero_pump_target(91000);
-	vTaskDelay(3000 / portTICK_PERIOD_MS);
-    set_kero_pump_target(143000);
-	vTaskDelay(3000 / portTICK_PERIOD_MS);*/
-	vTaskDelay(100 / portTICK_PERIOD_MS);
-	}
+			//ESP_LOGI(TAG,"EGT : %d ; GAZ : %d",turbine.EGT,turbine.GAZ) ;
+			vTaskDelay(200 / portTICK_PERIOD_MS);
+		}
+		for(int32_t i=0 ; i<100;i++)
+		{
+				turbine.pump1.value-=1;
+				turbine.pump2.value-=2;
+				turbine.vanne1.value-=1;
+				turbine.vanne2.value-=1;
+				turbine.glow.value-=2;
+			//if( xSemaphoreTake(xTimeMutex,( TickType_t ) 10) == pdTRUE ) {
+				//turbine.EGT ++ ;
+				//turbine.GAZ -- ;
+				//ESP_LOGI(TAG,"EGT : %d ; GAZ : %d",turbine.EGT,turbine.GAZ) ;
+			//}xSemaphoreGive(xTimeMutex) ;
+				vTaskDelay(200 / portTICK_PERIOD_MS);
+		}
+		/*
+		set_kero_pump_target(36000);
+		vTaskDelay(3000 / portTICK_PERIOD_MS);
+		set_kero_pump_target(54000);
+		vTaskDelay(3000 / portTICK_PERIOD_MS);
+		set_kero_pump_target(70000);
+		vTaskDelay(3000 / portTICK_PERIOD_MS);
+		set_kero_pump_target(91000);
+		vTaskDelay(3000 / portTICK_PERIOD_MS);
+		set_kero_pump_target(143000);
+		vTaskDelay(3000 / portTICK_PERIOD_MS);*/
+		//vTaskDelay(400 / portTICK_PERIOD_MS);
+		}
 }

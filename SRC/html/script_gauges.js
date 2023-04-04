@@ -165,10 +165,26 @@ function getReadings() {
 			var ppm_aux = myObj.ppm_aux;
 			var egt = myObj.egt;
 			var rpm = myObj.rpm;
+			var pump1 = myObj.pump1;
+			var pump2 = myObj.pump2;
+			var glow = myObj.glow;
+			var vanne1 = myObj.vanne1;
+			var vanne2 = myObj.vanne2;
+			var status = myObj.status;
+			var error = myObj.error;
+			var time = myObj.time;
 			gaugeRC.value = ppm_gaz;
 			gaugeRC_aux.value = ppm_aux;
 			gaugeEGT.value = egt;
 			gaugeRPM.value = rpm;
+			document.getElementById('pump1').innerHTML = pump1;
+			document.getElementById('pump2').innerHTML = pump2;
+			document.getElementById('vanne1').innerHTML = vanne1;
+			document.getElementById('vanne2').innerHTML = vanne2;
+			document.getElementById('glow').innerHTML = glow;
+			document.getElementById('status').innerHTML = status;
+			document.getElementById('error').innerHTML = error;
+			document.getElementById('time').innerHTML = time;
 		}
 	};
 	xhr.open("GET", "/readings", true);

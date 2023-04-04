@@ -20,6 +20,7 @@
 
 #include "inputs.h"
 #include "jf-ecu32.h"
+#include "error.h"
 #include <stdio.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -32,6 +33,8 @@
 #include "esp_log.h"
 #include "esp_err.h"
 #include <max31855.h>
+
+
 
 static const char *TAG = "INPUTS";
 
@@ -126,6 +129,9 @@ static void task_egt(void *pvParameter)
             if (scv) ESP_LOGW(TAG, "Thermocouple shorted to VCC!");
             if (scg) ESP_LOGW(TAG, "Thermocouple shorted to GND!");
             if (oc) ESP_LOGW(TAG, "No connection to thermocouple!");
+            if (scv) add_error_msg(E_K,"K shorted to VCC!");
+            if (scg) add_error_msg(E_K,"K shorted to GND!");
+            if (oc) add_error_msg(E_K,"K not connected");
             //ESP_LOGI(TAG, "Temperature: %.2f°C, cold junction temperature: %.4f°C", tc_t, cj_t);
             //ESP_LOGI("wifi", "free Heap:%d,%d", esp_get_free_heap_size(), heap_caps_get_free_size(MALLOC_CAP_8BIT));
             turbine.EGT = tc_t ;
