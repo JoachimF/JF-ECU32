@@ -7,8 +7,12 @@ RC Jet Engine ECU
 
 - Démarrage GAZ/KERO
 - Fonctionnement du réacteur
+- Apprentissage du moteur
 - Surveillance des paramètres
 - Redémarrage en vol
+- Log
+- Interface WEB
+- Ecran sans fil
 
 
 ### Composants :
@@ -20,15 +24,12 @@ RC Jet Engine ECU
 - Entrée PPM - Gaz ou SBUS
 - Entrée PPM - AUX
 - Entrée compte tours IR ou HALL
-- Entrée sonde K (module MAX6675 ou MAX31865)
-- Entrée pression (à voir le capteur selon les plages de pression 2 bars max?)
+- Entrée sonde K (module MAX31865)
 
 ### Sorties :
-- Sortie PPM pour le moteur de démarrage
-- Sortie PWM/PPM pour la pompe 10A ou ESC brushless
-- Sortie PWM/PPM pour ESC de pompe numéro 2 (fumigène ou redondance, comme sur les grandeurs)
-- Sorties pour 2 électrovannes (KERO/GAZ - KERO/KERO) 1A
-- Sortie pour une bougies Glow ou Kero 10A
+- Sortie PWM/PPM 10A pour le moteur de démarrage
+- Sortie PWM/PPM 10A pour la pompe ou ESC brushless
+- Sortie PWM/PPM 10A pour ESC de pompe numéro 2 (fumigène ou redondance, comme sur les grandeurs)
+- Sorties PWM pour 2 électrovannes (KERO/GAZ - KERO/KERO) 1A
+- Sortie PWM pour une bougies Glow ou Kero 10A
 - Sortie FPORT FRSky (télémétrie)
-- Sortie LED W2812
-
