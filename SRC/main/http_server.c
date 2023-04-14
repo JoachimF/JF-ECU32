@@ -1160,6 +1160,97 @@ static esp_err_t gauges_get_handler(httpd_req_t *req){
 
 extern long int time_ecu ;
 
+static esp_err_t g_params_get_handler(httpd_req_t *req){
+	static cJSON *myjson;
+	char rpms[8][4] ;
+	uint32_t max_rpm = turbine_config.jet_full_power_rpm*1.1/1000 ;
+	//char errors[200] ;
+	//uint32_t rpm = 0 ;
+	//ESP_LOGI(TAG, "readings_get_handler req->uri=[%s]", req->uri);
+	if(max_rpm <= 160)
+	{
+		strcpy(rpms[0],"20") ;
+		strcpy(rpms[1],"40") ;
+		strcpy(rpms[2],"60") ;
+		strcpy(rpms[3],"80") ;
+		strcpy(rpms[4],"100") ;
+		strcpy(rpms[5],"120") ;
+		strcpy(rpms[6],"140") ;
+		strcpy(rpms[7],"160") ;
+		max_rpm = 160 ;
+	}
+	else 	if(max_rpm <= 200)
+	{
+		strcpy(rpms[0],"25") ;
+		strcpy(rpms[1],"50") ;
+		strcpy(rpms[2],"75") ;
+		strcpy(rpms[3],"100") ;
+		strcpy(rpms[4],"125") ;
+		strcpy(rpms[5],"150") ;
+		strcpy(rpms[6],"175") ;
+		strcpy(rpms[7],"200") ;
+		max_rpm = 200 ;
+	}
+	else 	if(max_rpm <= 240)
+	{
+		strcpy(rpms[0],"30") ;
+		strcpy(rpms[1],"60") ;
+		strcpy(rpms[2],"90") ;
+		strcpy(rpms[3],"120") ;
+		strcpy(rpms[4],"150") ;
+		strcpy(rpms[5],"180") ;
+		strcpy(rpms[6],"210") ;
+		strcpy(rpms[7],"240") ;
+		max_rpm = 240 ;
+	}
+	else 	if(max_rpm <= 280)
+	{
+		strcpy(rpms[0],"35") ;
+		strcpy(rpms[1],"70") ;
+		strcpy(rpms[2],"105") ;
+		strcpy(rpms[3],"140") ;
+		strcpy(rpms[4],"175") ;
+		strcpy(rpms[5],"210") ;
+		strcpy(rpms[6],"245") ;
+		strcpy(rpms[7],"280") ;
+		max_rpm = 280 ;
+	}
+	else 	if(max_rpm <= 320)
+	{
+		strcpy(rpms[0],"40") ;
+		strcpy(rpms[1],"80") ;
+		strcpy(rpms[2],"120") ;
+		strcpy(rpms[3],"160") ;
+		strcpy(rpms[4],"200") ;
+		strcpy(rpms[5],"240") ;
+		strcpy(rpms[6],"280") ;
+		strcpy(rpms[7],"320") ;
+		max_rpm = 320 ;		
+	}
+
+	myjson = cJSON_CreateObject();
+//	if( xSemaphoreTake(xTimeMutex,( TickType_t ) 10) == pdTRUE ) {
+
+	cJSON_AddNumberToObject(myjson, "egt_red", turbine_config.max_temp);
+	cJSON_AddNumberToObject(myjson, "rpm_max", max_rpm);
+	cJSON_AddNumberToObject(myjson, "rpm_red", turbine_config.jet_full_power_rpm/1000);
+	cJSON_AddStringToObject(myjson, "rpm1", rpms[0]);
+	cJSON_AddStringToObject(myjson, "rpm2", rpms[1]);
+	cJSON_AddStringToObject(myjson, "rpm3", rpms[2]);
+	cJSON_AddStringToObject(myjson, "rpm4", rpms[3]);
+	cJSON_AddStringToObject(myjson, "rpm5", rpms[4]);
+	cJSON_AddStringToObject(myjson, "rpm6", rpms[5]);
+	cJSON_AddStringToObject(myjson, "rpm7", rpms[6]);
+	cJSON_AddStringToObject(myjson, "rpm8", rpms[7]);
+	char *my_json_string = cJSON_Print(myjson);
+	httpd_resp_set_type(req, "application/json");
+	httpd_resp_sendstr_chunk(req, my_json_string); //fin de la page
+	httpd_resp_sendstr_chunk(req, NULL); //fin de la page
+	cJSON_Delete(myjson) ;
+	free(my_json_string) ; 
+	return ESP_OK;
+}		
+
 static esp_err_t readings_get_handler(httpd_req_t *req){
 	static cJSON *myjson;
 	char status[50] ;
@@ -1172,7 +1263,7 @@ static esp_err_t readings_get_handler(httpd_req_t *req){
 		cJSON_AddNumberToObject(myjson, "ppm_gaz", turbine.GAZ);
 		cJSON_AddNumberToObject(myjson, "ppm_aux", turbine.Aux);
 		cJSON_AddNumberToObject(myjson, "egt", turbine.EGT);
-		cJSON_AddNumberToObject(myjson, "rpm", turbine.RPM);
+		cJSON_AddNumberToObject(myjson, "rpm", turbine.RPM/1000);
 		cJSON_AddNumberToObject(myjson, "pump1", turbine.pump1.value);
 		cJSON_AddNumberToObject(myjson, "pump2", turbine.pump2.value);
 		cJSON_AddNumberToObject(myjson, "vanne1", turbine.vanne1.value);
@@ -1194,14 +1285,14 @@ static esp_err_t readings_get_handler(httpd_req_t *req){
 	return ESP_OK;
 }
 
-static esp_err_t events_get_handler(httpd_req_t *req){
+/*static esp_err_t events_get_handler(httpd_req_t *req){
 //	ESP_LOGI(TAG, "events_get_handler req->uri=[%s]", req->uri);
 	httpd_resp_set_type(req, "text/event-stream");
 	httpd_resp_sendstr_chunk(req, "Alive"); //fin de la page
 	httpd_resp_sendstr_chunk(req, NULL); //fin de la page
 	readings_get_handler(req) ;
 	return ESP_OK;
-}
+}*/
 
 /*esp_err_t upgrade_get_handler(httpd_req_t *req)
 {
@@ -1211,6 +1302,7 @@ static esp_err_t events_get_handler(httpd_req_t *req){
 	vTaskDelay(500 / portTICK_PERIOD_MS);
 	esp_restart();
 }*/
+
 extern const uint8_t index_html_start[] asm("_binary_index_html_start");
 extern const uint8_t index_html_end[] asm("_binary_index_html_end");
 esp_err_t upgrade_get_handler(httpd_req_t *req)
@@ -1272,8 +1364,10 @@ static esp_err_t frontpage(httpd_req_t *req)
 	}
 	else if(strcmp(filename, "/readings") == 0) 
 		readings_get_handler(req) ;
-	else if(strcmp(filename, "/events") == 0) 
-		events_get_handler(req) ;
+	else if(strcmp(filename, "/g_params") == 0) 
+		g_params_get_handler(req) ;
+	//else if(strcmp(filename, "/events") == 0) 
+	//	events_get_handler(req) ;
 	else if(strcmp(filename, "/upgrade") == 0) 
 		upgrade_get_handler(req) ;
 	else if(strcmp(filename, "/") == 0 ) 

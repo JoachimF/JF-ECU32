@@ -77,9 +77,9 @@ var gaugeRC_aux = new LinearGauge({
     animationTarget:"plate"    
 }).draw();
 
-
+var gaugeEGT ;
 // Create EGT Gauge
-var gaugeEGT = new RadialGauge({
+var gaugeEGTconf = {
 	renderTo: "gauge-EGT",
 	width: 300,
 	height: 300,
@@ -114,28 +114,29 @@ var gaugeEGT = new RadialGauge({
 	needleCircleInner: false,
 	animationDuration: 50,
 	animationRule: "linear",
-}).draw();
+};
 
 // Create RPM Gauge
-var gaugeRPM = new RadialGauge({
+var gaugeRPM 
+var gaugeRPMconf = {
 	renderTo: "gauge-RPM",
 	width: 300,
 	height: 300,
 	units: "RPM x1000",
 	minValue: 0,
-	maxValue: 200000,
+	//maxValue: 200,
 	colorValueBoxRect: "#049faa",
 	colorValueBoxRectEnd: "#049faa",
 	colorValueBoxBackground: "#f1fbfc",
     valueDec: 0,
 	valueInt: 3,
-	majorTicks: ["0", "25", "50","75", "100","125", "150","175", "200"],
-	minorTicks: 4,
+	//majorTicks: ["0", "25", "50","75", "100","125", "150","175", "200"],
+	minorTicks: 5,
 	strokeTicks: true,
 	highlights: [
 		{
-			from: 160000,
-			to: 200000,
+			from: 160,
+			to: 200,
 			color: "rgba(200, 50, 50, .75)",
 		},
 	],
@@ -152,7 +153,7 @@ var gaugeRPM = new RadialGauge({
 	needleCircleInner: false,
 	animationDuration: 50,
 	animationRule: "linear",
-}).draw();
+};
 
 // Function to get current readings on the webpage when it loads for the first time
 function getReadings() {
@@ -191,6 +192,55 @@ function getReadings() {
 	xhr.send();
 }
 setInterval(getReadings,200) ;
+
+var Params = function() {
+	var xhr = new XMLHttpRequest();
+	xhr.onreadystatechange = function () {
+		if (this.readyState == 4 && this.status == 200) {
+			var myObj = JSON.parse(this.responseText);
+			console.log(myObj);
+			var egt_hli = myObj.egt_red;
+			var hlitmp = [
+				{
+					from: egt_hli,
+					to: 1000,
+					color: "rgba(200, 50, 50, .75)",
+				}
+			] ;
+			Object.assign(gaugeEGTconf,{highlights:hlitmp}) ;
+			//gaugeEGT.highlights.from = egt_hli;
+			gaugeEGT = new RadialGauge(gaugeEGTconf) ;
+			gaugeEGT.draw() ;
+			var rpm1 = myObj.rpm1;
+			var rpm2 = myObj.rpm2;
+			var rpm3 = myObj.rpm3;
+			var rpm4 = myObj.rpm4;
+			var rpm5 = myObj.rpm5;
+			var rpm6 = myObj.rpm6;
+			var rpm7 = myObj.rpm7;
+			var rpm8 = myObj.rpm8;
+			var rpm_red = myObj.rpm_red;
+			var rpm_max = myObj.rpm_max;
+			var majorticksconf = ["0",rpm1,rpm2,rpm3,rpm4,rpm5,rpm6,rpm7,rpm8];
+			var hlitmp = [
+				{
+					from: rpm_red,
+					to: rpm_max,
+					color: "rgba(200, 50, 50, .75)",
+				}
+			] ;
+			Object.assign(gaugeRPMconf,{highlights:hlitmp}) ;
+			Object.assign(gaugeRPMconf,{maxValue:rpm_max}) ;
+			Object.assign(gaugeRPMconf,{majorTicks:majorticksconf}) ;
+			gaugeRPM = new RadialGauge(gaugeRPMconf) ;
+			gaugeRPM.draw() ;
+		}
+	};
+	xhr.open("GET", "/g_params", true);
+	xhr.send();
+}(); // <--- () causes self execution
+
+
 
 /*
 if (!!window.EventSource) {
