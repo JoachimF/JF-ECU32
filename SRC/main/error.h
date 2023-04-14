@@ -23,6 +23,7 @@
 #include <string.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/timers.h"
+#include "driver/gptimer.h"
 
 typedef enum _error_sources_ {
     E_K,E_RPM,E_RC_SIGNAL,E_AUX_SIGNAL,E_EGT,E_GLOW

@@ -19,16 +19,25 @@
 
 #include "error.h"
 #include "inputs.h"
+#include "freertos/semphr.h"
+#include "esp_log.h"
 
 _errors_t errors_struct ;
+SemaphoreHandle_t xErrormutex;
 
 bool search_id(_error_sources_t id)
 {
     bool res = 0 ;
+    uint64_t time ;
+    gptimer_get_raw_count(gptimer, &time) ; 
     for(int i=0 ;i<errors_struct.nb_error;i++)
       {
         if(errors_struct.error[i]->id == id)
+        {
             res = 1 ;
+            errors_struct.error[i]->time = time ;
+            //ESP_LOGI("ERRORtask", "Error update, nb_error = %d id=%d time=%lld",errors_struct.nb_error,id,time);
+        }
       }
       return res ;
 }
@@ -36,58 +45,73 @@ bool search_id(_error_sources_t id)
 void add_error_msg(_error_sources_t id,const char *msg) 
 {
     int len ;
-    if(!search_id(id))
+    uint64_t time ;
+    gptimer_get_raw_count(gptimer, &time) ; 
+    if( xSemaphoreTake(xErrormutex,( TickType_t ) 10 ) == pdTRUE ) 
     {
-        if(errors_struct.nb_error < 5)
+        if(!search_id(id))
         {
-            len = strlen(msg) ;
-            errors_struct.error[errors_struct.nb_error] = malloc(sizeof(_error_t)) ;
-            errors_struct.error[errors_struct.nb_error]->msg = malloc(sizeof(char)*len + 1) ;
-            strcpy(errors_struct.error[errors_struct.nb_error]->msg,msg) ;
-            errors_struct.error[errors_struct.nb_error]->id = id ;
-            gptimer_get_raw_count(gptimer, &errors_struct.error[errors_struct.nb_error]->time) ; 
-            errors_struct.nb_error++ ;
-        }    
+            if(errors_struct.nb_error < 5)
+            {
+                len = strlen(msg) ;
+                errors_struct.error[errors_struct.nb_error] = malloc(sizeof(_error_t)) ;
+                errors_struct.error[errors_struct.nb_error]->msg = malloc(sizeof(char)*len + 1) ;
+                strcpy(errors_struct.error[errors_struct.nb_error]->msg,msg) ;
+                errors_struct.error[errors_struct.nb_error]->id = id ;
+                errors_struct.error[errors_struct.nb_error]->time = time ; 
+                //ESP_LOGI("ERRORtask", "Error added, nb_error = %d id=%d time=%lld",errors_struct.nb_error,id,errors_struct.error[errors_struct.nb_error]->time);
+                errors_struct.nb_error++ ;
+            }    
+        }
     }
+    xSemaphoreGive(xErrormutex) ;
 }
 
 void check_errors(void) 
 {
       uint64_t time ;
-      gptimer_get_raw_count(gptimer, &time) ;   
-      for(int i = 0 ;i<errors_struct.nb_error;i++)
-      {
-        if(time - errors_struct.error[i]->time > 2000)
+      gptimer_get_raw_count(gptimer, &time) ;  
+      if( xSemaphoreTake(xErrormutex,( TickType_t ) 2 ) == pdTRUE ) 
+        for(int i = 0 ;i<errors_struct.nb_error;i++)
         {
-            free(errors_struct.error[i]->msg) ;
-            free(errors_struct.error[i]) ;
-            for(int j = i ;j<errors_struct.nb_error-1;j++)
+            if(time - errors_struct.error[i]->time > 2000000)
             {
-                errors_struct.error[j] = errors_struct.error[j+1] ;
+                free(errors_struct.error[i]->msg) ;
+                free(errors_struct.error[i]) ;
+                for(int j = i ;j<errors_struct.nb_error-1;j++)
+                {
+                    errors_struct.error[j] = errors_struct.error[j+1] ;
+                }
+                errors_struct.nb_error--;
+                //ESP_LOGI("ERRORtask", "Error removed, nb_error = %d time=%lld",errors_struct.nb_error,time);
             }
-            errors_struct.nb_error--;
         }
-      }
+      xSemaphoreGive(xErrormutex) ;
 }
 
 void init_errors(void)
 {
     errors_struct.nb_error = 0 ;
+    xErrormutex = xSemaphoreCreateMutex() ;
 }
 
 void get_errors(char *output)
 {
     char buff[200] ;
-    if(errors_struct.nb_error > 0)
+    if( xSemaphoreTake(xErrormutex,( TickType_t ) 2 ) == pdTRUE )
     {
-        sprintf(buff,"%s",errors_struct.error[0]->msg) ;
-        strcpy(output,buff) ;
-        for(int i = 1;i<errors_struct.nb_error;i++)
+        if(errors_struct.nb_error > 0)
         {
-            sprintf(buff,"%s - %s",output,errors_struct.error[i]->msg) ;
+            sprintf(buff,"%s",errors_struct.error[0]->msg) ;
             strcpy(output,buff) ;
+            for(int i = 1;i<errors_struct.nb_error;i++)
+            {
+                sprintf(buff,"%s - %s",output,errors_struct.error[i]->msg) ;
+                strcpy(output,buff) ;
+            }
         }
+        else
+            output[0] = 0 ;
     }
-    else
-        output[0] = 0 ;
+    xSemaphoreGive(xErrormutex) ;
 }
