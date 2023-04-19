@@ -1,0 +1,63 @@
+### Module positions - created on Wed Apr 19 22:06:55 2023 ###
+### Printed by Pcbnew version (6.0.9)
+## Unit = mm, Angle = deg.
+## Side : top
+# Ref     Val              Package                                  PosX       PosY       Rot  Side
+BOOT0     Conn_01x01_Male  PinHeader_1x01_P2.00mm_Vertical       55.3720  -183.8960    0.0000  top
+BOOT1     BOOT             C_0603_1608Metric                     59.4614  -171.5900   90.0000  top
+C1        1µF             C_0603_1608Metric                     35.9918  -160.2486  -90.0000  top
+C2        10nF             C_0603_1608Metric                     37.8460  -166.8780   90.0000  top
+C3        22µF            CP_Elec_5x3                           60.9600  -154.8130   90.0000  top
+C7        1µF             C_0603_1608Metric                     38.1632  -164.7444  180.0000  top
+C8        22µF            CP_Elec_5x3                           52.4100  -154.1780    0.0000  top
+C9        0.1µF           C_0603_1608Metric                     80.6450  -191.5160    0.0000  top
+D18       BZV55C3V3        D_MiniMELF                            39.7510  -159.2326    0.0000  top
+D19       BZV55C3V3        D_MiniMELF                            43.4340  -165.6842   90.0000  top
+GND1      Conn_01x01_Male  PinHeader_1x01_P2.00mm_Vertical       69.0880  -168.4020    0.0000  top
+GND2      Conn_01x01_Male  PinHeader_1x01_P2.00mm_Vertical       55.3720  -186.8170    0.0000  top
+J1        GAZ              PinHeader_1x03_P2.54mm_Vertical       76.2000  -158.0030  180.0000  top
+J2        AUX              PinHeader_1x03_P2.54mm_Vertical       78.7400  -158.0030  180.0000  top
+J3        PPM/PWM          PinHeader_1x03_P2.54mm_Vertical       49.5300  -175.8950  180.0000  top
+J4        STARTER          PinHeader_1x03_P2.54mm_Vertical       41.5036  -188.4680    0.0000  top
+J5        GLOW             AMASS_XT30U-F_1x02_P5.0mm_Vertical    22.6930  -173.9900  180.0000  top
+J6        VANNE_KEROSTART  PinHeader_1x03_P2.54mm_Vertical       18.8110  -169.4180   90.0000  top
+J7        VANNE_KERO       PinHeader_1x03_P2.54mm_Vertical       18.8110  -166.6240   90.0000  top
+J8        BATTERY_2S/3S    AMASS_XT30U-M_1x02_P5.0mm_Vertical    22.8600  -157.4800  180.0000  top
+J9        STARTER          AMASS_XT30U-F_1x02_P5.0mm_Vertical    22.6930  -180.0860  180.0000  top
+J10       k                PinHeader_1x02_P2.54mm_Vertical       27.9400  -153.1620   90.0000  top
+J11       RPM              PinHeader_1x03_P2.54mm_Vertical       22.6060  -153.1620  -90.0000  top
+J12       S.PORT           PinHeader_1x03_P2.54mm_Vertical       81.2800  -157.9880  180.0000  top
+J13       PPM/PWM          PinHeader_1x03_P2.54mm_Vertical       52.0700  -175.8950  180.0000  top
+J14       PUMP1            AMASS_XT30U-F_1x02_P5.0mm_Vertical    22.6930  -186.0550  180.0000  top
+J15       PUMP1            PinHeader_1x03_P2.54mm_Vertical       44.3230  -188.4680    0.0000  top
+J16       PPM/PWM          PinHeader_1x03_P2.54mm_Vertical       54.6100  -175.8800  180.0000  top
+J17       PUMP2            AMASS_XT30U-F_1x02_P5.0mm_Vertical    22.6930  -192.0240  180.0000  top
+J18       PUMP2            PinHeader_1x03_P2.54mm_Vertical       47.1170  -188.4680    0.0000  top
+J19       UART0            PinHeader_1x04_P2.54mm_Vertical       81.5340  -181.8640    0.0000  top
+Q1        AO3400A          SOT-23                                27.3050  -164.4650  180.0000  top
+Q2        QM6006D          TO-252-2                              32.3500  -172.3400  180.0000  top
+Q3        AO3400A          SOT-23                                27.3050  -167.6400  180.0000  top
+Q4        QM6006D          TO-252-2                              32.3850  -179.3250  180.0000  top
+Q5        QM6006D          TO-252-2                              32.4290  -186.3100  180.0000  top
+Q6        QM6006D          TO-252-2                              32.3850  -193.2950  180.0000  top
+R1        R020             R_2512_6332Metric                     43.1800  -175.8950    0.0000  top
+R2        R020             R_2512_6332Metric                     43.1800  -172.0850    0.0000  top
+R3        10K              R_0603_1608Metric                     20.8280  -160.9090    0.0000  top
+R4        2.7K             R_0603_1608Metric                     23.8380  -160.9090    0.0000  top
+R5        10K              R_0603_1608Metric                     40.3050  -165.7277   90.0000  top
+R6        10K              R_0603_1608Metric                     39.8780  -168.2750    0.0000  top
+R7        R                R_0603_1608Metric                     36.5760  -186.2450   90.0000  top
+R8        R                R_0603_1608Metric                     36.5760  -193.2300   90.0000  top
+R9        R                R_0603_1608Metric                     36.5760  -179.3870   90.0000  top
+R10       R                R_0603_1608Metric                     29.8450  -167.6400   90.0000  top
+R11       R                R_0603_1608Metric                     36.5760  -172.4020   90.0000  top
+R12       R                R_0603_1608Metric                     29.8450  -164.4650   90.0000  top
+R13       10K              R_0603_1608Metric                     58.0390  -171.6400  -90.0000  top
+R15       10K              R_0603_1608Metric                     61.9760  -170.4340   90.0000  top
+TCK1      Conn_01x01_Male  PinHeader_1x01_P2.00mm_Vertical       66.9290  -168.4020    0.0000  top
+TDI1      Conn_01x01_Male  PinHeader_1x01_P2.00mm_Vertical       47.3710  -163.0680    0.0000  top
+TDO1      Conn_01x01_Male  PinHeader_1x01_P2.00mm_Vertical       64.7700  -168.4020    0.0000  top
+TMS1      Conn_01x01_Male  PinHeader_1x01_P2.00mm_Vertical       59.6900  -164.7190    0.0000  top
+U1        ESP32-WROOM-32D  ESP32-WROOM-32                        68.1990  -182.6710  180.0000  top
+U4        AMS1117-3.3      SOT-223-3_TabPin2                     69.2400  -155.4480    0.0000  top
+## End
