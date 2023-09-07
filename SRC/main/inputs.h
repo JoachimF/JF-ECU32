@@ -21,6 +21,7 @@
 #define _INPUTS_H_
 
 #include "driver/gptimer.h"
+#include "driver/timer.h"
 #include <stdio.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -40,6 +41,13 @@
 #else
 #define HOST    SPI2_HOST
 #endif
+
+typedef struct {
+    int timer_group;
+    int timer_idx;
+    int alarm_interval;
+    bool auto_reload;
+} RPM_timer_info_t;
 
 
 extern gptimer_handle_t gptimer ;

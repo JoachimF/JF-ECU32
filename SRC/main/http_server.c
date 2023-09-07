@@ -361,6 +361,7 @@ static esp_err_t root_post_handler(httpd_req_t *req)
     char filepath[20];
 	char content[200];
 	char param[30] ;
+	uint32_t param_int32 ;
 	int16_t len ;
 
 	const char *filename = get_path_from_uri(filepath, req->uri, sizeof(filepath));
@@ -396,6 +397,7 @@ static esp_err_t root_post_handler(httpd_req_t *req)
 		len = find_value("pwmSliderValue1=",content,param) ;
 		if(len > 0)
 		{
+			turbine.pump1.value = atoi(param) ;
 			if(turbine.pump1.config.ppm_pwm == PPM)
 				set_power_func_us(&turbine.pump1,atoi(param)) ;
 			else
@@ -405,6 +407,7 @@ static esp_err_t root_post_handler(httpd_req_t *req)
 		len = find_value("pwmSliderValue2=",content,param) ;
 		if(len > 0)
 		{
+			turbine.pump2.value = atoi(param) ;
 			if(turbine.pump2.config.ppm_pwm == PPM)
 				set_power_func_us(&turbine.pump2,atoi(param)) ;
 			else
@@ -414,23 +417,37 @@ static esp_err_t root_post_handler(httpd_req_t *req)
 		len = find_value("pwmSliderValue3=",content,param) ;
 		if(len > 0)
 		{
-			if(turbine.pump2.config.ppm_pwm == PPM)
+			turbine.starter.value = atoi(param) ;
+			if(turbine.starter.config.ppm_pwm == PPM)
 				set_power_func_us(&turbine.starter,atoi(param)) ;
 			else
 				set_power_func(&turbine.starter,atof(param)/20) ;
 		}
-
+		//Vanne 1
 		len = find_value("pwmSliderValue4=",content,param) ;
 		if(len > 0)
-		turbine.vanne1.set_power(&turbine.vanne1.config,atoi(param)) ;
+		{
+			turbine.vanne1.value = atoi(param) ;
+			turbine.vanne1.set_power(&turbine.vanne1.config,atoi(param)) ;
+		}
+		//Vanne 2
 		len = find_value("pwmSliderValue5=",content,param) ;
 		if(len > 0)
-		turbine.vanne2.set_power(&turbine.vanne2.config,atoi(param)) ;
+		{
+			turbine.vanne2.value = atoi(param) ;
+			turbine.vanne2.set_power(&turbine.vanne2.config,atoi(param)) ;
+		}
+		// GLOW
 		len = find_value("pwmSliderValue6=",content,param) ;
 		if(len > 0)
-		turbine.glow.set_power(&turbine.glow.config,atoi(param)) ;
-
-		//ESP_LOGI(TAG,"%s",content) ;
+		{
+			param_int32 = atoi(param) ;
+			if(param_int32 > turbine_config.glow_power)
+				param_int32 = turbine_config.glow_power ;
+			turbine.glow.value = param_int32 ;	
+			turbine.glow.set_power(&turbine.glow.config,param_int32) ;
+		}
+		ESP_LOGI(TAG,"%s",content) ;
 		/* Send a simple response */
 		const char resp[] = "URI POST Response";
 		httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);

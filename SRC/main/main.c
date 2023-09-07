@@ -211,26 +211,28 @@ long int timer_old,Timer1,time_ecu ;
 void app_main()
 {
 	int res ;
-	/*
-	gpio_pad_select_gpio(STARTER_PIN);
+	//*** A commenter pour utiliser le JTAG ******
+	//gpio_pad_select_gpio(STARTER_PIN);
 	gpio_set_direction(STARTER_PIN, GPIO_MODE_OUTPUT);
 	gpio_set_level(STARTER_PIN, 0);
-	gpio_pad_select_gpio(PUMP1_PIN);
+	//gpio_pad_select_gpio(PUMP1_PIN);
 	gpio_set_direction(PUMP1_PIN, GPIO_MODE_OUTPUT);
 	gpio_set_level(PUMP1_PIN, 0);
-	gpio_pad_select_gpio(PUMP2_PIN);
+	//gpio_pad_select_gpio(PUMP2_PIN);
 	gpio_set_direction(PUMP2_PIN, GPIO_MODE_OUTPUT);
 	gpio_set_level(PUMP2_PIN, 0);
-	gpio_pad_select_gpio(VANNE1_PIN);
-	gpio_set_direction(VANNE1_PIN, GPIO_MODE_OUTPUT);
+    //** commenter pour le JTAG ********
+    //gpio_pad_select_gpio(VANNE1_PIN);
 	gpio_set_level(VANNE1_PIN, 0);
-	gpio_pad_select_gpio(VANNE2_PIN);
-	gpio_set_direction(VANNE2_PIN, GPIO_MODE_OUTPUT);
+	gpio_set_direction(VANNE1_PIN, GPIO_MODE_OUTPUT);
 	gpio_set_level(VANNE2_PIN, 0);
-	gpio_pad_select_gpio(GLOW_PIN);
+	//gpio_pad_select_gpio(VANNE2_PIN);
+	gpio_set_direction(VANNE2_PIN, GPIO_MODE_OUTPUT);
+	gpio_set_level(GLOW_PIN, 0);
+	//gpio_pad_select_gpio(GLOW_PIN);
 	gpio_set_direction(GLOW_PIN, GPIO_MODE_OUTPUT);
 	gpio_set_level(GLOW_PIN, 0);
-	*/
+	
 	const esp_partition_t *partition = esp_ota_get_running_partition();
 	esp_chip_info_t chip_info;
 	esp_chip_info(&chip_info);
@@ -341,8 +343,9 @@ void app_main()
 	//turbine.GAZ = 1000 ;
 	Timer1 = esp_timer_get_time();
 
+	// *********** Simulation *********
 	//int32_t time =     //printf("Timer: %lld μs\n", Timer1/1000); 
-	strcpy(turbine.error_message,"OVERHEAT");
+	/*strcpy(turbine.error_message,"OVERHEAT");
 	while(1){
 		for(int32_t i=0;i<100;i++)
 		{
@@ -372,17 +375,19 @@ void app_main()
 			//}xSemaphoreGive(xTimeMutex) ;
 				vTaskDelay(200 / portTICK_PERIOD_MS);
 		}
-		/*
-		set_kero_pump_target(36000);
-		vTaskDelay(3000 / portTICK_PERIOD_MS);
-		set_kero_pump_target(54000);
-		vTaskDelay(3000 / portTICK_PERIOD_MS);
-		set_kero_pump_target(70000);
-		vTaskDelay(3000 / portTICK_PERIOD_MS);
-		set_kero_pump_target(91000);
-		vTaskDelay(3000 / portTICK_PERIOD_MS);
-		set_kero_pump_target(143000);
-		vTaskDelay(3000 / portTICK_PERIOD_MS);*/
+	
+		
+		//set_kero_pump_target(36000);
+		//vTaskDelay(3000 / portTICK_PERIOD_MS);
+		//set_kero_pump_target(54000);
+		//vTaskDelay(3000 / portTICK_PERIOD_MS);
+		//set_kero_pump_target(70000);
+		//vTaskDelay(3000 / portTICK_PERIOD_MS);
+		//set_kero_pump_target(91000);
+		//vTaskDelay(3000 / portTICK_PERIOD_MS);
+		//set_kero_pump_target(143000);
+		//vTaskDelay(3000 / portTICK_PERIOD_MS);
 		//vTaskDelay(400 / portTICK_PERIOD_MS);
 		}
+	*/
 }

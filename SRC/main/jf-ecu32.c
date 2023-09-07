@@ -88,14 +88,15 @@ void set_power_ledc(_ledc_config *config ,uint32_t value)
 {
     ESP_ERROR_CHECK(ledc_set_duty(LEDC_LOW_SPEED_MODE, config->ledc_channel, value));
     ESP_ERROR_CHECK(ledc_update_duty(LEDC_LOW_SPEED_MODE, config->ledc_channel));
-    //ESP_LOGI(TAG,"ledc_channel %d ; value : %d ; pin : %d",config->ledc_channel,value,config->gpio_num);
+    ESP_LOGI(TAG,"ledc_channel %d ; value : %d ; pin : %d",config->ledc_channel,value,config->gpio_num);
+//    ESP_LOGI(TAG,"ledc_channel %d ; value : %d ; pin : %d",config->ledc_channel,ledc_get_duty(LEDC_LOW_SPEED_MODE, config->ledc_channel),config->gpio_num);
 }
 
 ledc_timer_config_t ledc_timer = {
     .speed_mode = LEDC_LOW_SPEED_MODE,
     .timer_num  = LEDC_TIMER_0,
     .duty_resolution = LEDC_TIMER_8_BIT,
-    .freq_hz = 400,
+    .freq_hz = 2000,
     .clk_cfg = LEDC_AUTO_CLK
 };
 
@@ -252,8 +253,9 @@ void init_mcpwm(void) // IDF 4.3.4
         ledc_channel[i].intr_type = LEDC_INTR_DISABLE;
         ledc_channel[i].duty = 0;
         ledc_channel[i].hpoint = 0;
-        //ESP_ERROR_CHECK(ledc_channel_config(&ledc_channel[i]));
+        ESP_ERROR_CHECK(ledc_channel_config(&ledc_channel[i]));
     }
+
 }
 
 void init(void)
@@ -436,6 +438,7 @@ void vTimer1sCallback( TimerHandle_t pxTimer )
             turbine.secondes = 0 ;
             turbine.minutes++ ;
         }
+        turbine.RPM = 0 ;
         //ESP_LOGI(TAG,"%02d:%02d",turbine.minutes,turbine.secondes) ;
     }
     xSemaphoreGive(xTimeMutex) ;

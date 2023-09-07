@@ -1,0 +1,7 @@
+# Partition table with both OTA and SPIFFS features # ota_1,    app,  ota_1,   0x220000,1M
+nvs,      data, nvs,     ,  0x4000
+otadata,  data, ota,     ,  0x2000
+phy_init, data, phy,     ,  0x1000
+ota_0,    app,  ota_0,   ,  3000K
+ota_1,    app,  ota_1,   ,  3000K
+storage,  data, spiffs,  ,  2000K
