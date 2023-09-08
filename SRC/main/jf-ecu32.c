@@ -438,7 +438,7 @@ void vTimer1sCallback( TimerHandle_t pxTimer )
             turbine.secondes = 0 ;
             turbine.minutes++ ;
         }
-        turbine.RPM = 0 ;
+        //turbine.RPM = 0 ;
         //ESP_LOGI(TAG,"%02d:%02d",turbine.minutes,turbine.secondes) ;
     }
     xSemaphoreGive(xTimeMutex) ;
@@ -446,7 +446,7 @@ void vTimer1sCallback( TimerHandle_t pxTimer )
     
     //ESP_LOGI("wifi", "free Heap:%d,%d", esp_get_free_heap_size(), heap_caps_get_free_size(MALLOC_CAP_8BIT));
     //ESP_LOGI("Time", "%02d:%02d",turbine.minutes,turbine.secondes);
-
+    ESP_LOGI(TAG,"Period RPM : %ld",turbine.RPM) ;
     //heap_trace_dump();
     //long long int Timer1 = esp_timer_get_time();
     //printf("Timer: %lld μs\n", Timer1/1000);  

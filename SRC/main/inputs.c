@@ -69,18 +69,19 @@ static void IRAM_ATTR gpio_isr_handler(void* arg)
     unsigned long rpm ;
 
     uint32_t gpio_num = (uint32_t) arg;
-    ESP_ERROR_CHECK(gptimer_stop(gptimer)) ;
-    ESP_ERROR_CHECK(gptimer_get_raw_count(gptimer, &time)) ;
-    ESP_ERROR_CHECK(gptimer_set_raw_count(gptimer, 0)) ;
-    ESP_ERROR_CHECK(gptimer_start(gptimer)) ;
-    period = time - time_prec ;
-    time_prec = time ;
+    //ESP_ERROR_CHECK(gptimer_stop(gptimer)) ;
+    gptimer_get_raw_count(gptimer, &time) ;
+    gptimer_set_raw_count(gptimer, 0) ;
+    //ESP_ERROR_CHECK(gptimer_start(gptimer)) ;
+    period = time ;
+    //time_prec = time ;
     //ESP_LOGI(TAG,"RPM input period : %d",period) ;
+    turbine.RPM = period ;
     if(period > 10)
     {
         rpm = 600000 / (period/10) ;
         //turbine.RPM = rpm ; // Sans filtre
-        turbine.RPM = (rpm + (3*turbine.RPM))/4 ; //filtre
+        //turbine.RPM = (rpm + (3*turbine.RPM))/4 ; //filtre
     }
     //xQueueOverwriteFromISR(rpm_evt_queue,&period,&xHigherPriorityTaskWoken);
 }
@@ -153,7 +154,7 @@ void init_inputs(void)
     ESP_ERROR_CHECK(gptimer_new_timer(&timer_config, &gptimer));
     ESP_ERROR_CHECK(gptimer_enable(gptimer));
     ESP_ERROR_CHECK(gptimer_set_raw_count(gptimer,0));
-    //ESP_ERROR_CHECK(gptimer_start(gptimer));
+    ESP_ERROR_CHECK(gptimer_start(gptimer));
      
 
     ESP_LOGI("RPM","Init RPM");
