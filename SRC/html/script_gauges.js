@@ -165,7 +165,8 @@ function getReadings() {
 			var ppm_gaz = myObj.ppm_gaz;
 			var ppm_aux = myObj.ppm_aux;
 			var egt = myObj.egt;
-			var rpm = myObj.rpm;
+			var rpm = myObj.rpm/1000;
+			var rpmtxt = myObj.rpm;
 			var pump1 = myObj.pump1;
 			var pump2 = myObj.pump2;
 			var glow = myObj.glow;
@@ -183,6 +184,7 @@ function getReadings() {
 			document.getElementById('vanne1').innerHTML = vanne1;
 			document.getElementById('vanne2').innerHTML = vanne2;
 			document.getElementById('glow').innerHTML = glow;
+			document.getElementById('rpmtxt').innerHTML = rpmtxt;
 			document.getElementById('status').innerHTML = status;
 			document.getElementById('error').innerHTML = error;
 			document.getElementById('time').innerHTML = time;

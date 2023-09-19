@@ -34,6 +34,7 @@
 #include "freertos/semphr.h"
 #include "mdns.h"
 #include "driver/rmt_rx.h"
+#include "driver/pulse_cnt.h"
 //#include "esp_heap_trace.h"
 
 #include "jf-ecu32.h"
@@ -88,8 +89,8 @@ void set_power_ledc(_ledc_config *config ,uint32_t value)
 {
     ESP_ERROR_CHECK(ledc_set_duty(LEDC_LOW_SPEED_MODE, config->ledc_channel, value));
     ESP_ERROR_CHECK(ledc_update_duty(LEDC_LOW_SPEED_MODE, config->ledc_channel));
-    ESP_LOGI(TAG,"ledc_channel %d ; value : %d ; pin : %d",config->ledc_channel,value,config->gpio_num);
-//    ESP_LOGI(TAG,"ledc_channel %d ; value : %d ; pin : %d",config->ledc_channel,ledc_get_duty(LEDC_LOW_SPEED_MODE, config->ledc_channel),config->gpio_num);
+    //ESP_LOGI(TAG,"ledc_channel %d ; value : %d ; pin : %d",config->ledc_channel,value,config->gpio_num);
+    //ESP_LOGI(TAG,"ledc_channel %d ; value : %d ; pin : %d",config->ledc_channel,ledc_get_duty(LEDC_LOW_SPEED_MODE, config->ledc_channel),config->gpio_num);
 }
 
 ledc_timer_config_t ledc_timer = {
@@ -218,7 +219,7 @@ void init_mcpwm(void) // IDF 4.3.4
     printf("Configuring Initial Parameters of mcpwm......\n");
 
     //Config pour PWM
-    pwm_config[0].frequency = 10000;    //frequency = 10000Hz, pour les moteur DC et vannes
+    pwm_config[0].frequency = 10000;    //frequency = 10000Hz, pour les moteur DC
     pwm_config[0].cmpr_a = 0;    //duty cycle of PWMxA = 0  Pompe1
     pwm_config[0].cmpr_b = 0;    //duty cycle of PWMxb = 0  Pompe2
     pwm_config[0].counter_mode = MCPWM_UP_COUNTER;
@@ -328,6 +329,8 @@ void phase_to_str(char *status)
                     break ;
         case COOL : strcpy(status,"COOL") ;
                     break ;
+        case STOP : strcpy(status,"STOP") ;
+                    break ;
     }
 }
 
@@ -405,7 +408,8 @@ void log_task( void * pvParameters )
 void create_timers(void)
 {
     xTimeMutex = xSemaphoreCreateMutex() ;
-    xRPMmutex = xSemaphoreCreateMutex() ;
+    xRPMmutex = xSemaphoreCreateBinary() ;
+    xSemaphoreGive(xRPMmutex) ;
     xGAZmutex = xSemaphoreCreateMutex() ;
     xTimer1s = xTimerCreate("Timer1s",       // Just a text name, not used by the kernel.
                             ( 1000 /portTICK_PERIOD_MS ),   // The timer period in ticks.
@@ -432,21 +436,35 @@ void start_timers(void)
 
 void vTimer1sCallback( TimerHandle_t pxTimer )
 {
+    // Mutex sur le temps d'allumage de l'ECU
+    uint32_t rpm ;
     if( xSemaphoreTake(xTimeMutex,( TickType_t ) 10) == pdTRUE ) {
         turbine.secondes++ ;
         if(turbine.secondes > 59) {
             turbine.secondes = 0 ;
             turbine.minutes++ ;
         }
-        //turbine.RPM = 0 ;
         //ESP_LOGI(TAG,"%02d:%02d",turbine.minutes,turbine.secondes) ;
     }
     xSemaphoreGive(xTimeMutex) ;
+
+    //ESP_LOGI(TAG,"RPM_sec : %ld - %ld",turbine.RPM_sec,turbine.RPM_sec*60) ;
+    //turbine.RPM_sec = 0 ;
+    //ESP_LOGI(TAG,"WDT_RPM : %ld",turbine.WDT_RPM) ;
+    
+    if(turbine.WDT_RPM == 0)
+        Reset_RPM() ;
+    else
+        turbine.WDT_RPM = 0 ;
+    
     check_errors() ;
+
     
     //ESP_LOGI("wifi", "free Heap:%d,%d", esp_get_free_heap_size(), heap_caps_get_free_size(MALLOC_CAP_8BIT));
     //ESP_LOGI("Time", "%02d:%02d",turbine.minutes,turbine.secondes);
-    ESP_LOGI(TAG,"Period RPM : %ld",turbine.RPM) ;
+    Get_RPM(&rpm) ;
+    ESP_LOGI(TAG,"RPM_sec : %ld",turbine.RPM_sec) ;
+    turbine.RPM_sec = 0 ;
     //heap_trace_dump();
     //long long int Timer1 = esp_timer_get_time();
     //printf("Timer: %lld μs\n", Timer1/1000);  
@@ -468,20 +486,72 @@ void ecu_task(void * pvParameters )
     ESP_LOGI(TAG, "Start ECU Task");
     while(1)
     {
-        vTaskDelay(100 / portTICK_PERIOD_MS);
+        vTaskDelay(10 / portTICK_PERIOD_MS);
             switch(turbine.phase_fonctionnement)
             {
+                case STOP :
+                        turbine.starter.value = 0 ;
+                        set_power_func_us(&turbine.starter,0) ;
+                    	turbine.vanne1.value = 0 ;
+			            turbine.vanne1.set_power(&turbine.vanne2.config,0) ;
+                       	turbine.vanne2.value = 0 ;
+			            turbine.vanne2.set_power(&turbine.vanne2.config,0) ;
+                        turbine.pump1.value = 0 ;
+                        set_power_func_us(&turbine.pump1,0) ;
+                        turbine.pump2.value = 0 ;
+                        set_power_func_us(&turbine.pump2,0) ;
+                        turbine.glow.value = 0 ;	
+			            turbine.glow.set_power(&turbine.glow.config,0) ;
+                        turbine.phase_fonctionnement = WAIT ;
+                        break ;
                 case WAIT :
                     if(turbine.EGT > 100)
                         turbine.phase_fonctionnement = COOL ;
-                    else if(turbine.position_gaz == COUPE) {}
-                        //Attendret
+                    else if(turbine.position_gaz == COUPE) 
+                    {
+                        bool fail = 0 ;
+                        for(int i=0;i<100;i++) //Attendre 1 seconde
+                        {
+                            if(turbine.position_gaz != COUPE)
+                            {
+                                fail = 1 ;
+                                break;
+                            }
+                            vTaskDelay(10 / portTICK_PERIOD_MS);  
+                        }
+                    }                        
                     else if(turbine.position_gaz == PLEINGAZ)
+                    {
                         // Attendre 1sec pour verifier si la position reste
-                        turbine.phase_fonctionnement = START ;
+                        bool fail = 0;
+                        for(int i=0;i<100;i++)
+                        {
+                            if(turbine.position_gaz != PLEINGAZ)
+                            {
+                                fail = 1 ;
+                                break;
+                            }
+                            vTaskDelay(10 / portTICK_PERIOD_MS);  
+                        }
+                        if(!fail)
+                            turbine.phase_fonctionnement = START ;
+                    }                      
                     else if(turbine.position_gaz == MIGAZ)
+                    {
                         // Attendre 1sec pour verifier si la position reste
-                        turbine.phase_fonctionnement = PURGE ;
+                        bool fail = 0;
+                        for(int i=0;i<100;i++)
+                        {
+                            if(turbine.position_gaz != MIGAZ)
+                            {
+                                fail = 1 ;
+                                break;
+                            }
+                            vTaskDelay(10 / portTICK_PERIOD_MS);  
+                        }
+                        if(!fail)
+                            turbine.phase_fonctionnement = PURGE ;
+                    }
                     break;
                 case START :
                     if(turbine.position_gaz == COUPE)
@@ -495,15 +565,35 @@ void ecu_task(void * pvParameters )
                 case GLOW :
                     if(turbine.position_gaz == COUPE)
                         turbine.phase_fonctionnement = WAIT ;
-                    else if(turbine.position_gaz == PLEINGAZ){
+                    else if(turbine.position_gaz == PLEINGAZ)
+                    {
                         turbine.glow.set_power(&turbine.glow.config,turbine_config.glow_power) ;
-                        //Attendre 1 seconde
-                        turbine.starter.set_power(&turbine.starter.config,300) ;
-                        if(turbine.EGT > 100)
-                            turbine.phase_fonctionnement = PREHEAT ;
-                        else{}
-                            //Attendre 5 secondes Max sinon GOTO WAIT
+                        bool fail = 0;
+                        for(int i=0;i<100;i++) //Attendre 1 seconde
+                        {
+                            if(turbine.position_gaz != PLEINGAZ)
+                            {
+                                fail = 1 ;
+                                break;
+                            }
+                            vTaskDelay(10 / portTICK_PERIOD_MS);  
                         }
+                        if(fail)
+                            turbine.phase_fonctionnement = WAIT ;
+                        else
+                        {                        
+                            turbine.starter.set_power(&turbine.starter.config,300) ;
+                            if(turbine.EGT > 100)
+                                turbine.phase_fonctionnement = PREHEAT ;
+                            else
+                            {
+                                vTaskDelay(5000 / portTICK_PERIOD_MS);
+                                if(turbine.EGT > 100)
+                                    turbine.phase_fonctionnement = WAIT ;
+                            }
+                                //Attendre 5 secondes Max sinon GOTO WAIT
+                        }
+                    }
                     break;
                 case KEROSTART :
                     if(turbine.position_gaz == COUPE)
@@ -558,7 +648,7 @@ void ecu_task(void * pvParameters )
 
 void inputs_task(void * pvParameters)
 {
-    unsigned long long timer,timer_prec = 0 ;
+    //unsigned long long timer,timer_prec = 0 ;
 
     rmt_rx_done_event_data_t rx_data;
     rmt_rx_done_event_data_t aux_rx_data;
@@ -566,7 +656,7 @@ void inputs_task(void * pvParameters)
     {
         
         //ESP_ERROR_CHECK( heap_trace_start(HEAP_TRACE_LEAKS) );
-        gptimer_get_raw_count(gptimer, &timer) ;
+        //gptimer_get_raw_count(gptimer, &timer) ;
         //RPM
 
         //PPM Voie Gaz
@@ -634,7 +724,7 @@ void inputs_task(void * pvParameters)
         //ESP_LOGI("PPM Gaz Time", "%ldµS",turbine.GAZ);
         //ESP_LOGI("PPM Aux Time", "%ldµS",turbine.Aux);
         //ESP_LOGI("PPM Timer", "%lldµS",timer-timer_prec);
-        timer_prec = timer ;
+        //timer_prec = timer ;
         //vTaskDelay( 10 / portTICK_PERIOD_MS );
         //ESP_ERROR_CHECK( heap_trace_stop() );
 		

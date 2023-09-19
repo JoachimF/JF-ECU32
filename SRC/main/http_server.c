@@ -447,7 +447,7 @@ static esp_err_t root_post_handler(httpd_req_t *req)
 			turbine.glow.value = param_int32 ;	
 			turbine.glow.set_power(&turbine.glow.config,param_int32) ;
 		}
-		ESP_LOGI(TAG,"%s",content) ;
+		//ESP_LOGI(TAG,"%s",content) ;
 		/* Send a simple response */
 		const char resp[] = "URI POST Response";
 		httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
@@ -930,6 +930,24 @@ void save_configturbine(httpd_req_t *req)
 	if(len>1) {
 		turbine_config.min_pump2 = atoi(param) ;		
 	}
+	/*Max vanne1*/
+	len = find_value("max_vanne1=",buf,param) ;
+	ESP_LOGI(TAG, "max_vanne1=%c len=%d",*param,len);
+	if(len>1) {
+		turbine_config.max_vanne1 = atoi(param) ;		
+	}	
+	/*Max vanne2*/
+	len = find_value("max_vanne2=",buf,param) ;
+	ESP_LOGI(TAG, "max_vanne2=%c len=%d",*param,len);
+	if(len>1) {
+		turbine_config.max_vanne2 = atoi(param) ;		
+	}
+	/*RPM Start Starter*/
+	len = find_value("start_starter=",buf,param) ;
+	ESP_LOGI(TAG, "start_starter=%c len=%d",*param,len);
+	if(len>1) {
+		turbine_config.start_starter = atoi(param) ;		
+	}
 	write_nvs_turbine() ;
 	free(buf) ;
 }
@@ -1114,6 +1132,24 @@ static esp_err_t configmoteur(httpd_req_t *req)
 	httpd_resp_sendstr_chunk(req, tmp) ;
 	httpd_resp_sendstr_chunk(req, "\" name=\"min_pump2\" type=\"number\" min=\"0\" max=\"1024\"></p><p>");
 
+	httpd_resp_sendstr_chunk(req, "<b>PWM Max vanne 1 (0-1024)</b><br>");
+	httpd_resp_sendstr_chunk(req, "<input id=\"max_vanne1\" placeholder=\"\" value=\"");
+	itoa(turbine_config.max_vanne1,tmp,10) ;
+	httpd_resp_sendstr_chunk(req, tmp) ;
+	httpd_resp_sendstr_chunk(req, "\" name=\"max_vanne1\" type=\"number\" min=\"0\" max=\"1024\"></p><p>");
+
+	httpd_resp_sendstr_chunk(req, "<b>PWM Max vanne 2 (0-1024)</b><br>");
+	httpd_resp_sendstr_chunk(req, "<input id=\"max_vanne2\" placeholder=\"\" value=\"");
+	itoa(turbine_config.max_vanne2,tmp,10) ;
+	httpd_resp_sendstr_chunk(req, tmp) ;
+	httpd_resp_sendstr_chunk(req, "\" name=\"max_vanne2\" type=\"number\" min=\"0\" max=\"1024\"></p><p>");
+
+	httpd_resp_sendstr_chunk(req, "<b>RPM Allumage (0-5000RPM)</b><br>");
+	httpd_resp_sendstr_chunk(req, "<input id=\"start_starter\" placeholder=\"\" value=\"");
+	itoa(turbine_config.start_starter,tmp,10) ;
+	httpd_resp_sendstr_chunk(req, tmp) ;
+	httpd_resp_sendstr_chunk(req, "\" name=\"start_starter\" type=\"number\" min=\"0\" max=\"5000\"></p><p>");	
+
 	httpd_resp_sendstr_chunk(req, "<button name=\"save\" type=\"submit\" class=\"button bgrn\">Sauvegarde</button>") ;
 	httpd_resp_sendstr_chunk(req, "</form></fieldset>") ;
 
@@ -1272,7 +1308,7 @@ static esp_err_t readings_get_handler(httpd_req_t *req){
 	static cJSON *myjson;
 	char status[50] ;
 	char errors[200] ;
-	uint32_t rpm = 0 ;
+	//uint32_t rpm = 0 ;
 	//ESP_LOGI(TAG, "readings_get_handler req->uri=[%s]", req->uri);
 	myjson = cJSON_CreateObject();
 //	if( xSemaphoreTake(xTimeMutex,( TickType_t ) 10) == pdTRUE ) {
@@ -1280,7 +1316,7 @@ static esp_err_t readings_get_handler(httpd_req_t *req){
 		cJSON_AddNumberToObject(myjson, "ppm_gaz", turbine.GAZ);
 		cJSON_AddNumberToObject(myjson, "ppm_aux", turbine.Aux);
 		cJSON_AddNumberToObject(myjson, "egt", turbine.EGT);
-		cJSON_AddNumberToObject(myjson, "rpm", turbine.RPM/1000);
+		cJSON_AddNumberToObject(myjson, "rpm", turbine.RPM);
 		cJSON_AddNumberToObject(myjson, "pump1", turbine.pump1.value);
 		cJSON_AddNumberToObject(myjson, "pump2", turbine.pump2.value);
 		cJSON_AddNumberToObject(myjson, "vanne1", turbine.vanne1.value);
@@ -1334,7 +1370,7 @@ static esp_err_t frontpage(httpd_req_t *req)
 {
 //	ESP_LOGI(TAG, "root_get_handler req->uri=[%s]", req->uri);
     char filepath[20];
-	static int i=0 ;
+	//static int i=0 ;
     //ESP_LOGI(TAG, "URI : %s", req->uri);
 	xTimerStop( xTimer60s,0) ;
     const char *filename = get_path_from_uri(filepath, req->uri, sizeof(filepath));
@@ -1356,6 +1392,12 @@ static esp_err_t frontpage(httpd_req_t *req)
 		logs(req) ;
 	else if(strcmp(filename, "/slider") == 0) 
 		slider(req) ;
+	else if(strcmp(filename, "/start") == 0) 
+		turbine.phase_fonctionnement = START ;
+	else if(strcmp(filename, "/stop") == 0) 
+		turbine.phase_fonctionnement = STOP ;
+
+
 	else if(strcmp(filename, "/curves.txt") == 0) 
 		curves_get_handler(req) ;
 	else if(strcmp(filename, "/logs.txt") == 0) 
@@ -1431,6 +1473,16 @@ static esp_err_t frontpage(httpd_req_t *req)
 
 	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"gauges\">");
 	httpd_resp_sendstr_chunk(req, "<button>Jauges</button></form>");
+	httpd_resp_sendstr_chunk(req, "</form>");
+	httpd_resp_sendstr_chunk(req, "<p></p>");
+
+	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"start\">");
+	httpd_resp_sendstr_chunk(req, "<button>Start engine</button></form>");
+	httpd_resp_sendstr_chunk(req, "</form>");
+	httpd_resp_sendstr_chunk(req, "<p></p>");
+
+	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"stop\">");
+	httpd_resp_sendstr_chunk(req, "<button>Stop engine</button></form>");
 	httpd_resp_sendstr_chunk(req, "</form>");
 	httpd_resp_sendstr_chunk(req, "<p></p>");
 

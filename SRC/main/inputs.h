@@ -27,6 +27,8 @@
 #include "freertos/task.h"
 #include "freertos/queue.h"
 #include "driver/rmt_rx.h"
+#include "freertos/semphr.h"
+
 
 #define RPM_PIN 21
 #define RMT_RX_GPIO_NUM  26     /*!< GPIO number for Throttle */
@@ -49,6 +51,7 @@ typedef struct {
     bool auto_reload;
 } RPM_timer_info_t;
 
+extern SemaphoreHandle_t xRPMmutex;
 
 extern gptimer_handle_t gptimer ;
 extern gptimer_config_t timer_config ;
@@ -63,6 +66,8 @@ extern rmt_symbol_word_t raw_symbols[64]; //
 extern rmt_symbol_word_t aux_raw_symbols[64]; // 
 extern rmt_receive_config_t receive_config ;
 
-void init_inputs(void)  ;
+void init_inputs(void) ;
+bool Get_RPM(uint32_t *rpm) ;
+void Reset_RPM() ;
 
 #endif

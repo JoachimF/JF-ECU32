@@ -95,7 +95,7 @@ typedef struct {
 
 
 enum phases {
-    WAIT,START,GLOW,KEROSTART,PREHEAT,RAMP,IDLE,PURGE,COOL
+    WAIT,START,GLOW,KEROSTART,PREHEAT,RAMP,IDLE,PURGE,COOL,STOP
  };
 
 enum manche_de_gaz {
@@ -130,6 +130,10 @@ typedef struct {
   uint16_t min_pump1 ; // puissance min de la pompe 1
   uint16_t max_pump2 ; // puissance max de la pompe 1
   uint16_t min_pump2 ; // puissance min de la pompe 1
+  uint16_t max_vanne1 ; // puissance max de la vanne 1
+  uint16_t max_vanne2 ; // puissance max de la vanne 2
+  uint16_t start_starter ; // vitesse du starter pour l'allumage
+  
   _pump_table_t power_table;
   uint32_t checksum ;
 } _configEngine_t;
@@ -188,6 +192,9 @@ typedef struct _engine_ {
   uint32_t GAZ ;
   uint32_t Aux ;
   uint32_t RPM ;
+  uint64_t RPM_period ;
+  bool WDT_RPM ;
+  uint16_t RPM_sec ;
   uint32_t EGT ;
   _PUMP_t pump1 ;
   _PUMP_t pump2 ;

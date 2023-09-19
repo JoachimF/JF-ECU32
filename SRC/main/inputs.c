@@ -32,12 +32,13 @@
 #include "driver/rmt_rx.h"
 #include "esp_log.h"
 #include "esp_err.h"
+#include "freertos/semphr.h"
+
 #include <max31855.h>
 
 
 
 static const char *TAG = "INPUTS";
-
 
 
 // Timer
@@ -62,28 +63,24 @@ rmt_channel_handle_t rx_ppm_aux_chan = NULL;
 
 static void IRAM_ATTR gpio_isr_handler(void* arg)
 {
-    static unsigned long long time ;
-    static unsigned long long time_prec ;
-    static unsigned long long period ;
-    //BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-    unsigned long rpm ;
-
     uint32_t gpio_num = (uint32_t) arg;
-    //ESP_ERROR_CHECK(gptimer_stop(gptimer)) ;
-    gptimer_get_raw_count(gptimer, &time) ;
-    gptimer_set_raw_count(gptimer, 0) ;
-    //ESP_ERROR_CHECK(gptimer_start(gptimer)) ;
-    period = time ;
-    //time_prec = time ;
-    //ESP_LOGI(TAG,"RPM input period : %d",period) ;
-    turbine.RPM = period ;
-    if(period > 10)
+    static uint64_t period ;
+    static BaseType_t xHigherPriorityTaskWoken;
+    gptimer_get_raw_count(gptimer, &period) ;
+    if(period > 200)
     {
-        rpm = 600000 / (period/10) ;
-        //turbine.RPM = rpm ; // Sans filtre
-        //turbine.RPM = (rpm + (3*turbine.RPM))/4 ; //filtre
+            gptimer_set_raw_count(gptimer, 0) ;
+            if(xSemaphoreTakeFromISR(xRPMmutex,&xHigherPriorityTaskWoken ) == pdTRUE)
+            {
+                //turbine.RPM_period = period ; 
+                turbine.RPM_period = (period + (3*turbine.RPM_period))/4 ; //filtre
+                xSemaphoreGiveFromISR(xRPMmutex,&xHigherPriorityTaskWoken) ;
+            }
+            turbine.WDT_RPM = 1 ;
+            
+            
     }
-    //xQueueOverwriteFromISR(rpm_evt_queue,&period,&xHigherPriorityTaskWoken);
+    turbine.RPM_sec++ ;
 }
 
 BaseType_t high_task_wakeup = pdTRUE;
@@ -155,17 +152,17 @@ void init_inputs(void)
     ESP_ERROR_CHECK(gptimer_enable(gptimer));
     ESP_ERROR_CHECK(gptimer_set_raw_count(gptimer,0));
     ESP_ERROR_CHECK(gptimer_start(gptimer));
-     
 
     ESP_LOGI("RPM","Init RPM");
-    rpm_evt_queue = xQueueCreate(1, sizeof(unsigned long long));
+    //rpm_evt_queue = xQueueCreate(1, sizeof(unsigned long long));
 
+    //** Interruption RPM
     gpio_set_direction(RPM_PIN, GPIO_MODE_INPUT);
+    gpio_pullup_dis(RPM_PIN);
+    gpio_pulldown_dis(RPM_PIN);
+    //gpio_pullup_en(RPM_PIN);
     //gpio_pulldown_en(RPM_PIN);
-    //gpio_pullup_dis(RPM_PIN);
-    gpio_pullup_en(RPM_PIN);
     gpio_set_intr_type(RPM_PIN, GPIO_INTR_POSEDGE);    
-
     gpio_install_isr_service(ESP_INTR_FLAG_LEVEL3|ESP_INTR_FLAG_IRAM);
     gpio_isr_handler_add(RPM_PIN, gpio_isr_handler, (void *)RPM_PIN);
     gpio_intr_enable(RPM_PIN) ;
@@ -219,3 +216,32 @@ void init_inputs(void)
     xTaskCreate(task_egt, TAG, configMINIMAL_STACK_SIZE * 8, NULL, 5, NULL);
 }
 
+bool Get_RPM(uint32_t *rpm) 
+{
+    uint64_t  period ;
+    //ESP_LOGI(TAG,"Get RPM") ;
+    if(xSemaphoreTake(xRPMmutex,( TickType_t ) 10) == pdTRUE ) 
+    {
+        period = turbine.RPM_period ;
+        xSemaphoreGive(xRPMmutex) ;
+        if(period > 0 )
+            *rpm = 60000000 / period ;
+        else
+            *rpm = 0 ;
+        turbine.RPM = *rpm ;
+        ESP_LOGI(TAG,"Get RPM mutex RPM : %ld - Period : %ld",*rpm,period) ;
+        return 1 ;
+    }
+    return 0 ;
+}
+
+void Reset_RPM() 
+{
+    //ESP_LOGI(TAG,"Reset RPM") ;
+    if(xSemaphoreTake(xRPMmutex,( TickType_t ) 10) == pdTRUE )
+    {
+        turbine.RPM_period = 0 ;
+        xSemaphoreGive(xRPMmutex) ;
+        //ESP_LOGI(TAG,"Reset RPM mutex") ;
+    }
+}

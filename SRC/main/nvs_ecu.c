@@ -149,7 +149,7 @@ static void set_defaut_turbine(void)
 {
     strcpy(turbine_config.name,"Nom du moteur") ;
     turbine_config.log_count = 1 ;
-    turbine_config.glow_power = 25 ;
+    turbine_config.glow_power = 10 ;
     turbine_config.jet_full_power_rpm = 145000 ;
     turbine_config.jet_idle_rpm = 35000 ;
     turbine_config.start_temp = 100 ;
