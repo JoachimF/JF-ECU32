@@ -33,6 +33,7 @@
 #include "esp_log.h"
 #include "esp_err.h"
 #include "freertos/semphr.h"
+#include <ina219.h>
 
 #include <max31855.h>
 
@@ -59,6 +60,9 @@ rmt_symbol_word_t aux_raw_symbols[64]; //
 rmt_receive_config_t receive_config ;
 rmt_channel_handle_t rx_ppm_chan = NULL;
 rmt_channel_handle_t rx_ppm_aux_chan = NULL;
+
+//Courant bougie
+ina219_t dev;
 
 
 static void IRAM_ATTR gpio_isr_handler(void* arg)
@@ -100,6 +104,26 @@ static bool IRAM_ATTR ppm_rmt_aux_done_callback(rmt_channel_handle_t channel, co
     xQueueOverwriteFromISR(receive_queue3, edata, &high_task_wakeup);
     // return whether any task is woken up
     return high_task_wakeup == pdTRUE;
+}
+static void task_glow_current(void *pvParameter)
+{
+    memset(&dev, 0, sizeof(ina219_t));
+
+    ESP_ERROR_CHECK(ina219_init_desc(&dev, I2C_ADDR, I2C_PORT, SDA_GPIO, SCL_GPIO));
+    ESP_LOGI(TAG, "Initializing INA219");
+    ESP_ERROR_CHECK(ina219_init(&dev));
+
+    ESP_LOGI(TAG, "Configuring INA219");
+    ESP_ERROR_CHECK(ina219_configure(&dev, INA219_BUS_RANGE_16V, INA219_GAIN_0_125,
+            INA219_RES_12BIT_1S, INA219_RES_12BIT_1S, INA219_MODE_CONT_SHUNT_BUS));
+
+    ESP_LOGI(TAG, "Calibrating INA219");
+
+    ESP_ERROR_CHECK(ina219_calibrate(&dev, (float)10 / 1000.0f)); // Résistance de shunt 10mOhm
+    while(1)
+    {
+        ESP_ERROR_CHECK(ina219_get_current(&dev, &turbine.GLOW_CURRENT)) ;
+    }
 }
 
 static void task_egt(void *pvParameter)
@@ -214,6 +238,9 @@ void init_inputs(void)
     
     ESP_LOGI(TAG, "MAX31855 initialized\n");
     xTaskCreate(task_egt, TAG, configMINIMAL_STACK_SIZE * 8, NULL, 5, NULL);
+    ESP_LOGI(TAG, "INA219 initialized\n");
+    xTaskCreate(task_glow_current, TAG, configMINIMAL_STACK_SIZE * 8, NULL, 5, NULL);
+
 }
 
 bool Get_RPM(uint32_t *rpm) 

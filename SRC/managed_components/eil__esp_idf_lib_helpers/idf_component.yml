@@ -1,0 +1,13 @@
+dependencies:
+  idf:
+    version: '>=4.3'
+description: Common support library for esp-idf-lib
+documentation: https://esp-idf-lib.readthedocs.io/en/latest/groups/esp_idf_lib_helpers.html
+issues: https://github.com/UncleRus/esp-idf-lib/issues
+license: ISC
+maintainers:
+- Tomoyuki Sakurai <y@trombik.org>
+- Ruslan V. Uss <unclerus@gmail.com>
+repository: https://github.com/UncleRus/esp-idf-lib
+url: https://github.com/UncleRus/esp-idf-lib
+version: 1.2.1

@@ -1,15 +1,27 @@
 dependencies:
-  espressif/mdns:
-    component_hash: 2e95568e6fb1b1e5933217556db18b29affd4f706a6d90636fbb88dd32fc3e29
+  eil/esp_idf_lib_helpers:
+    component_hash: eaee96f02db1bea59d369e53e46fd100331eb9d1d9726416cace4dd01f72698e
     source:
       service_url: https://api.components.espressif.com/
       type: service
-    version: 1.0.7
+    version: 1.2.1
+  eil/i2cdev:
+    component_hash: 320f24484a1678083133ca19c195ea58740c188dd590626980b1cf2032539aaa
+    source:
+      service_url: https://api.components.espressif.com/
+      type: service
+    version: 1.5.1
+  espressif/mdns:
+    component_hash: 31117d76cae83a6d83ffd7f035f6fdae5bd05b914fc30b641afeb208b84de19a
+    source:
+      service_url: https://api.components.espressif.com/
+      type: service
+    version: 1.3.2
   idf:
     component_hash: null
     source:
       type: idf
     version: 5.0.0
-manifest_hash: fba0ada5805129818154a8c357f0bdc41c619f9799ae6cf313e7e1f584efbfa4
+manifest_hash: 459b80ee95368eefc6e86f497fddbbcbbd7d6f3dbdd2c5baccf2350fd9463478
 target: esp32
 version: 1.0.0

@@ -34,9 +34,17 @@
 #define RMT_RX_GPIO_NUM  26     /*!< GPIO number for Throttle */
 #define RMT_AUX_GPIO_NUM 22     /*!< GPIO number for Aux */
 
+// SPI capteur température
 #define MISO_GPIO_NUM 19     /*!< GPIO number for MISO */
 #define CLK_GPIO_NUM 18     /*!< GPIO number for CLK */
 #define CS_GPIO_NUM 5       /*!< GPIO number for CS */
+
+// I2C capteur courant bougie
+#define I2C_PORT 0
+#define I2C_ADDR INA219_ADDR_GND_GND
+#define SDA_GPIO 34
+#define SCL_GPIO 35
+
 
 #if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(4, 0, 0)
 #define HOST    HSPI_HOST

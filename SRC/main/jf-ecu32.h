@@ -27,6 +27,7 @@
 #include "freertos/event_groups.h"
 #include "freertos/semphr.h"
 #include "freertos/timers.h"
+#include <ina219.h>
 
 
 typedef struct {  
@@ -196,6 +197,7 @@ typedef struct _engine_ {
   bool WDT_RPM ;
   uint16_t RPM_sec ;
   uint32_t EGT ;
+  float GLOW_CURRENT ;
   _PUMP_t pump1 ;
   _PUMP_t pump2 ;
   _PUMP_t starter ;
