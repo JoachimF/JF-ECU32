@@ -64,11 +64,11 @@
       35,
       36
     ],
-    "visible_layers": "00040f0_80000001",
+    "visible_layers": "0000000_80000001",
     "zone_display_mode": 0
   },
   "meta": {
-    "filename": "jf-ecu32.kicad_prl",
+    "filename": "jf-ecu32.kicad7_sch.kicad_prl",
     "version": 3
   },
   "project": {
