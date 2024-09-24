@@ -33,11 +33,13 @@
 #include "esp_http_server.h"
 #include "esp_wifi.h"
 #include "cJSON.h"
+
 //#include "esp_heap_trace.h"
 
 #include <esp_ota_ops.h>
 
 #include "jf-ecu32.h"
+#include "inputs.h"
 #include "nvs_ecu.h"
 #include "http_server.h"
 #include "wifi.h"
@@ -1308,24 +1310,26 @@ static esp_err_t readings_get_handler(httpd_req_t *req){
 	static cJSON *myjson;
 	char status[50] ;
 	char errors[200] ;
+	uint8_t minutes,secondes ;
+	get_time_up(&turbine,&secondes,&minutes,NULL) ;
 	//uint32_t rpm = 0 ;
 	//ESP_LOGI(TAG, "readings_get_handler req->uri=[%s]", req->uri);
 	myjson = cJSON_CreateObject();
 //	if( xSemaphoreTake(xTimeMutex,( TickType_t ) 10) == pdTRUE ) {
 		phase_to_str(status) ;
-		cJSON_AddNumberToObject(myjson, "ppm_gaz", turbine.GAZ);
-		cJSON_AddNumberToObject(myjson, "ppm_aux", turbine.Aux);
-		cJSON_AddNumberToObject(myjson, "egt", turbine.EGT);
-		cJSON_AddNumberToObject(myjson, "rpm", turbine.RPM);
+		cJSON_AddNumberToObject(myjson, "ppm_gaz", get_gaz(&turbine));
+		cJSON_AddNumberToObject(myjson, "ppm_aux", get_aux(&turbine));
+		cJSON_AddNumberToObject(myjson, "egt", get_EGT(&turbine));
+		cJSON_AddNumberToObject(myjson, "rpm", get_RPM(&turbine));
 		cJSON_AddNumberToObject(myjson, "pump1", turbine.pump1.value);
 		cJSON_AddNumberToObject(myjson, "pump2", turbine.pump2.value);
-		cJSON_AddNumberToObject(myjson, "vanne1", turbine.vanne1.value);
-		cJSON_AddNumberToObject(myjson, "vanne2", turbine.vanne2.value);
-		cJSON_AddNumberToObject(myjson, "glow", turbine.glow.value);
+		cJSON_AddNumberToObject(myjson, "vanne1", turbine.vanne1.get_power(&turbine.vanne1));
+		cJSON_AddNumberToObject(myjson, "vanne2", turbine.vanne2.get_power(&turbine.vanne2));
+		cJSON_AddNumberToObject(myjson, "glow", turbine.glow.get_power(&turbine.glow));
 		cJSON_AddStringToObject(myjson, "status", status);
 		get_errors(errors); 
 		cJSON_AddStringToObject(myjson, "error", errors);
-		sprintf(status,"%02d:%02d",turbine.minutes,turbine.secondes);
+		sprintf(status,"%02d:%02d",minutes,secondes);
 		cJSON_AddStringToObject(myjson, "time", status);
 	
 //	}xSemaphoreGive(xTimeMutex) ;

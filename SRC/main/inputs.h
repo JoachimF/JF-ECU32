@@ -28,7 +28,10 @@
 #include "freertos/queue.h"
 #include "driver/rmt_rx.h"
 #include "freertos/semphr.h"
+#include "jf-ecu32.h"
 
+#define ECU_ONEWIRE_BUS_GPIO    4
+#define ECU_ONEWIRE_MAX_DS18B20 1
 
 #define RPM_PIN 21
 #define RMT_RX_GPIO_NUM  26     /*!< GPIO number for Throttle */
@@ -52,12 +55,15 @@
 #define HOST    SPI2_HOST
 #endif
 
+/*    ds18b20          */
 typedef struct {
     int timer_group;
     int timer_idx;
     int alarm_interval;
     bool auto_reload;
 } RPM_timer_info_t;
+
+
 
 extern SemaphoreHandle_t xRPMmutex;
 
@@ -75,7 +81,13 @@ extern rmt_symbol_word_t aux_raw_symbols[64]; //
 extern rmt_receive_config_t receive_config ;
 
 void init_inputs(void) ;
-bool Get_RPM(uint32_t *rpm) ;
+//bool Get_RPM(uint32_t *rpm) ;
 void Reset_RPM() ;
+uint32_t get_gaz(_engine_t * engine) ;
+uint32_t get_aux(_engine_t * engine) ;
+uint32_t get_RPM(_engine_t * engine) ;
+uint32_t get_EGT(_engine_t * engine) ;
+float get_GLOW_CURRENT(_engine_t * engine) ;
+void init_ds18b20(void) ;
 
 #endif

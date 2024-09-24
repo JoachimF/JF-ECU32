@@ -29,4 +29,6 @@ void write_nvs_turbine(void) ;
 
 void init_power_table(void) ;
 void init_random_pump(void) ;
+
+void horametre_save(void) ;
 #endif

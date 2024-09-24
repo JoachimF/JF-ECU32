@@ -17,6 +17,7 @@
 #include "mdns.h"
 #include "lwip/dns.h"
 #include "driver/gpio.h"
+#include "driver/gptimer.h"
 //#include "esp_heap_trace.h"
 #include <esp_ota_ops.h>
 #include <esp_chip_info.h>
@@ -35,7 +36,7 @@
 #define STATS_TICKS         pdMS_TO_TICKS(1000)
 #define ARRAY_SIZE_OFFSET   5   //Increase this if print_real_time_stats returns ESP_ERR_INVALID_SIZE
 
-static char task_names[NUM_OF_SPIN_TASKS][configMAX_TASK_NAME_LEN];
+//static char task_names[NUM_OF_SPIN_TASKS][configMAX_TASK_NAME_LEN];
 static SemaphoreHandle_t sync_spin_task;
 static SemaphoreHandle_t sync_stats_task;
 
@@ -341,7 +342,10 @@ void app_main()
 	vTaskDelay(2000 / portTICK_PERIOD_MS);
 	//turbine.EGT = 1000 ;
 	//turbine.GAZ = 1000 ;
-	Timer1 = esp_timer_get_time();
+	while(1)
+	{
+		vTaskDelay(100 / portTICK_PERIOD_MS);
+	}
 
 	// *********** Simulation *********
 	//int32_t time =     //printf("Timer: %lld μs\n", Timer1/1000); 

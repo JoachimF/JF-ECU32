@@ -28,7 +28,8 @@
 #include "freertos/semphr.h"
 #include "freertos/timers.h"
 #include <ina219.h>
-
+#include "ds18b20.h"
+#include "onewire_bus_impl_rmt.h"
 
 typedef struct {  
   uint32_t pump[50] ; //Table RPM/PWM
@@ -96,7 +97,7 @@ typedef struct {
 
 
 enum phases {
-    WAIT,START,GLOW,KEROSTART,PREHEAT,RAMP,IDLE,PURGE,COOL,STOP
+    WAIT,START,GLOW,KEROSTART,PREHEAT,RAMP,IDLE,PURGE,COOL,STOP,RUN
  };
 
 enum manche_de_gaz {
@@ -134,8 +135,7 @@ typedef struct {
   uint16_t max_vanne1 ; // puissance max de la vanne 1
   uint16_t max_vanne2 ; // puissance max de la vanne 2
   uint16_t start_starter ; // vitesse du starter pour l'allumage
-  
-  _pump_table_t power_table;
+    _pump_table_t power_table;
   uint32_t checksum ;
 } _configEngine_t;
 
@@ -162,6 +162,7 @@ typedef struct _GLOW_{
   _ledc_config config ;
   void (*set_power)(_ledc_config *config,uint32_t power);
   uint32_t (*get_power)(struct _GLOW_ * glow);
+  void (*on)(_pwm_config *config);
   void (*off)(_pwm_config *config);
 } _GLOW_t ;
 
@@ -188,16 +189,21 @@ typedef struct _VALVE_{
 } _VALVE_t;
 
 typedef struct _engine_ {
-  uint8_t minutes ;
-  uint8_t secondes ;
+  //uint8_t minutes ;
+  //uint8_t secondes ;
+  uint32_t time ;
+  uint32_t time_up ;
   uint32_t GAZ ;
   uint32_t Aux ;
   uint32_t RPM ;
+  uint32_t RPM_delta ; //RPM secondes
   uint64_t RPM_period ;
   bool WDT_RPM ;
   uint16_t RPM_sec ;
   uint32_t EGT ;
+  uint32_t EGT_delta ; //Degrées secondes
   float GLOW_CURRENT ;
+  float DS18B20_temp ;
   _PUMP_t pump1 ;
   _PUMP_t pump2 ;
   _PUMP_t starter ;
@@ -207,6 +213,14 @@ typedef struct _engine_ {
   uint8_t phase_fonctionnement ;
   uint8_t position_gaz ;
   char error_message[50] ;
+  onewire_bus_handle_t bus ;
+  onewire_bus_config_t bus_config;
+  onewire_bus_rmt_config_t rmt_config ;
+  ds18b20_device_handle_t ds18b20s[1]; //1 seul capteur
+  onewire_device_iter_handle_t iter ;
+  onewire_device_t next_onewire_device ;
+ 
+  int ds18b20_device_num ;
 } _engine_t;
 
 //Taches
@@ -246,6 +260,23 @@ void inputs_task(void * pvParameters) ;
 void init_mcpwm(void) ;
 void set_power_func_us(_PUMP_t *config ,int32_t value) ;
 void set_power_func(_PUMP_t *config ,float value) ;
+/***Gestion du temps  */
+void get_time_total(_engine_t *engine, uint8_t *sec, uint8_t *min, uint8_t *heure) ;
+uint16_t get_heures_total(_engine_t * engine) ;
+uint8_t get_minutes_total(_engine_t * engine) ;
+uint8_t get_secondes_total(_engine_t * engine) ;
+void get_time_up(_engine_t *engine,uint8_t *,uint8_t *,uint8_t *) ;
+uint8_t get_heures_up(_engine_t * engine) ;
+uint8_t get_minutes_up(_engine_t * engine) ;
+uint8_t get_secondes_up(_engine_t * engine) ;
+/*Gestion des deltas*/
+void set_delta_RPM(_engine_t * engine,uint32_t) ;
+uint32_t get_delta_RPM(_engine_t * engine) ;
+void set_delta_EGT(_engine_t * engine,uint32_t) ;
+uint32_t get_delta_EGT(_engine_t * engine) ;
+bool isEngineRun(void) ;
+void init_ds18b20(void) ;
+
 void phase_to_str(char *status) ;
 
 

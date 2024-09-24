@@ -34,13 +34,11 @@
 #include "esp_err.h"
 #include "freertos/semphr.h"
 #include <ina219.h>
-
+#include "ds18b20.h"
+#include "onewire_bus_impl_rmt.h"
 #include <max31855.h>
 
-
-
 static const char *TAG = "INPUTS";
-
 
 // Timer
 gptimer_handle_t gptimer = NULL;
@@ -54,6 +52,8 @@ gptimer_config_t timer_config = {
 QueueHandle_t rpm_evt_queue = NULL;
 QueueHandle_t receive_queue = NULL ;
 QueueHandle_t receive_queue_aux = NULL ;
+SemaphoreHandle_t glow_current_sem = NULL ;
+SemaphoreHandle_t EGT_sem = NULL ;
 
 rmt_symbol_word_t raw_symbols[64]; // 
 rmt_symbol_word_t aux_raw_symbols[64]; // 
@@ -61,32 +61,77 @@ rmt_receive_config_t receive_config ;
 rmt_channel_handle_t rx_ppm_chan = NULL;
 rmt_channel_handle_t rx_ppm_aux_chan = NULL;
 
+TaskHandle_t *task_egt_h ;
+TaskHandle_t *task_glow_current_h ;
 //Courant bougie
 ina219_t dev;
 
 
+
+void init_ds18b20(void)
+{
+    // install 1-wire bus
+    turbine.bus_config.bus_gpio_num = ECU_ONEWIRE_BUS_GPIO ;
+    turbine.bus = NULL;
+    turbine.rmt_config.max_rx_bytes = 10 ; // 1byte ROM command + 8byte ROM number + 1byte device command
+    turbine.iter = NULL ;
+    esp_err_t search_result = ESP_OK ;
+    turbine.ds18b20_device_num = 0 ;
+
+    ESP_ERROR_CHECK(onewire_new_bus_rmt(&turbine.bus_config, &turbine.rmt_config, &turbine.bus));
+    
+    // create 1-wire device iterator, which is used for device search
+    ESP_ERROR_CHECK(onewire_new_device_iter(turbine.bus, &turbine.iter));
+    ESP_LOGI(TAG, "Device iterator created, start searching...");
+    do {
+        search_result = onewire_device_iter_get_next(turbine.iter, &turbine.next_onewire_device);
+        if (search_result == ESP_OK) { // found a new device, let's check if we can upgrade it to a DS18B20
+            ds18b20_config_t ds_cfg = {};
+            // check if the device is a DS18B20, if so, return the ds18b20 handle
+            if (ds18b20_new_device(&turbine.next_onewire_device, &ds_cfg, &turbine.ds18b20s[turbine.ds18b20_device_num]) == ESP_OK) {
+                ESP_LOGI(TAG, "Found a DS18B20[%d], address: %016llX", turbine.ds18b20_device_num, turbine.next_onewire_device.address);
+                turbine.ds18b20_device_num++;
+            } else {
+                ESP_LOGI(TAG, "Found an unknown device, address: %016llX", turbine.next_onewire_device.address);
+            }
+        }
+    } while (search_result != ESP_ERR_NOT_FOUND);
+    ESP_ERROR_CHECK(onewire_del_device_iter(turbine.iter));
+    ESP_LOGI(TAG, "Searching done, %d DS18B20 device(s) found", turbine.ds18b20_device_num);
+
+    // Now you have the DS18B20 sensor handle, you can use it to read the temperature
+}
+
+/*********** ISR pour les RPM ******************/
 static void IRAM_ATTR gpio_isr_handler(void* arg)
 {
-    uint32_t gpio_num = (uint32_t) arg;
-    static uint64_t period ;
-    static BaseType_t xHigherPriorityTaskWoken;
+    //uint32_t gpio_num = (uint32_t) arg;
+    static uint64_t period,period_tmp ;
+    static uint32_t rpm_temp ;
+    //static BaseType_t xHigherPriorityTaskWoken;
     gptimer_get_raw_count(gptimer, &period) ;
     if(period > 200)
     {
             gptimer_set_raw_count(gptimer, 0) ;
-            if(xSemaphoreTakeFromISR(xRPMmutex,&xHigherPriorityTaskWoken ) == pdTRUE)
-            {
+            /*if(xSemaphoreTakeFromISR(xRPMmutex,&xHigherPriorityTaskWoken ) == pdTRUE)
+            {*/
                 //turbine.RPM_period = period ; 
-                turbine.RPM_period = (period + (3*turbine.RPM_period))/4 ; //filtre
-                xSemaphoreGiveFromISR(xRPMmutex,&xHigherPriorityTaskWoken) ;
-            }
-            turbine.WDT_RPM = 1 ;
-            
-            
+            period_tmp = (period + (3*turbine.RPM_period))/4 ; //filtre
+            turbine.RPM_period  = period_tmp ;
+
+            if(period > 0 )
+                rpm_temp = 60000000 / period ;
+            else
+                rpm_temp = 0 ;
+            turbine.RPM = rpm_temp ;
+                //xSemaphoreGiveFromISR(xRPMmutex,&xHigherPriorityTaskWoken) ;
+            /*}
+            turbine.WDT_RPM = 1 ;*/
     }
     turbine.RPM_sec++ ;
 }
 
+/*********** ISR pour la voie des gaz ******************/
 BaseType_t high_task_wakeup = pdTRUE;
 static bool IRAM_ATTR ppm_rmt_rx_done_callback(rmt_channel_handle_t channel, const rmt_rx_done_event_data_t *edata, void *user_data)
 {
@@ -97,6 +142,7 @@ static bool IRAM_ATTR ppm_rmt_rx_done_callback(rmt_channel_handle_t channel, con
     return high_task_wakeup == pdTRUE;
 }
 
+/*********** ISR pour la voie aux ******************/
 static bool IRAM_ATTR ppm_rmt_aux_done_callback(rmt_channel_handle_t channel, const rmt_rx_done_event_data_t *edata, void *user_data)
 {
     QueueHandle_t receive_queue3 = (QueueHandle_t)user_data;
@@ -105,6 +151,9 @@ static bool IRAM_ATTR ppm_rmt_aux_done_callback(rmt_channel_handle_t channel, co
     // return whether any task is woken up
     return high_task_wakeup == pdTRUE;
 }
+
+
+/*********** Tache pour lecture du courant de la bougie période 100ms ******************/
 static void task_glow_current(void *pvParameter)
 {
     memset(&dev, 0, sizeof(ina219_t));
@@ -123,9 +172,42 @@ static void task_glow_current(void *pvParameter)
     while(1)
     {
         ESP_ERROR_CHECK(ina219_get_current(&dev, &turbine.GLOW_CURRENT)) ;
+        xSemaphoreGive(glow_current_sem) ;
+        vTaskDelay(100 / portTICK_PERIOD_MS) ;
     }
 }
 
+void scan_i2c(void)
+{
+    i2c_dev_t dev = { 0 };
+    dev.cfg.sda_io_num = SDA_GPIO ;
+    dev.cfg.scl_io_num = SCL_GPIO ;
+    dev.cfg.master.clk_speed = 100000; // 100kHz
+
+    while (1)
+    {
+        esp_err_t res;
+        printf("     0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f\n");
+        printf("00:         ");
+        for (uint8_t addr = 3; addr < 0x78; addr++)
+        {
+            if (addr % 16 == 0)
+                printf("\n%.2x:", addr);
+
+            dev.addr = addr;
+            res = i2c_dev_probe(&dev, I2C_DEV_WRITE);
+
+            if (res == 0)
+                printf(" %.2x", addr);
+            else
+                printf(" --");
+        }
+        printf("\n\n");
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+}
+
+/*********** Tache de lecture des EGT et DS18B20 période 200ms ******************/
 static void task_egt(void *pvParameter)
 {
     max31855_t dev = { 0 };
@@ -162,8 +244,10 @@ static void task_egt(void *pvParameter)
             //ESP_LOGI(TAG, "Temperature: %.2f°C, cold junction temperature: %.4f°C", tc_t, cj_t);
             //ESP_LOGI("wifi", "free Heap:%d,%d", esp_get_free_heap_size(), heap_caps_get_free_size(MALLOC_CAP_8BIT));
             turbine.EGT = (turbine.EGT + tc_t)/2 ;
+            xSemaphoreGive(EGT_sem) ;
         }
-
+        if(turbine.ds18b20_device_num > 0)
+            ds18b20_get_temperature(turbine.ds18b20s[0],&turbine.DS18B20_temp) ;
         vTaskDelay(pdMS_TO_TICKS(200));
     }
 }
@@ -236,14 +320,18 @@ void init_inputs(void)
     ESP_ERROR_CHECK(rmt_enable(rx_ppm_aux_chan)) ;
     ESP_ERROR_CHECK(rmt_receive(rx_ppm_aux_chan, aux_raw_symbols, sizeof(aux_raw_symbols), &receive_config));
     
-    ESP_LOGI(TAG, "MAX31855 initialized\n");
-    xTaskCreate(task_egt, TAG, configMINIMAL_STACK_SIZE * 8, NULL, 5, NULL);
-    ESP_LOGI(TAG, "INA219 initialized\n");
-    xTaskCreate(task_glow_current, TAG, configMINIMAL_STACK_SIZE * 8, NULL, 5, NULL);
+    ESP_LOGI(TAG, "MAX31855 initialized\n"); //EGT
+    EGT_sem = xSemaphoreCreateMutex();
+    xTaskCreate(task_egt, TAG, configMINIMAL_STACK_SIZE * 8, NULL, 5, task_egt_h);
 
+    ESP_LOGI(TAG, "INA219 initialized\n");  // Glow current
+    glow_current_sem = xSemaphoreCreateMutex();
+    xTaskCreate(task_glow_current, TAG, configMINIMAL_STACK_SIZE * 8, NULL, 5, task_egt_h);
+    vTaskSuspend(*task_egt_h);
+    init_ds18b20() ;
 }
 
-bool Get_RPM(uint32_t *rpm) 
+/*bool Get_RPM(uint32_t *rpm) 
 {
     uint64_t  period ;
     //ESP_LOGI(TAG,"Get RPM") ;
@@ -260,15 +348,45 @@ bool Get_RPM(uint32_t *rpm)
         return 1 ;
     }
     return 0 ;
-}
+}*/
 
 void Reset_RPM() 
 {
     //ESP_LOGI(TAG,"Reset RPM") ;
-    if(xSemaphoreTake(xRPMmutex,( TickType_t ) 10) == pdTRUE )
-    {
+    /*if(xSemaphoreTake(xRPMmutex,( TickType_t ) 10) == pdTRUE )
+    {*/
         turbine.RPM_period = 0 ;
-        xSemaphoreGive(xRPMmutex) ;
+    /*    xSemaphoreGive(xRPMmutex) ;
         //ESP_LOGI(TAG,"Reset RPM mutex") ;
-    }
+    }*/
+}
+
+uint32_t get_gaz(struct _engine_ * engine)
+{
+    return engine->GAZ;
+}
+
+uint32_t get_aux(struct _engine_ * engine)
+{
+    return engine->Aux ;
+}
+
+uint32_t get_RPM(struct _engine_ * engine)
+{
+    uint32_t rpm_tmp ;
+    gpio_intr_disable(RPM_PIN) ;
+    rpm_tmp = engine->RPM ;
+    gpio_intr_enable(RPM_PIN) ;
+    return rpm_tmp ;
+
+}
+
+uint32_t get_EGT(struct _engine_ * engine)
+{
+    return engine->EGT ;
+}
+
+float get_GLOW_CURRENT(struct _engine_ * engine)
+{
+    return engine->GLOW_CURRENT ;
 }

@@ -1,48 +1,14 @@
 {
-    "C_Cpp.intelliSenseEngine": "Tag Parser",
     "idf.adapterTargetName": "esp32",
-    "idf.customExtraPaths": "C:\\Users\\Boby\\.espressif5\\tools\\xtensa-esp-elf-gdb\\11.2_20220823\\xtensa-esp-elf-gdb\\bin;C:\\Users\\Boby\\.espressif5\\tools\\riscv32-esp-elf-gdb\\11.2_20220823\\riscv32-esp-elf-gdb\\bin;C:\\Users\\Boby\\.espressif5\\tools\\xtensa-esp32-elf\\esp-2022r1-11.2.0\\xtensa-esp32-elf\\bin;C:\\Users\\Boby\\.espressif5\\tools\\xtensa-esp32s2-elf\\esp-2022r1-11.2.0\\xtensa-esp32s2-elf\\bin;C:\\Users\\Boby\\.espressif5\\tools\\xtensa-esp32s3-elf\\esp-2022r1-11.2.0\\xtensa-esp32s3-elf\\bin;C:\\Users\\Boby\\.espressif5\\tools\\riscv32-esp-elf\\esp-2022r1-11.2.0\\riscv32-esp-elf\\bin;C:\\Users\\Boby\\.espressif5\\tools\\esp32ulp-elf\\2.35_20220830\\esp32ulp-elf\\bin;C:\\Users\\Boby\\.espressif5\\tools\\cmake\\3.24.0\\bin;C:\\Users\\Boby\\.espressif5\\tools\\openocd-esp32\\v0.11.0-esp32-20221026\\openocd-esp32\\bin;C:\\Users\\Boby\\.espressif5\\tools\\ninja\\1.10.2;C:\\Users\\Boby\\.espressif5\\tools\\idf-exe\\1.0.3;C:\\Users\\Boby\\.espressif5\\tools\\ccache\\4.6.2\\ccache-4.6.2-windows-x86_64;C:\\Users\\Boby\\.espressif5\\tools\\dfu-util\\0.9\\dfu-util-0.9-win64",
-    "idf.customExtraVars": {
-        "OPENOCD_SCRIPTS": "C:\\Users\\Boby\\.espressif5\\tools\\openocd-esp32\\v0.11.0-esp32-20221026/openocd-esp32/share/openocd/scripts",
-        "IDF_CCACHE_ENABLE": "1"
-    },
-    "idf.espIdfPathWin": "C:\\Users\\Boby\\esp5.0\\esp-idf",
-    "idf.espAdfPathWin": "D:\\ESP32\\adf\\esp-adf",
     "idf.openOcdConfigs": [
         "interface/ftdi/esp32_devkitj_v1.cfg",
         "target/esp32.cfg"
     ],
-    "idf.portWin": "COM11",
-    "idf.pythonBinPathWin": "C:\\Users\\Boby\\.espressif5\\python_env\\idf5.0_py3.8_env\\Scripts\\python.exe",
-    "idf.toolsPathWin": "C:\\Users\\Boby\\.espressif5",
-    "idf.gitPathWin": "\\Git\\cmd\\git.exe",
-    "idf.flashType": "UART",
-    "idf.svdFilePath": "${workspaceFolder}/esp32.svd",
     "files.associations": {
-        "*.cps": "javascript",
-        "jf-ecu32.h": "c",
-        "ui.h": "c",
-        "lvgl.h": "c",
-        "sdl.h": "c",
-        "monitor.h": "c",
-        "esp_ota_ops.h": "c",
-        "esp_partition.h": "c",
-        "chrono": "c",
-        "esp_chip_info.h": "c",
-        "esp_spi_flash.h": "c",
-        "spi_flash_mmap.h": "c",
-        "esp_flash.h": "c",
-        "optional": "c",
-        "istream": "c",
-        "ostream": "c",
-        "ratio": "c",
-        "system_error": "c",
-        "array": "c",
-        "functional": "c",
-        "tuple": "c",
-        "type_traits": "c",
-        "utility": "c",
-        "random": "c",
-        "*.tcc": "c"
+        "cjson.h": "c",
+        "rtc_cntl.h": "c",
+        "rtc_ctrl.h": "c",
+        "rmt_rx.h": "c",
+        "onewire_bus_impl_rmt.h": "c"
     }
 }

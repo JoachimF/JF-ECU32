@@ -58,18 +58,77 @@ TimerHandle_t xTimer1s ;
 TimerHandle_t xTimer60s ;
 
 // Semaphores
-SemaphoreHandle_t xTimeMutex;
-SemaphoreHandle_t xRPMmutex;
-SemaphoreHandle_t xGAZmutex;
+//SemaphoreHandle_t xTimeMutex;
+//SemaphoreHandle_t xRPMmutex;
+//SemaphoreHandle_t xGAZmutex;
 SemaphoreHandle_t log_task_start;
 SemaphoreHandle_t ecu_task_start;
 
 static const char *TAG = "ECU";
 
+bool isEngineRun(void)
+{
+    uint8_t phase = turbine.phase_fonctionnement ;
+    if(phase == GLOW || phase ==  KEROSTART || phase == PREHEAT || phase == RAMP || phase == IDLE || phase == RUN)
+        return 1;
+    else
+        return 0 ;
+}
+
 void linear_interpolation(uint32_t rpm1,uint32_t pump1,uint32_t rpm2,uint32_t pump2,uint32_t rpm,uint32_t *res) //RPM,PUMP,RPM,PUMP
 {
     *res =  pump1 + ((pump2-pump1)* (rpm - rpm1))/(rpm2-rpm1) ;
     //ESP_LOGI(TAG,"RPM1 : %d ; pump1 : %d , RPM1 : %d ; pump1 : %d , rpm : %d , res : %d",rpm1,pump1,rpm2,pump2,rpm,*res);
+}
+
+void get_time(uint32_t _time_up, uint8_t *sec, uint8_t *min, uint8_t *heure)
+{
+    *sec = _time_up % 60 ;
+    if(min != NULL)
+        *min = (_time_up % 3600)/60 ;
+    if(heure != NULL)
+        *heure = _time_up / 3600 ;
+}
+
+void get_time_up(_engine_t *engine, uint8_t *sec, uint8_t *min, uint8_t *heure)
+{
+    get_time(engine->time_up,sec,min,heure);
+}
+
+void get_time_total(_engine_t *engine, uint8_t *sec, uint8_t *min, uint8_t *heure)
+{
+    get_time(engine->time_up,sec,min,heure);
+}
+
+uint8_t get_secondes_up(_engine_t *engine)
+{
+    return engine->time_up % 60 ;
+
+}
+uint8_t get_minutes_up(_engine_t *engine)
+{
+    return (engine->time_up % 3600)/60 ;
+}
+
+uint8_t get_heures_up(_engine_t *engine)
+{
+    return engine->time_up / 3600 ;
+}
+
+uint8_t get_secondes_total(_engine_t *engine)
+{
+    return engine->time % 60 ;
+
+}
+
+uint8_t get_minutes_total(_engine_t *engine)
+{
+    return (engine->time % 3600)/60 ;
+}
+
+uint16_t get_heures_total(_engine_t *engine)
+{
+    return engine->time / 3600 ;
 }
 
 void set_power_func_us(_PUMP_t *config ,int32_t value)
@@ -108,8 +167,7 @@ static mcpwm_config_t pwm_config[2]; //IDF 4.3.4
 
 
 _engine_t turbine = { 
-    .minutes = 0 ,
-    .secondes = 0 ,
+    .time_up = 0 ,
     .GAZ = 0 ,
     .Aux = 0 ,
     .RPM = 0 ,
@@ -155,6 +213,7 @@ _engine_t turbine = {
     .glow.config.ledc_channel = LEDC_CHANNEL_2,
     .glow.set_power = set_power_ledc,
     .glow.value = 0 ,
+
  };
  
  _configEngine_t turbine_config ;
@@ -165,6 +224,9 @@ void init_pwm_outputs(_pwm_config *config)
     mcpwm_gpio_init(config->MCPWM_UNIT, config->MCPWM, config->gpio_num);   
     ESP_LOGI(TAG,"MCPWM_UNIT : %d ; MCPWM_TIMER : %d ; MCPWM_GEN : %d ; MCPWM_TIMER : %d ; pin : %d",config->MCPWM_UNIT,config->MCPWM_TIMER,config->MCPWM_GEN,config->MCPWM_TIMER,config->gpio_num); 
 }
+
+
+
 
 // IDF 4.3.4
 void init_mcpwm(void) // IDF 4.3.4
@@ -259,12 +321,13 @@ void init_mcpwm(void) // IDF 4.3.4
 
 }
 
+
+
 void init(void)
 {
 //    turbine.secondes = 0 ;
 //    turbine.minutes = 0 ;
     read_nvs() ;
-
     //Init les sortie PWM
     turbine.starter.config.ppm_pwm = config_ECU.output_starter ;
     turbine.pump1.config.ppm_pwm = config_ECU.output_pump1 ;
@@ -367,18 +430,8 @@ void update_logs_file(void)
     FILE *fd = NULL;
 	char FileName[] = "/html/logs.txt" ;
     uint8_t minutes,secondes ;
-    if( xSemaphoreTake(xTimeMutex,( TickType_t ) 10) == pdTRUE ) 
-    {
-        minutes = turbine.minutes ;
-        secondes = turbine.secondes ;
-    }
-    else
-    {
-        minutes = 99 ;
-        secondes = 99 ;
-    
-    }
-    xSemaphoreGive(xTimeMutex) ;
+    get_time_up(&turbine,&secondes,&minutes,NULL) ;
+
     fd = fopen(FileName, "a");
     if (!fd) {
         ESP_LOGI("File", "Failed to read existing file : logs.txt");
@@ -407,10 +460,10 @@ void log_task( void * pvParameters )
 
 void create_timers(void)
 {
-    xTimeMutex = xSemaphoreCreateMutex() ;
-    xRPMmutex = xSemaphoreCreateBinary() ;
-    xSemaphoreGive(xRPMmutex) ;
-    xGAZmutex = xSemaphoreCreateMutex() ;
+    //xTimeMutex = xSemaphoreCreateMutex() ;
+    //xRPMmutex = xSemaphoreCreateBinary() ;
+    //xSemaphoreGive(xRPMmutex) ;
+    //xGAZmutex = xSemaphoreCreateMutex() ;
     xTimer1s = xTimerCreate("Timer1s",       // Just a text name, not used by the kernel.
                             ( 1000 /portTICK_PERIOD_MS ),   // The timer period in ticks.
                             pdTRUE,        // The timers will auto-reload themselves when they expire.
@@ -434,11 +487,13 @@ void start_timers(void)
     xTimerStart( xTimer60s, 0 ) ;
 }
 
-void vTimer1sCallback( TimerHandle_t pxTimer )
+void vTimer1sCallback( TimerHandle_t pxTimer ) //toutes les secondes
 {
     // Mutex sur le temps d'allumage de l'ECU
-    uint32_t rpm ;
-    if( xSemaphoreTake(xTimeMutex,( TickType_t ) 10) == pdTRUE ) {
+    static uint32_t rpm_prec = 0 ;
+    static uint32_t egt_prec = 0 ;
+    
+    /*if( xSemaphoreTake(xTimeMutex,( TickType_t ) 10) == pdTRUE ) {
         turbine.secondes++ ;
         if(turbine.secondes > 59) {
             turbine.secondes = 0 ;
@@ -446,7 +501,18 @@ void vTimer1sCallback( TimerHandle_t pxTimer )
         }
         //ESP_LOGI(TAG,"%02d:%02d",turbine.minutes,turbine.secondes) ;
     }
-    xSemaphoreGive(xTimeMutex) ;
+    xSemaphoreGive(xTimeMutex) ;*/
+    turbine.time++ ;
+    if(isEngineRun())
+        turbine.time_up++ ;
+    
+    set_delta_RPM(&turbine,get_RPM(&turbine)-rpm_prec) ;
+    set_delta_EGT(&turbine,get_EGT(&turbine)-egt_prec) ;
+    
+    rpm_prec = get_RPM(&turbine) ;
+    egt_prec = get_EGT(&turbine) ;
+   
+
 
     //ESP_LOGI(TAG,"RPM_sec : %ld - %ld",turbine.RPM_sec,turbine.RPM_sec*60) ;
     //turbine.RPM_sec = 0 ;
@@ -459,16 +525,11 @@ void vTimer1sCallback( TimerHandle_t pxTimer )
     
     check_errors() ;
 
-    
-    //ESP_LOGI("wifi", "free Heap:%d,%d", esp_get_free_heap_size(), heap_caps_get_free_size(MALLOC_CAP_8BIT));
-    //ESP_LOGI("Time", "%02d:%02d",turbine.minutes,turbine.secondes);
-    Get_RPM(&rpm) ;
-    ESP_LOGI(TAG,"RPM_sec : %ld",turbine.RPM_sec) ;
+    //ESP_LOGI(TAG,"RPM_sec : %ld",turbine.RPM_sec) ;
     turbine.RPM_sec = 0 ;
     //heap_trace_dump();
     //long long int Timer1 = esp_timer_get_time();
-    //printf("Timer: %lld μs\n", Timer1/1000);  
-
+    //printf("Timer: %lld μs\n", Timer1/1000);
 }
 
 void vTimer60sCallback( TimerHandle_t pxTimer )
@@ -478,6 +539,8 @@ void vTimer60sCallback( TimerHandle_t pxTimer )
     //vTaskDelete( xWebHandle );
     ESP_LOGI(TAG,"Server STOP") ;
     mdns_free();
+    if(isEngineRun())
+        horametre_save() ;
 }
 
 void ecu_task(void * pvParameters ) 
@@ -556,42 +619,64 @@ void ecu_task(void * pvParameters )
                 case START :
                     if(turbine.position_gaz == COUPE)
                         turbine.phase_fonctionnement = WAIT ;
-                    else
-                        if(config_ECU.glow_type == GAS)
-                            turbine.phase_fonctionnement = GLOW ;
-                         else
-                            turbine.phase_fonctionnement = KEROSTART ;
+                    else if(turbine.position_gaz == PLEINGAZ) {
+                        // Ventilation
+                        turbine.starter.set_power(&turbine.starter.config,turbine_config.start_starter) ;
+                        turbine.phase_fonctionnement = GLOW ;
+                    }
                     break;
                 case GLOW :
+                    float avg_current = 0 ;
+                    int count_curr_sample = 0 ;
                     if(turbine.position_gaz == COUPE)
                         turbine.phase_fonctionnement = WAIT ;
                     else if(turbine.position_gaz == PLEINGAZ)
                     {
                         turbine.glow.set_power(&turbine.glow.config,turbine_config.glow_power) ;
                         bool fail = 0;
-                        for(int i=0;i<100;i++) //Attendre 1 seconde
+
+                        //Mesurer le courant
+                        // Si courant OK
+                        //Envoyer le carburant
+                        for(int i=0;i<10;i++) //Attendre 1 seconde
                         {
+
+                                avg_current += turbine.GLOW_CURRENT ;
+                                count_curr_sample++ ;
+ 
                             if(turbine.position_gaz != PLEINGAZ)
                             {
                                 fail = 1 ;
+                                turbine.phase_fonctionnement = WAIT ;
                                 break;
-                            }
-                            vTaskDelay(10 / portTICK_PERIOD_MS);  
+                            }  
                         }
-                        if(fail)
+                        if(count_curr_sample > 0) //Capteur de courant donne des valeurs
+                        {
+                            avg_current /= count_curr_sample ;
+                        }else{
+                            fail = 1 ;
                             turbine.phase_fonctionnement = WAIT ;
-                        else
-                        {                        
-                            turbine.starter.set_power(&turbine.starter.config,300) ;
-                            if(turbine.EGT > 100)
+                            break;
+                        }  
+                        if( avg_current > 0.5 && fail == 0) //Courant passe dans la bougie, envoie du Gaz
+                        {
+                            turbine.vanne1.on(&turbine.vanne1.config); 
+                        }
+                        else{
+                            turbine.phase_fonctionnement = WAIT ;
+                            break;
+                        }
+                        for(int i=0;i<10;i++) //Attendre 1 seconde
+                        {
+                            
+                            if(get_EGT(&turbine) > 100)
                                 turbine.phase_fonctionnement = PREHEAT ;
                             else
                             {
-                                vTaskDelay(5000 / portTICK_PERIOD_MS);
-                                if(turbine.EGT > 100)
-                                    turbine.phase_fonctionnement = WAIT ;
+                               turbine.phase_fonctionnement = WAIT ; /*********** Pas de données de l'EGT ********/
+                               break ;
                             }
-                                //Attendre 5 secondes Max sinon GOTO WAIT
                         }
                     }
                     break;
@@ -667,13 +752,13 @@ void inputs_task(void * pvParameters)
             ESP_ERROR_CHECK(rmt_receive(rx_ppm_chan, raw_symbols, sizeof(raw_symbols), &receive_config));
             if(rx_data.received_symbols[0].level0 == 1)
             {
-                if( xSemaphoreTake(xGAZmutex,( TickType_t ) 2 ) == pdTRUE )
+                //if( xSemaphoreTake(xGAZmutex,( TickType_t ) 2 ) == pdTRUE )
                     turbine.GAZ = rx_data.received_symbols[0].duration0 ;
-                xSemaphoreGive(xGAZmutex) ;
+                //xSemaphoreGive(xGAZmutex) ;
             }else{
-                if( xSemaphoreTake(xGAZmutex,( TickType_t ) 2 ) == pdTRUE )
+                //if( xSemaphoreTake(xGAZmutex,( TickType_t ) 2 ) == pdTRUE )
                     turbine.GAZ = rx_data.received_symbols[0].duration1 ;
-                xSemaphoreGive(xGAZmutex) ;
+                //xSemaphoreGive(xGAZmutex) ;
             }
             /*ESP_LOGI("PPM", "Symbols : %ld",rx_data.num_symbols) ;
             for(int ii=0; ii<rx_data.num_symbols; ii++)
@@ -698,13 +783,13 @@ void inputs_task(void * pvParameters)
             ESP_ERROR_CHECK(rmt_receive(rx_ppm_aux_chan, aux_raw_symbols, sizeof(aux_raw_symbols), &receive_config));
             if(aux_rx_data.received_symbols[0].level0 == 1)
             {
-                if( xSemaphoreTake(xGAZmutex,( TickType_t ) 2 ) == pdTRUE )
+                //if( xSemaphoreTake(xGAZmutex,( TickType_t ) 2 ) == pdTRUE )
                     turbine.Aux = aux_rx_data.received_symbols[0].duration0 ;
-                xSemaphoreGive(xGAZmutex) ;
+                //xSemaphoreGive(xGAZmutex) ;
             }else{
-                if( xSemaphoreTake(xGAZmutex,( TickType_t ) 2 ) == pdTRUE )
+                //if( xSemaphoreTake(xGAZmutex,( TickType_t ) 2 ) == pdTRUE )
                     turbine.Aux = aux_rx_data.received_symbols[0].duration1 ;
-                xSemaphoreGive(xGAZmutex) ;
+                //xSemaphoreGive(xGAZmutex) ;
             }
             /*ESP_LOGI("PPM", "Symbols : %ld",rx_data.num_symbols) ;
             for(int ii=0; ii<rx_data.num_symbols; ii++)
@@ -731,3 +816,23 @@ void inputs_task(void * pvParameters)
     }
 }
 
+/*Gestion des deltas*/
+void set_delta_RPM(_engine_t * engine,uint32_t delta)
+{
+    engine->RPM_delta = delta ;
+}
+
+uint32_t get_delta_RPM(_engine_t * engine) 
+{
+    return engine->RPM_delta ;
+}
+
+void set_delta_EGT(_engine_t * engine, uint32_t delta) 
+{
+    engine->EGT_delta = delta ;
+}
+
+uint32_t get_delta_EGT(_engine_t * engine)
+{
+    return engine->EGT_delta ;
+}

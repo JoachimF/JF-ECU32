@@ -22,6 +22,8 @@
 #include "esp_spiffs.h"
 #include "nvs_flash.h"
 #include "nvs.h"
+#include "soc/rtc_cntl_reg.h"
+#include "esp_private/rtc_ctrl.h"
 
 #include "jf-ecu32.h"
 #include "nvs_ecu.h"
@@ -33,6 +35,28 @@ nvs_handle my_handle;
 extern _wifi_params_t wifi_params ;
 extern _configEngine_t turbine_config ;
 extern  _BITsconfigECU_u config_ECU ;
+
+void horametre_save(void) {
+    nvs_handle my_handle;
+    esp_err_t err = nvs_open("storage", NVS_READWRITE, &my_handle);
+    if (err != ESP_OK) {
+        ESP_LOGI(TAG, "Error (%s) opening NVS handle!\n", esp_err_to_name(err));
+    } else {
+        ESP_LOGI(TAG, "Ecriture horametre");
+        err = nvs_set_u32(my_handle, "time", turbine.time);
+        err = nvs_commit(my_handle);        
+        // Close
+        nvs_close(my_handle);
+        REG_WRITE(RTC_CNTL_INT_CLR_REG, RTC_CNTL_BROWN_OUT_INT_CLR);
+        esp_cpu_stall(!xPortGetCoreID());
+        ESP_LOGI(TAG, "\r\nBrownout detector was triggered\r\n\r\n");
+        //esp_restart_noos();
+        while(1) {
+            vTaskDelay(1 / portTICK_PERIOD_MS);
+        }
+    }
+}
+
 
 //Test du checksum retourne 1 i OK, retourne 0 si pas ok et ecrit le checkum
 static int test_checksum_ecu(_BITsconfigECU_u *params,uint32_t *checksum)
@@ -201,7 +225,7 @@ void write_nvs_wifi(void)
         err = nvs_open("storage", NVS_READWRITE, &my_handle) ;
         if (err != ESP_OK) {
             ESP_LOGE(TAG,"Error (%s) opening NVS handle!\n", esp_err_to_name(err));
-        } 
+        } else {
         // Write
         ESP_LOGI(TAG, "Ecriture wifi");
         size_t required_size = sizeof(_wifi_params_t);
@@ -212,6 +236,7 @@ void write_nvs_wifi(void)
         err = nvs_commit(my_handle);
         printf((err != ESP_OK) ? "Failed!" : "Done");
         nvs_close(my_handle);
+        }
 }
 
 void read_nvs_wifi(void)
@@ -261,6 +286,7 @@ void init_nvs(void)
     if (err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND) {
         // NVS partition was truncated and needs to be erased
         // Retry nvs_flash_init
+        ESP_LOGI(TAG, "Flash formated");
         ESP_ERROR_CHECK(nvs_flash_erase());
         err = nvs_flash_init();
     }
@@ -281,7 +307,7 @@ void read_nvs(void)
     ESP_LOGI("NVS", "Lecture config turbine");
     err = nvs_get_blob(my_handle, "config", NULL, &required_size );
     err = nvs_get_blob(my_handle, "config", (void *)&turbine_config, &required_size);
-        ESP_LOGI("NVS", "Fermeture du handle");
+    ESP_LOGI("NVS", "Fermeture du handle");
     nvs_close(my_handle);  
     switch (err) {
             case ESP_OK:
@@ -380,6 +406,26 @@ void read_nvs(void)
                 set_defaut_ecu() ;
                 write_nvs_ecu() ;
                 ESP_LOGI(TAG,"Error (%s) reading config_ECU!", esp_err_to_name(err));
+        }
+        ESP_LOGI(TAG, "Ouverture du handle");
+        err = nvs_open("storage", NVS_READWRITE, &my_handle);
+        if (err != ESP_OK) {
+            ESP_LOGE(TAG, "Error (%s) opening NVS handle!\n", esp_err_to_name(err));
+        } 
+        ESP_LOGI(TAG, "Lecture horametre");
+        err = nvs_get_u32(my_handle, "time", &turbine.time);
+        switch (err) {
+                case ESP_OK:
+                    ESP_LOGI(TAG,"Done\n");
+                    ESP_LOGI(TAG,"time = %ld\n", turbine.time);
+                    break;
+                case ESP_ERR_NVS_NOT_FOUND:
+                    ESP_LOGI(TAG,"Valeur non trouvée, initialisée à 0\n");
+                    err = nvs_set_i32(my_handle, "time", 0);
+                    err = nvs_commit(my_handle);   
+                    break;
+                default :
+                    ESP_LOGI(TAG,"Error (%s) reading!\n", esp_err_to_name(err));
         }  
     
 }
@@ -392,17 +438,18 @@ void write_nvs_turbine(void)
         err = nvs_open("storage", NVS_READWRITE, &my_handle);
         if (err != ESP_OK) {
             ESP_LOGI(TAG,"Error (%s) opening NVS handle!\n", esp_err_to_name(err));
-        } 
-        // Write
-        ESP_LOGI("NVS", "Ecriture turbine");
-        size_t required_size = sizeof(_configEngine_t);
-        ESP_LOGI(TAG,"Save config to turbine_config Struct... Size : %d ",required_size);
-        err = nvs_set_blob(my_handle, "config", (const void*)&turbine_config, required_size);
-        printf((err != ESP_OK) ? "Failed!" : "Done");
-        ESP_LOGI(TAG,"Committing turbine_config in NVS ... ");
-        err = nvs_commit(my_handle);
-        printf((err != ESP_OK) ? "Failed!" : "Done");
-        nvs_close(my_handle);
+        } else { 
+            // Write
+            ESP_LOGI("NVS", "Ecriture turbine");
+            size_t required_size = sizeof(_configEngine_t);
+            ESP_LOGI(TAG,"Save config to turbine_config Struct... Size : %d ",required_size);
+            err = nvs_set_blob(my_handle, "config", (const void*)&turbine_config, required_size);
+            printf((err != ESP_OK) ? "Failed!" : "Done");
+            ESP_LOGI(TAG,"Committing turbine_config in NVS ... ");
+            err = nvs_commit(my_handle);
+            printf((err != ESP_OK) ? "Failed!" : "Done");
+            nvs_close(my_handle);
+        }
 }
 
 void write_nvs_ecu(void)
@@ -413,17 +460,18 @@ void write_nvs_ecu(void)
         err = nvs_open("storage", NVS_READWRITE, &my_handle);
         if (err != ESP_OK) {
             ESP_LOGI(TAG,"Error (%s) opening NVS handle!", esp_err_to_name(err));
-        } 
-        // Write
-        ESP_LOGI("NVS", "Ecriture ECU");        
-        size_t required_size = sizeof(_BITsconfigECU_u);
-        ESP_LOGI(TAG,"Save config to config_ECU Struct... Size : %d ",required_size);
-        err = nvs_set_blob(my_handle, "configECU", (const void*)&config_ECU, required_size);
-        printf((err != ESP_OK) ? "Failed!" : "Done");
-        ESP_LOGI(TAG,"Committing config_ECU in NVS ... ");
-        err = nvs_commit(my_handle);
-        printf((err != ESP_OK) ? "Failed!" : "Done");
-        // Close
-        ESP_LOGI("NVS", "Fermeture du handle");
-        nvs_close(my_handle);
+        } else {
+            // Write
+            ESP_LOGI("NVS", "Ecriture ECU");        
+            size_t required_size = sizeof(_BITsconfigECU_u);
+            ESP_LOGI(TAG,"Save config to config_ECU Struct... Size : %d ",required_size);
+            err = nvs_set_blob(my_handle, "configECU", (const void*)&config_ECU, required_size);
+            printf((err != ESP_OK) ? "Failed!" : "Done");
+            ESP_LOGI(TAG,"Committing config_ECU in NVS ... ");
+            err = nvs_commit(my_handle);
+            printf((err != ESP_OK) ? "Failed!" : "Done");
+            // Close
+            ESP_LOGI("NVS", "Fermeture du handle");
+            nvs_close(my_handle);
+        }
 }
