@@ -80,6 +80,12 @@ extern rmt_symbol_word_t raw_symbols[64]; //
 extern rmt_symbol_word_t aux_raw_symbols[64]; // 
 extern rmt_receive_config_t receive_config ;
 
+extern TaskHandle_t task_egt_h ;
+extern TaskHandle_t task_glow_current_h ;
+extern SemaphoreHandle_t SEM_glow_current ;
+extern SemaphoreHandle_t SEM_EGT ;
+
+
 void init_inputs(void) ;
 //bool Get_RPM(uint32_t *rpm) ;
 void Reset_RPM() ;
@@ -89,5 +95,8 @@ uint32_t get_RPM(_engine_t * engine) ;
 uint32_t get_EGT(_engine_t * engine) ;
 float get_GLOW_CURRENT(_engine_t * engine) ;
 void init_ds18b20(void) ;
+
+void task_glow_current(void *pvParameter) ;
+void task_egt(void *pvParameter) ;
 
 #endif

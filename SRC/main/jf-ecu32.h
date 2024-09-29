@@ -31,7 +31,7 @@
 #include "ds18b20.h"
 #include "onewire_bus_impl_rmt.h"
 
-typedef struct {  
+typedef struct _pump_table{  
   uint32_t pump[50] ; //Table RPM/PWM
   uint32_t RPM[50] ;
   uint16_t Temps[5] ;
@@ -79,7 +79,7 @@ enum yesno_type {
     NO,YES
 };
 
-typedef struct {                                 
+typedef struct _BITsconfigECU_{                                 
     uint8_t input_type ; //PPM - SBUS
     uint8_t glow_type ;  // GLOW ou KERO             
     uint8_t start_type ; // MANUAL ou AUTO-GAS ou AUTO-KERO
@@ -115,7 +115,7 @@ typedef union {
 } _BITsconfigstart_u;*/
 
 
-typedef struct {
+typedef struct _configEngine_{
   char name[21] ; // Nom du moteur
   uint8_t log_count ; //Numéro du log dans le fichier
   uint32_t horametre ; // nombre de secondes de fonctionnement du moteur
@@ -128,14 +128,21 @@ typedef struct {
   uint8_t acceleration_delay ; // délais d'accélération
   uint8_t deceleration_delay ; // délais de décélération
   uint8_t stability_delay ; // coefficient I dans l'asservissement en vitesse
+  //Pumps
   uint16_t max_pump1 ; // puissance max de la pompe 1
   uint16_t min_pump1 ; // puissance min de la pompe 1
   uint16_t max_pump2 ; // puissance max de la pompe 1
   uint16_t min_pump2 ; // puissance min de la pompe 1
+  //Vannes
   uint16_t max_vanne1 ; // puissance max de la vanne 1
   uint16_t max_vanne2 ; // puissance max de la vanne 2
-  uint16_t start_starter ; // vitesse du starter pour l'allumage
-    _pump_table_t power_table;
+  // Paramètre du démarreur
+  uint16_t starter_rpm_start ; // vitesse du starter pour l'allumage ex : start_starter
+  float starter_pwm_perc_start ; // PWM à laquelle le démarreur commence a tourner
+  float starter_pwm_perc_min ; // PWM à laquelle le démarreur cale
+  u_int32_t starter_max_rpm ; // RPM max du démarreur
+
+  _pump_table_t power_table;
   uint32_t checksum ;
 } _configEngine_t;
 

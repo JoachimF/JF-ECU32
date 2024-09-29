@@ -27,6 +27,7 @@
 #include "http_server.h"
 #include "wifi.h"
 #include "nvs_ecu.h"
+#include "inputs.h"
 
 #define TAG	"MAIN"
 #define NUM_OF_SPIN_TASKS   6
@@ -331,6 +332,17 @@ void app_main()
 	sync_spin_task = xSemaphoreCreateCounting(NUM_OF_SPIN_TASKS, 0);
     sync_stats_task = xSemaphoreCreateBinary();
 	xTaskCreatePinnedToCore(stats_task, "stats", 4096, NULL, STATS_TASK_PRIO, NULL, tskNO_AFFINITY);
+
+
+	ESP_LOGI(TAG, "Initializing MAX31855 Task\n"); //EGT
+    SEM_EGT = xSemaphoreCreateMutex();
+    xTaskCreatePinnedToCore(task_egt, "EGT", configMINIMAL_STACK_SIZE * 8, NULL,(configMAX_PRIORITIES -1 )|( 1UL | portPRIVILEGE_BIT ), &task_egt_h,1);
+    
+    ESP_LOGI(TAG, "Initializing INA219 Task\n");  // Glow current
+    SEM_glow_current = xSemaphoreCreateMutex();
+    xTaskCreatePinnedToCore(task_glow_current, "GLOW Current", configMINIMAL_STACK_SIZE * 8, NULL, (configMAX_PRIORITIES -1 )|( 1UL | portPRIVILEGE_BIT ), &task_glow_current_h,1);
+    vTaskSuspend(task_glow_current_h);
+
     //xSemaphoreGive(sync_stats_task);
 	/* Htop */
 

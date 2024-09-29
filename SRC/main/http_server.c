@@ -945,10 +945,10 @@ void save_configturbine(httpd_req_t *req)
 		turbine_config.max_vanne2 = atoi(param) ;		
 	}
 	/*RPM Start Starter*/
-	len = find_value("start_starter=",buf,param) ;
-	ESP_LOGI(TAG, "start_starter=%c len=%d",*param,len);
+	len = find_value("starter_rpm_start=",buf,param) ;
+	ESP_LOGI(TAG, "starter_rpm_start=%c len=%d",*param,len);
 	if(len>1) {
-		turbine_config.start_starter = atoi(param) ;		
+		turbine_config.starter_rpm_start = atoi(param) ;		
 	}
 	write_nvs_turbine() ;
 	free(buf) ;
@@ -1147,10 +1147,10 @@ static esp_err_t configmoteur(httpd_req_t *req)
 	httpd_resp_sendstr_chunk(req, "\" name=\"max_vanne2\" type=\"number\" min=\"0\" max=\"1024\"></p><p>");
 
 	httpd_resp_sendstr_chunk(req, "<b>RPM Allumage (0-5000RPM)</b><br>");
-	httpd_resp_sendstr_chunk(req, "<input id=\"start_starter\" placeholder=\"\" value=\"");
-	itoa(turbine_config.start_starter,tmp,10) ;
+	httpd_resp_sendstr_chunk(req, "<input id=\"starter_rpm_start\" placeholder=\"\" value=\"");
+	itoa(turbine_config.starter_rpm_start,tmp,10) ;
 	httpd_resp_sendstr_chunk(req, tmp) ;
-	httpd_resp_sendstr_chunk(req, "\" name=\"start_starter\" type=\"number\" min=\"0\" max=\"5000\"></p><p>");	
+	httpd_resp_sendstr_chunk(req, "\" name=\"starter_rpm_start\" type=\"number\" min=\"0\" max=\"5000\"></p><p>");	
 
 	httpd_resp_sendstr_chunk(req, "<button name=\"save\" type=\"submit\" class=\"button bgrn\">Sauvegarde</button>") ;
 	httpd_resp_sendstr_chunk(req, "</form></fieldset>") ;

@@ -52,8 +52,9 @@ gptimer_config_t timer_config = {
 QueueHandle_t rpm_evt_queue = NULL;
 QueueHandle_t receive_queue = NULL ;
 QueueHandle_t receive_queue_aux = NULL ;
-SemaphoreHandle_t glow_current_sem = NULL ;
-SemaphoreHandle_t EGT_sem = NULL ;
+
+SemaphoreHandle_t SEM_glow_current = NULL ;
+SemaphoreHandle_t SEM_EGT = NULL ;
 
 rmt_symbol_word_t raw_symbols[64]; // 
 rmt_symbol_word_t aux_raw_symbols[64]; // 
@@ -61,8 +62,8 @@ rmt_receive_config_t receive_config ;
 rmt_channel_handle_t rx_ppm_chan = NULL;
 rmt_channel_handle_t rx_ppm_aux_chan = NULL;
 
-TaskHandle_t *task_egt_h ;
-TaskHandle_t *task_glow_current_h ;
+TaskHandle_t task_egt_h ;
+TaskHandle_t task_glow_current_h ;
 //Courant bougie
 ina219_t dev;
 
@@ -131,8 +132,8 @@ static void IRAM_ATTR gpio_isr_handler(void* arg)
     turbine.RPM_sec++ ;
 }
 
-/*********** ISR pour la voie des gaz ******************/
 BaseType_t high_task_wakeup = pdTRUE;
+/*********** ISR pour la voie des gaz ******************/
 static bool IRAM_ATTR ppm_rmt_rx_done_callback(rmt_channel_handle_t channel, const rmt_rx_done_event_data_t *edata, void *user_data)
 {
     QueueHandle_t receive_queue2 = (QueueHandle_t)user_data;
@@ -154,7 +155,7 @@ static bool IRAM_ATTR ppm_rmt_aux_done_callback(rmt_channel_handle_t channel, co
 
 
 /*********** Tache pour lecture du courant de la bougie période 100ms ******************/
-static void task_glow_current(void *pvParameter)
+void task_glow_current(void *pvParameter)
 {
     memset(&dev, 0, sizeof(ina219_t));
 
@@ -172,7 +173,7 @@ static void task_glow_current(void *pvParameter)
     while(1)
     {
         ESP_ERROR_CHECK(ina219_get_current(&dev, &turbine.GLOW_CURRENT)) ;
-        xSemaphoreGive(glow_current_sem) ;
+        xSemaphoreGive(SEM_glow_current) ;
         vTaskDelay(100 / portTICK_PERIOD_MS) ;
     }
 }
@@ -208,7 +209,7 @@ void scan_i2c(void)
 }
 
 /*********** Tache de lecture des EGT et DS18B20 période 200ms ******************/
-static void task_egt(void *pvParameter)
+void task_egt(void *pvParameter)
 {
     max31855_t dev = { 0 };
     // Configure SPI bus
@@ -244,7 +245,7 @@ static void task_egt(void *pvParameter)
             //ESP_LOGI(TAG, "Temperature: %.2f°C, cold junction temperature: %.4f°C", tc_t, cj_t);
             //ESP_LOGI("wifi", "free Heap:%d,%d", esp_get_free_heap_size(), heap_caps_get_free_size(MALLOC_CAP_8BIT));
             turbine.EGT = (turbine.EGT + tc_t)/2 ;
-            xSemaphoreGive(EGT_sem) ;
+            xSemaphoreGive(SEM_EGT) ;
         }
         if(turbine.ds18b20_device_num > 0)
             ds18b20_get_temperature(turbine.ds18b20s[0],&turbine.DS18B20_temp) ;
@@ -280,8 +281,8 @@ void init_inputs(void)
     //voie des gaz
 
     rmt_rx_channel_config_t rmt_rx = {
-        .clk_src = RMT_CLK_SRC_DEFAULT,       // select source clock
-        .resolution_hz = 1 * 1000 * 1000, // 1MHz tick resolution, i.e. 1 tick = 1us
+        .clk_src = RMT_CLK_SRC_REF_TICK, //RMT_CLK_SRC_DEFAULT,       // select source clock
+        .resolution_hz = 1 * 1000 * 1000,//1 * 1000 * 1000, // 1MHz tick resolution, i.e. 1 tick = 1us
         .mem_block_symbols = 64,          // memory block size, 64 * 4 = 256Bytes
         .gpio_num = RMT_RX_GPIO_NUM,                    // GPIO number
         .flags.invert_in = false,         // don't invert input signal
@@ -294,7 +295,7 @@ void init_inputs(void)
     rmt_rx.gpio_num = RMT_AUX_GPIO_NUM ;
     ESP_ERROR_CHECK(rmt_new_rx_channel(&rmt_rx, &rx_ppm_aux_chan));
 
-    ESP_LOGI(TAG, "PPM AUX RX initialized\n");
+    ESP_LOGI(TAG, "PPM AUX RX initializated\n");
 
     receive_queue = xQueueCreate(1, sizeof(rmt_rx_done_event_data_t));
     receive_queue_aux = xQueueCreate(1, sizeof(rmt_rx_done_event_data_t));
@@ -307,28 +308,25 @@ void init_inputs(void)
     };
 
     ESP_ERROR_CHECK(rmt_rx_register_event_callbacks(rx_ppm_chan, &cbs, receive_queue));
+    ESP_LOGI(TAG, "RMT RX initialized\n");
     ESP_ERROR_CHECK(rmt_rx_register_event_callbacks(rx_ppm_aux_chan, &cbs_aux, receive_queue_aux));
+    ESP_LOGI(TAG, "RMT AUX initialized\n");
 
     // the following timing requirement is based on NEC protocol
-    receive_config.signal_range_min_ns = 700000;     // the shortest duration for NEC signal is 560us, 1250ns < 560us, valid signal won't be treated as noise
-    receive_config.signal_range_max_ns = 10000000; // the longest duration for NEC signal is 9000us, 12000000ns > 9000us, the receive won't stop early
+    receive_config.signal_range_min_ns = 0; //100 * 1000;    // 700ms
+    receive_config.signal_range_max_ns = 3000 * 1000; //10000000UL; // 3000ms
     
-
     // ready to receive
     ESP_ERROR_CHECK(rmt_enable(rx_ppm_chan)) ;
     ESP_ERROR_CHECK(rmt_receive(rx_ppm_chan, raw_symbols, sizeof(raw_symbols), &receive_config));
+    ESP_LOGI(TAG, "Receive RX ranges initialized\n");
     ESP_ERROR_CHECK(rmt_enable(rx_ppm_aux_chan)) ;
     ESP_ERROR_CHECK(rmt_receive(rx_ppm_aux_chan, aux_raw_symbols, sizeof(aux_raw_symbols), &receive_config));
-    
-    ESP_LOGI(TAG, "MAX31855 initialized\n"); //EGT
-    EGT_sem = xSemaphoreCreateMutex();
-    xTaskCreate(task_egt, TAG, configMINIMAL_STACK_SIZE * 8, NULL, 5, task_egt_h);
+    ESP_LOGI(TAG, "Receive AUX ranges initialized\n");
 
-    ESP_LOGI(TAG, "INA219 initialized\n");  // Glow current
-    glow_current_sem = xSemaphoreCreateMutex();
-    xTaskCreate(task_glow_current, TAG, configMINIMAL_STACK_SIZE * 8, NULL, 5, task_egt_h);
-    vTaskSuspend(*task_egt_h);
-    init_ds18b20() ;
+
+    
+    //init_ds18b20() ;
 }
 
 /*bool Get_RPM(uint32_t *rpm) 

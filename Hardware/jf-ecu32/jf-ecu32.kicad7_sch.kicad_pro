@@ -500,32 +500,7 @@
     },
     "net_colors": null,
     "netclass_assignments": null,
-    "netclass_patterns": [
-      {
-        "netclass": "3.3V",
-        "pattern": "VDC"
-      },
-      {
-        "netclass": "5v",
-        "pattern": "Net-(D7-Pad2)"
-      },
-      {
-        "netclass": "5v",
-        "pattern": "Net-(D9-Pad2)"
-      },
-      {
-        "netclass": "Batt",
-        "pattern": "+BATT"
-      },
-      {
-        "netclass": "Batt",
-        "pattern": "Net-(D13-Pad2)"
-      },
-      {
-        "netclass": "Batt",
-        "pattern": "Net-(D15-Pad2)"
-      }
-    ]
+    "netclass_patterns": []
   },
   "pcbnew": {
     "last_paths": {

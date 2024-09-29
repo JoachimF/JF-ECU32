@@ -173,18 +173,30 @@ static void set_defaut_turbine(void)
 {
     strcpy(turbine_config.name,"Nom du moteur") ;
     turbine_config.log_count = 1 ;
+    turbine_config.horametre = 0 ;
     turbine_config.glow_power = 10 ;
     turbine_config.jet_full_power_rpm = 145000 ;
     turbine_config.jet_idle_rpm = 35000 ;
+    turbine_config.jet_min_rpm = 0 ;
     turbine_config.start_temp = 100 ;
     turbine_config.max_temp = 750 ;
     turbine_config.acceleration_delay = 10 ;
     turbine_config.deceleration_delay = 12 ;
     turbine_config.stability_delay = 5 ;
+    // Pumps
     turbine_config.max_pump1 = 1024 ;
     turbine_config.min_pump1 = 0 ;
     turbine_config.max_pump2 = 512 ;
-    turbine_config.jet_min_rpm = 0 ;
+    turbine_config.min_pump2 = 0 ;
+    //Vannes
+    turbine_config.max_vanne1 = 1024 ;
+    turbine_config.max_vanne2 = 1024 ;
+    // Starter    
+    turbine_config.starter_rpm_start = 0 ;
+    turbine_config.starter_pwm_perc_start = 0 ;
+    turbine_config.starter_pwm_perc_min = 0 ;
+    turbine_config.starter_max_rpm = 0 ;
+
     init_power_table() ;
     init_random_pump() ;
     test_checksum_turbine(&turbine_config,&turbine_config.checksum) ;
@@ -321,10 +333,20 @@ void read_nvs(void)
                 ESP_LOGI(TAG,"acceleration_delay = %d", turbine_config.acceleration_delay);
                 ESP_LOGI(TAG,"deceleration_delay = %d", turbine_config.deceleration_delay);
                 ESP_LOGI(TAG,"stability_delay = %d", turbine_config.stability_delay);
+                //Pumps
                 ESP_LOGI(TAG,"max_pump1 = %d", turbine_config.max_pump1);
                 ESP_LOGI(TAG,"min_pump1= %d", turbine_config.min_pump1);
                 ESP_LOGI(TAG,"max_pump2 = %d", turbine_config.max_pump2);
-                ESP_LOGI(TAG,"min_pump2= %ld", turbine_config.jet_min_rpm);
+                ESP_LOGI(TAG,"min_pump2= %d", turbine_config.jet_min_rpm);
+                //Vannes
+                ESP_LOGI(TAG,"max_vanne1 = %d", turbine_config.max_vanne1);
+                ESP_LOGI(TAG,"max_vanne2= %d", turbine_config.max_vanne2);
+                //Démarreur
+                ESP_LOGI(TAG,"starter_rpm_start = %d", turbine_config.starter_rpm_start);
+                ESP_LOGI(TAG,"starter_pwm_perc_start= %f", turbine_config.starter_pwm_perc_start);
+                ESP_LOGI(TAG,"starter_pwm_perc_min = %f", turbine_config.starter_pwm_perc_min);
+                ESP_LOGI(TAG,"starter_max_rpm= %ld", turbine_config.starter_max_rpm);
+
                 /*for(int i=0;i<50;i++)
                 {
                     ESP_LOGI(TAG,"pump = %d - ", turbine_config.power_table.pump[i]);

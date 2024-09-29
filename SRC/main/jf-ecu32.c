@@ -213,7 +213,6 @@ _engine_t turbine = {
     .glow.config.ledc_channel = LEDC_CHANNEL_2,
     .glow.set_power = set_power_ledc,
     .glow.value = 0 ,
-
  };
  
  _configEngine_t turbine_config ;
@@ -553,17 +552,17 @@ void ecu_task(void * pvParameters )
             switch(turbine.phase_fonctionnement)
             {
                 case STOP :
-                        turbine.starter.value = 0 ;
+                        //turbine.starter.value = 0 ;
                         set_power_func_us(&turbine.starter,0) ;
-                    	turbine.vanne1.value = 0 ;
+                    	//turbine.vanne1.value = 0 ;
 			            turbine.vanne1.set_power(&turbine.vanne2.config,0) ;
-                       	turbine.vanne2.value = 0 ;
+                       	//turbine.vanne2.value = 0 ;
 			            turbine.vanne2.set_power(&turbine.vanne2.config,0) ;
-                        turbine.pump1.value = 0 ;
+                        //turbine.pump1.value = 0 ;
                         set_power_func_us(&turbine.pump1,0) ;
-                        turbine.pump2.value = 0 ;
+                        //turbine.pump2.value = 0 ;
                         set_power_func_us(&turbine.pump2,0) ;
-                        turbine.glow.value = 0 ;	
+                        //turbine.glow.value = 0 ;	
 			            turbine.glow.set_power(&turbine.glow.config,0) ;
                         turbine.phase_fonctionnement = WAIT ;
                         break ;
@@ -621,7 +620,7 @@ void ecu_task(void * pvParameters )
                         turbine.phase_fonctionnement = WAIT ;
                     else if(turbine.position_gaz == PLEINGAZ) {
                         // Ventilation
-                        turbine.starter.set_power(&turbine.starter.config,turbine_config.start_starter) ;
+                        turbine.starter.set_power(&turbine.starter.config,turbine_config.starter_rpm_start) ;
                         turbine.phase_fonctionnement = GLOW ;
                     }
                     break;

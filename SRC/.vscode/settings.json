@@ -10,5 +10,17 @@
         "rtc_ctrl.h": "c",
         "rmt_rx.h": "c",
         "onewire_bus_impl_rmt.h": "c"
-    }
+    },
+    "idf.espIdfPathWin": "C:\\Users\\Boby\\esp\\v5.0.7\\esp-idf",
+    "idf.pythonBinPathWin": "C:\\Users\\Boby\\.espressif5\\python_env\\idf5.0_py3.11_env\\Scripts\\python.exe",
+    "idf.toolsPathWin": "C:\\Users\\Boby\\.espressif5",
+    "idf.customExtraPaths": "C:\\Users\\Boby\\.espressif5\\tools\\xtensa-esp-elf-gdb\\12.1_20231023\\xtensa-esp-elf-gdb\\bin;C:\\Users\\Boby\\.espressif5\\tools\\riscv32-esp-elf-gdb\\12.1_20231023\\riscv32-esp-elf-gdb\\bin;C:\\Users\\Boby\\.espressif5\\tools\\xtensa-esp32-elf\\esp-2022r1-11.2.0\\xtensa-esp32-elf\\bin;C:\\Users\\Boby\\.espressif5\\tools\\xtensa-esp32s2-elf\\esp-2022r1-11.2.0\\xtensa-esp32s2-elf\\bin;C:\\Users\\Boby\\.espressif5\\tools\\xtensa-esp32s3-elf\\esp-2022r1-11.2.0\\xtensa-esp32s3-elf\\bin;C:\\Users\\Boby\\.espressif5\\tools\\riscv32-esp-elf\\esp-2022r1-11.2.0\\riscv32-esp-elf\\bin;C:\\Users\\Boby\\.espressif5\\tools\\esp32ulp-elf\\2.35_20220830\\esp32ulp-elf\\bin;C:\\Users\\Boby\\.espressif5\\tools\\cmake\\3.24.0\\bin;C:\\Users\\Boby\\.espressif5\\tools\\openocd-esp32\\v0.12.0-esp32-20240318\\openocd-esp32\\bin;C:\\Users\\Boby\\.espressif5\\tools\\ninja\\1.10.2;C:\\Users\\Boby\\.espressif5\\tools\\idf-exe\\1.0.3;C:\\Users\\Boby\\.espressif5\\tools\\ccache\\4.6.2\\ccache-4.6.2-windows-x86_64;C:\\Users\\Boby\\.espressif5\\tools\\dfu-util\\0.9\\dfu-util-0.9-win64;C:\\Users\\Boby\\.espressif5\\tools\\esp-rom-elfs\\20220823",
+    "idf.customExtraVars": {
+        "OPENOCD_SCRIPTS": "C:\\Users\\Boby\\.espressif5\\tools\\openocd-esp32\\v0.12.0-esp32-20240318/openocd-esp32/share/openocd/scripts",
+        "IDF_CCACHE_ENABLE": "1",
+        "ESP_ROM_ELF_DIR": "C:\\Users\\Boby\\.espressif5\\tools\\esp-rom-elfs\\20220823/"
+    },
+    "idf.gitPathWin": "C:\\Users\\Boby\\.espressif5\\tools\\idf-git\\2.39.2\\cmd\\git.exe",
+    "idf.portWin": "COM11",
+    "idf.flashType": "UART"
 }
