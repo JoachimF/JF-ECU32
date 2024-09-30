@@ -25,7 +25,8 @@ typedef struct {
 } URL_t;
 
 //#define MIN(iA,iB)  ((iA)<(iB) ? (iA) : (iB))
-static const char* get_path_from_uri(char *dest, const char *uri, size_t destsize) ;
+static const char* get_path_from_uri(char *, const char *, size_t ) ;
+
 //const char* get_path_from_uri(char *dest, const char *uri, size_t destsize) ;
 
 #endif

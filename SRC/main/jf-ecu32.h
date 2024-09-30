@@ -140,7 +140,7 @@ typedef struct _configEngine_{
   uint16_t starter_rpm_start ; // vitesse du starter pour l'allumage ex : start_starter
   float starter_pwm_perc_start ; // PWM à laquelle le démarreur commence a tourner
   float starter_pwm_perc_min ; // PWM à laquelle le démarreur cale
-  u_int32_t starter_max_rpm ; // RPM max du démarreur
+  uint32_t starter_max_rpm ; // RPM max du démarreur
 
   _pump_table_t power_table;
   uint32_t checksum ;
@@ -181,7 +181,7 @@ typedef struct _PUMP_{
   _pwm_config config ;
   void (*set_power)( _pwm_config *config,float power);
   void (*set_power_us)( _pwm_config *config,uint32_t power);
-  uint16_t (*get_power)(struct _PUMP_ * config) ;
+  uint32_t (*get_power)(struct _PUMP_ * config) ;
   void (*off)(_pwm_config *config);
 } _PUMP_t;
 
@@ -190,7 +190,7 @@ typedef struct _VALVE_{
   bool state;
   _ledc_config config ;
   void (*set_power)(_ledc_config *config,uint32_t power);
-  uint16_t (*get_power)(struct _VALVE_ * valve);
+  uint8_t (*get_power)(struct _VALVE_ * valve);
   void (*on)(_pwm_config *config);
   void (*off)(_pwm_config *config);
 } _VALVE_t;
@@ -267,6 +267,11 @@ void inputs_task(void * pvParameters) ;
 void init_mcpwm(void) ;
 void set_power_func_us(_PUMP_t *config ,int32_t value) ;
 void set_power_func(_PUMP_t *config ,float value) ;
+float get_pump_power_float(_PUMP_t *config) ;
+uint32_t get_pump_power_int(_PUMP_t *config) ;
+uint8_t get_glow_power(_GLOW_t *config) ;
+uint8_t get_vanne_power(_VALVE_t *config) ;
+
 /***Gestion du temps  */
 void get_time_total(_engine_t *engine, uint8_t *sec, uint8_t *min, uint8_t *heure) ;
 uint16_t get_heures_total(_engine_t * engine) ;

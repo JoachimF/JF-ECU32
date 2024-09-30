@@ -34,7 +34,7 @@
 #include "esp_wifi.h"
 #include "cJSON.h"
 
-//#include "esp_heap_trace.h"
+#include "esp_heap_trace.h"
 
 #include <esp_ota_ops.h>
 
@@ -44,6 +44,7 @@
 #include "http_server.h"
 #include "wifi.h"
 #include "error.h"
+#include "calibration.h"
 
 extern TimerHandle_t xTimer60s ;
 static const char *TAG = "HTTP";
@@ -1032,6 +1033,53 @@ static esp_err_t wifi_get_handler(httpd_req_t *req)
 	return ESP_OK;
 }
 
+static esp_err_t calibrations(httpd_req_t *req)
+{
+	ESP_LOGI(TAG, "root_get_handler req->uri=[%s]", req->uri);
+
+	// Send HTML header
+	send_head(req) ;
+
+	// Send buttons
+	httpd_resp_sendstr_chunk(req, "<p></p><form action=\"starter_calibration\" method=\"get\"><button name="">Calibrer le démarreur</button></form>") ;
+
+	httpd_resp_sendstr_chunk(req, "<p></p><form action=\"/\" method=\"get\"><button name="">Retour</button></form>") ;
+
+	// Send footer
+	Text2Html(req, "/html/footer.html");
+	httpd_resp_sendstr_chunk(req, NULL); //fin de la page
+
+	return ESP_OK;
+}
+
+static esp_err_t starter_calibration_page(httpd_req_t *req)
+{
+	ESP_LOGI(TAG, "root_get_handler req->uri=[%s]", req->uri);
+
+	// Send HTML header
+	send_head(req) ;
+
+	// Send buttons
+	httpd_resp_sendstr_chunk(req, "<p></p><form action=\"stop_starter_calibration\" method=\"get\"><button name="">Arrêter la calibration</button></form>") ;
+
+	// Send footer
+	Text2Html(req, "/html/footer.html");
+	httpd_resp_sendstr_chunk(req, NULL); //fin de la page
+	
+	xTaskCreatePinnedToCore(starter_calibration, "Starter calibration", configMINIMAL_STACK_SIZE * 8, NULL, (configMAX_PRIORITIES -1 )|( 1UL | portPRIVILEGE_BIT ), &starter_calibration_h,1);	
+	return ESP_OK;
+}
+
+static esp_err_t stop_starter_calibration(httpd_req_t *req)
+{
+	ESP_LOGI(TAG, "root_get_handler req->uri=[%s]", req->uri) ;
+	stop_starter_cal() ;
+	
+	calibrations(req) ;
+	
+	return ESP_OK;
+}
+
 static esp_err_t configmoteur(httpd_req_t *req)
 {
 	ESP_LOGI(TAG, "root_get_handler req->uri=[%s]", req->uri);
@@ -1154,6 +1202,8 @@ static esp_err_t configmoteur(httpd_req_t *req)
 
 	httpd_resp_sendstr_chunk(req, "<button name=\"save\" type=\"submit\" class=\"button bgrn\">Sauvegarde</button>") ;
 	httpd_resp_sendstr_chunk(req, "</form></fieldset>") ;
+
+	httpd_resp_sendstr_chunk(req, "<p></p><form action=\"calibrations\" method=\"get\"><button name="">Calibrations</button></form>") ;	
 
 	httpd_resp_sendstr_chunk(req, "<p></p><form action=\"/\" method=\"get\"><button name="">Retour</button></form>") ;
 	
@@ -1311,33 +1361,50 @@ static esp_err_t readings_get_handler(httpd_req_t *req){
 	char status[50] ;
 	char errors[200] ;
 	uint8_t minutes,secondes ;
+	//ESP_LOGI(TAG, "readings_get_handler req->uri=[%s]", req->uri);
 	get_time_up(&turbine,&secondes,&minutes,NULL) ;
 	//uint32_t rpm = 0 ;
-	//ESP_LOGI(TAG, "readings_get_handler req->uri=[%s]", req->uri);
+	//ESP_LOGI(TAG, "cJSON_CreateObject");
 	myjson = cJSON_CreateObject();
 //	if( xSemaphoreTake(xTimeMutex,( TickType_t ) 10) == pdTRUE ) {
 		phase_to_str(status) ;
+		//ESP_LOGI(TAG, "get_gaz");
 		cJSON_AddNumberToObject(myjson, "ppm_gaz", get_gaz(&turbine));
+		//ESP_LOGI(TAG, "get_aux");
 		cJSON_AddNumberToObject(myjson, "ppm_aux", get_aux(&turbine));
+		//ESP_LOGI(TAG, "get_EGT");
 		cJSON_AddNumberToObject(myjson, "egt", get_EGT(&turbine));
+		//ESP_LOGI(TAG, "get_RPM");
 		cJSON_AddNumberToObject(myjson, "rpm", get_RPM(&turbine));
+		//ESP_LOGI(TAG, "pump1");
 		cJSON_AddNumberToObject(myjson, "pump1", turbine.pump1.value);
+		//ESP_LOGI(TAG, "pump2");
 		cJSON_AddNumberToObject(myjson, "pump2", turbine.pump2.value);
-		cJSON_AddNumberToObject(myjson, "vanne1", turbine.vanne1.get_power(&turbine.vanne1));
-		cJSON_AddNumberToObject(myjson, "vanne2", turbine.vanne2.get_power(&turbine.vanne2));
-		cJSON_AddNumberToObject(myjson, "glow", turbine.glow.get_power(&turbine.glow));
+		//ESP_LOGI(TAG, "vanne1");
+		cJSON_AddNumberToObject(myjson, "vanne1", get_vanne_power(&turbine.vanne1));
+		//ESP_LOGI(TAG, "vanne2");
+		cJSON_AddNumberToObject(myjson, "vanne2", get_vanne_power(&turbine.vanne2));
+		//ESP_LOGI(TAG, "glow");
+		cJSON_AddNumberToObject(myjson, "glow", get_glow_power(&turbine.glow));
+		//ESP_LOGI(TAG, "statut : %s", status);
 		cJSON_AddStringToObject(myjson, "status", status);
+		//ESP_LOGI(TAG, "get_errors");
 		get_errors(errors); 
 		cJSON_AddStringToObject(myjson, "error", errors);
+		//ESP_LOGI(TAG, "minutes,secondes");
 		sprintf(status,"%02d:%02d",minutes,secondes);
+		//ESP_LOGI(TAG, "time : %s", status);
 		cJSON_AddStringToObject(myjson, "time", status);
 	
 //	}xSemaphoreGive(xTimeMutex) ;
+	//ESP_LOGI(TAG, "Send http");
 	char *my_json_string = cJSON_Print(myjson);
 	httpd_resp_set_type(req, "application/json");
 	httpd_resp_sendstr_chunk(req, my_json_string); //fin de la page
 	httpd_resp_sendstr_chunk(req, NULL); //fin de la page
+	//ESP_LOGI(TAG, "cJSON_Delete");
 	cJSON_Delete(myjson) ;
+	//ESP_LOGI(TAG, "free");
 	free(my_json_string) ; 
 	return ESP_OK;
 }
@@ -1372,9 +1439,9 @@ esp_err_t upgrade_get_handler(httpd_req_t *req)
 
 static esp_err_t frontpage(httpd_req_t *req)
 {
-//	ESP_LOGI(TAG, "root_get_handler req->uri=[%s]", req->uri);
+	//ESP_LOGI(TAG, "root_get_handler req->uri=[%s]", req->uri);
     char filepath[20];
-	//static int i=0 ;
+	static int i=0 ;
     //ESP_LOGI(TAG, "URI : %s", req->uri);
 	xTimerStop( xTimer60s,0) ;
     const char *filename = get_path_from_uri(filepath, req->uri, sizeof(filepath));
@@ -1392,6 +1459,12 @@ static esp_err_t frontpage(httpd_req_t *req)
 		configecu(req) ;
 	else if(strcmp(filename, "/configmoteur") == 0) 
 		configmoteur(req) ;
+	else if(strcmp(filename, "/calibrations") == 0) 
+		calibrations(req) ;
+	else if(strcmp(filename, "/starter_calibration") == 0) 
+		starter_calibration_page(req) ;
+	else if(strcmp(filename, "/stop_starter_calibration") == 0) 
+		stop_starter_calibration(req) ;
 	else if(strcmp(filename, "/logs") == 0) 
 		logs(req) ;
 	else if(strcmp(filename, "/slider") == 0) 
@@ -1400,8 +1473,6 @@ static esp_err_t frontpage(httpd_req_t *req)
 		turbine.phase_fonctionnement = START ;
 	else if(strcmp(filename, "/stop") == 0) 
 		turbine.phase_fonctionnement = STOP ;
-
-
 	else if(strcmp(filename, "/curves.txt") == 0) 
 		curves_get_handler(req) ;
 	else if(strcmp(filename, "/logs.txt") == 0) 
@@ -1417,7 +1488,7 @@ static esp_err_t frontpage(httpd_req_t *req)
 	{
 //		ESP_ERROR_CHECK( heap_trace_start(HEAP_TRACE_LEAKS) );
 		gauges_get_handler(req) ;
-/*		i++ ;
+		/*i++ ;
 		if(i>10)
 		{
 			ESP_ERROR_CHECK( heap_trace_stop() );

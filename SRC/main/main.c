@@ -18,6 +18,7 @@
 #include "lwip/dns.h"
 #include "driver/gpio.h"
 #include "driver/gptimer.h"
+#include "esp_timer.h"
 //#include "esp_heap_trace.h"
 #include <esp_ota_ops.h>
 #include <esp_chip_info.h>
@@ -246,9 +247,11 @@ void app_main()
 
 	printf("silicon revision %d, ", chip_info.revision);
 	printf("Currently running partition: %s\r\n", partition->label);
-	// Initialize NVS
+	
+	// Initialize Heap Trace
 	//ESP_ERROR_CHECK( heap_trace_init_standalone(trace_record, NUM_RECORDS) );
 
+	// Initialize NVS
 	ESP_LOGI(TAG, "Initializing NVS");
 	init_nvs() ;
 	// read wifi conf.
@@ -354,14 +357,15 @@ void app_main()
 	vTaskDelay(2000 / portTICK_PERIOD_MS);
 	//turbine.EGT = 1000 ;
 	//turbine.GAZ = 1000 ;
+	#if 0
 	while(1)
 	{
 		vTaskDelay(100 / portTICK_PERIOD_MS);
 	}
-
+	#else
 	// *********** Simulation *********
-	//int32_t time =     //printf("Timer: %lld μs\n", Timer1/1000); 
-	/*strcpy(turbine.error_message,"OVERHEAT");
+	int32_t time = 0 ;    //printf("Timer: %lld μs\n", Timer1/1000); 
+	strcpy(turbine.error_message,"OVERHEAT");
 	while(1){
 		for(int32_t i=0;i<100;i++)
 		{
@@ -370,8 +374,8 @@ void app_main()
 			turbine.vanne1.value+=1;
 			turbine.vanne2.value+=1;
 			turbine.glow.value+=2;
-			//turbine.EGT -- ;
-			//turbine.GAZ ++ ;
+			turbine.EGT ++ ;
+			turbine.GAZ ++ ;
 			time_ecu = esp_timer_get_time() - timer_old ;
 			timer_old = esp_timer_get_time();
 			//ESP_LOGI(TAG,"EGT : %d ; GAZ : %d",turbine.EGT,turbine.GAZ) ;
@@ -385,8 +389,8 @@ void app_main()
 				turbine.vanne2.value-=1;
 				turbine.glow.value-=2;
 			//if( xSemaphoreTake(xTimeMutex,( TickType_t ) 10) == pdTRUE ) {
-				//turbine.EGT ++ ;
-				//turbine.GAZ -- ;
+				turbine.EGT -- ;
+				turbine.GAZ -- ;
 				//ESP_LOGI(TAG,"EGT : %d ; GAZ : %d",turbine.EGT,turbine.GAZ) ;
 			//}xSemaphoreGive(xTimeMutex) ;
 				vTaskDelay(200 / portTICK_PERIOD_MS);
@@ -405,5 +409,5 @@ void app_main()
 		//vTaskDelay(3000 / portTICK_PERIOD_MS);
 		//vTaskDelay(400 / portTICK_PERIOD_MS);
 		}
-	*/
+	#endif
 }

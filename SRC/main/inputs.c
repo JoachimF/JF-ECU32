@@ -236,14 +236,14 @@ void task_egt(void *pvParameter)
             ESP_LOGE(TAG, "Failed to measure: %d (%s)", res, esp_err_to_name(res));
         else
         {
-            if (scv) ESP_LOGW(TAG, "Thermocouple shorted to VCC!");
+            /*if (scv) ESP_LOGW(TAG, "Thermocouple shorted to VCC!");
             if (scg) ESP_LOGW(TAG, "Thermocouple shorted to GND!");
             if (oc) ESP_LOGW(TAG, "No connection to thermocouple!");
             if (scv) add_error_msg(E_K,"K shorted to VCC!");
             if (scg) add_error_msg(E_K,"K shorted to GND!");
             if (oc) add_error_msg(E_K,"K not connected");
             //ESP_LOGI(TAG, "Temperature: %.2f°C, cold junction temperature: %.4f°C", tc_t, cj_t);
-            //ESP_LOGI("wifi", "free Heap:%d,%d", esp_get_free_heap_size(), heap_caps_get_free_size(MALLOC_CAP_8BIT));
+            //ESP_LOGI("wifi", "free Heap:%d,%d", esp_get_free_heap_size(), heap_caps_get_free_size(MALLOC_CAP_8BIT));*/
             turbine.EGT = (turbine.EGT + tc_t)/2 ;
             xSemaphoreGive(SEM_EGT) ;
         }
@@ -323,10 +323,9 @@ void init_inputs(void)
     ESP_ERROR_CHECK(rmt_enable(rx_ppm_aux_chan)) ;
     ESP_ERROR_CHECK(rmt_receive(rx_ppm_aux_chan, aux_raw_symbols, sizeof(aux_raw_symbols), &receive_config));
     ESP_LOGI(TAG, "Receive AUX ranges initialized\n");
-
-
     
     //init_ds18b20() ;
+    ESP_LOGI(TAG, "DS18B20 initialized\n");
 }
 
 /*bool Get_RPM(uint32_t *rpm) 
@@ -354,6 +353,7 @@ void Reset_RPM()
     /*if(xSemaphoreTake(xRPMmutex,( TickType_t ) 10) == pdTRUE )
     {*/
         turbine.RPM_period = 0 ;
+        turbine.RPM = 0 ;
     /*    xSemaphoreGive(xRPMmutex) ;
         //ESP_LOGI(TAG,"Reset RPM mutex") ;
     }*/

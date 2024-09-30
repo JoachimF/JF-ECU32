@@ -83,15 +83,24 @@ void linear_interpolation(uint32_t rpm1,uint32_t pump1,uint32_t rpm2,uint32_t pu
 
 void get_time(uint32_t _time_up, uint8_t *sec, uint8_t *min, uint8_t *heure)
 {
+    //ESP_LOGI("get_time", "_time_up : %d",_time_up);
     *sec = _time_up % 60 ;
+    //ESP_LOGI("get_time", "*sec : %d",*sec);
     if(min != NULL)
+    {
         *min = (_time_up % 3600)/60 ;
+        //ESP_LOGI("*min", "*min : %d",*min);
+    }
     if(heure != NULL)
+    {
         *heure = _time_up / 3600 ;
+        //ESP_LOGI("get_time", "*heure : %d",*heure);
+    }
 }
 
 void get_time_up(_engine_t *engine, uint8_t *sec, uint8_t *min, uint8_t *heure)
 {
+    //ESP_LOGI("get_time_up", "engine->time_up : %ld",engine->time_up);
     get_time(engine->time_up,sec,min,heure);
 }
 
@@ -144,6 +153,28 @@ void set_power_func(_PUMP_t *config ,float value)
     config->value = value ;
 }
 
+uint32_t get_pump_power_int(_PUMP_t *pump)
+{
+    return pump->value ;
+}
+
+float get_pump_power_float(_PUMP_t *pump)
+{
+    return pump->value ;
+}
+
+uint8_t get_glow_power(_GLOW_t *glow)
+{
+    return glow->value ;
+}
+
+uint8_t get_vanne_power(_VALVE_t *vanne)
+{
+    return vanne->value ;
+}
+
+
+
 void set_power_ledc(_ledc_config *config ,uint32_t value)
 {
     ESP_ERROR_CHECK(ledc_set_duty(LEDC_LOW_SPEED_MODE, config->ledc_channel, value));
@@ -195,7 +226,7 @@ _engine_t turbine = {
     .starter.config.nbits = _10BITS,
     .starter.config.gpio_num = STARTER_PIN,
 //    .starter.config.MCPWM_UNIT = MCPWM_UNIT_0,
-    .starter.set_power = set_power_func,    
+    .starter.set_power = set_power_func,  
     .starter.value = 0 ,
 
 // Configuration en LEDC
