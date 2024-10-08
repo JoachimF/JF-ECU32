@@ -128,6 +128,7 @@ static void IRAM_ATTR gpio_isr_handler(void* arg)
                 //xSemaphoreGiveFromISR(xRPMmutex,&xHigherPriorityTaskWoken) ;
             /*}
             turbine.WDT_RPM = 1 ;*/
+            turbine.WDT_RPM = 1 ;
     }
     turbine.RPM_sec++ ;
 }

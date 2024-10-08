@@ -45,6 +45,7 @@
 #include "wifi.h"
 #include "error.h"
 #include "calibration.h"
+#include "html.h"
 
 extern TimerHandle_t xTimer60s ;
 static const char *TAG = "HTTP";
@@ -749,19 +750,34 @@ static esp_err_t configecu(httpd_req_t *req)
 	httpd_resp_sendstr_chunk(req, turbine_config.name);
 	httpd_resp_sendstr_chunk(req, "</h2></div>");*/
 	
+	
+	
 	httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Paramètre de l'ECU&nbsp;</b></legend><form method=\"GET\" action=\"configecu\"><p>") ;
 	/*Voie des gaz*/
-	httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Voie des gaz</b></legend>") ;
+	//for(int z = 0; z<7 ; z++)
+		WSRadio(req,0,config_ECU.input_type,true);
+		WSRadio(req,1,config_ECU.input_type,true);
+		WSRadio(req,2,config_ECU.input_type,true);
+		WSRadio(req,3,config_ECU.input_type,true);
+		WSRadio(req,4,config_ECU.input_type,true);
+		WSRadio(req,5,config_ECU.input_type,true);
+		WSRadio(req,6,config_ECU.input_type,true);
+	
+	/*httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Voie des gaz</b></legend>") ;
+
 		httpd_resp_sendstr_chunk(req, "<p><input id=\"input_ppm\" name=\"input\" type=\"radio\" value=\"0\"") ;
 		httpd_resp_sendstr_chunk(req, (config_ECU.input_type == PPM) ? "checked=\"\"" :" " ) ;
 		httpd_resp_sendstr_chunk(req, "><b>Standard</b>") ;
 		
 		httpd_resp_sendstr_chunk(req, "<p><input id=\"input_sbus\" name=\"input\" type=\"radio\" value=\"1\"") ;
 		httpd_resp_sendstr_chunk(req, (config_ECU.input_type == SBUS) ? "checked=\"\"" :" " ) ;
-		httpd_resp_sendstr_chunk(req, "><b>SBUS</b>") ;
-	httpd_resp_sendstr_chunk(req, "</fieldset><p>") ;
+		httpd_resp_sendstr_chunk(req, "><b>SBUS</b>") ;*/
+	
+	//httpd_resp_sendstr_chunk(req, "</fieldset><p>") ;
 	/*Type de bougie*/
-	httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Type de bougie</b></legend>") ;
+	
+
+	/*httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Type de bougie</b></legend>") ;
 		httpd_resp_sendstr_chunk(req, "<p><input id=\"glow_type_gas\" name=\"glow_type\" type=\"radio\" value=\"0\"") ;
 		httpd_resp_sendstr_chunk(req, (config_ECU.glow_type == GAS) ? "checked=\"\"" :" " ) ;
 		httpd_resp_sendstr_chunk(req, "><b>Gaz</b>") ;
@@ -769,9 +785,9 @@ static esp_err_t configecu(httpd_req_t *req)
 		httpd_resp_sendstr_chunk(req, "<p><input id=\"glow_type_kero\" name=\"glow_type\" type=\"radio\" value=\"1\"") ;
 		httpd_resp_sendstr_chunk(req, (config_ECU.glow_type == KERO) ? "checked=\"\"" :" " ) ;
 		httpd_resp_sendstr_chunk(req, "><b>Kérostart</b>") ;
-	httpd_resp_sendstr_chunk(req, "</fieldset><p>") ;
+	httpd_resp_sendstr_chunk(req, "</fieldset><p>") ;*/
 	/*Type de démarrage*/
-	httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Démarrage</b></legend>") ;
+	/*httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Démarrage</b></legend>") ;
 		httpd_resp_sendstr_chunk(req, "<p><input id=\"start_type_manual\" name=\"start_type\" type=\"radio\" value=\"0\"") ;
 		httpd_resp_sendstr_chunk(req, (config_ECU.start_type == MANUAL ) ? "checked=\"\"" :" " ) ;
 		httpd_resp_sendstr_chunk(req, "><b>Manuel</b>") ;
@@ -779,9 +795,9 @@ static esp_err_t configecu(httpd_req_t *req)
 		httpd_resp_sendstr_chunk(req, "<p><input id=\"start_type_auto\" name=\"start_type\" type=\"radio\" value=\"1\"") ;
 		httpd_resp_sendstr_chunk(req, (config_ECU.start_type == AUTO ) ? "checked=\"\"" :" " ) ;
 		httpd_resp_sendstr_chunk(req, "><b>Auto</b>") ;
-	httpd_resp_sendstr_chunk(req, "</fieldset><p>") ;
+	httpd_resp_sendstr_chunk(req, "</fieldset><p>") ;*/
 	/*Type de pompe*/
-	httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Pompe 1</b></legend>") ;
+	/*httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Pompe 1</b></legend>") ;
 		httpd_resp_sendstr_chunk(req, "<p><input id=\"output_pump1_pwm\" name=\"output_pump1\" type=\"radio\" value=\"1\"") ;
 		httpd_resp_sendstr_chunk(req, (config_ECU.output_pump1 == PWM) ? "checked=\"\"" :" " ) ;
 		httpd_resp_sendstr_chunk(req, "><b>Moteur DC</b>") ;
@@ -789,9 +805,9 @@ static esp_err_t configecu(httpd_req_t *req)
 		httpd_resp_sendstr_chunk(req, "<p><input id=\"output_pump1_ppm\" name=\"output_pump1\" type=\"radio\" value=\"0\"") ;
 		httpd_resp_sendstr_chunk(req, (config_ECU.output_pump1 == PPM) ? "checked=\"\"" :" " ) ;
 		httpd_resp_sendstr_chunk(req, "><b>Variateur</b>") ;
-	httpd_resp_sendstr_chunk(req, "</fieldset><p>") ;
+	httpd_resp_sendstr_chunk(req, "</fieldset><p>") ;*/
 	/*Type de démarreur*/
-	httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Démarreur</b></legend>") ;
+	/*httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Démarreur</b></legend>") ;
 		httpd_resp_sendstr_chunk(req, "<p><input id=\"output_starter_pwm\" name=\"output_starter\" type=\"radio\" value=\"1\"") ;
 		httpd_resp_sendstr_chunk(req, (config_ECU.output_starter == PWM) ? "checked=\"\"" :" " ) ;
 		httpd_resp_sendstr_chunk(req, "><b>Moteur DC</b>") ;
@@ -799,9 +815,9 @@ static esp_err_t configecu(httpd_req_t *req)
 		httpd_resp_sendstr_chunk(req, "<p><input id=\"output_starter_ppm\" name=\"output_starter\" type=\"radio\" value=\"0\"") ;
 		httpd_resp_sendstr_chunk(req, (config_ECU.output_starter == PPM) ? "checked=\"\"" :" " ) ;
 		httpd_resp_sendstr_chunk(req, "><b>Variateur</b>") ;
-	httpd_resp_sendstr_chunk(req, "</fieldset><p>") ;
+	httpd_resp_sendstr_chunk(req, "</fieldset><p>") ;*/
 	/*Type de télémétrie*/
-	httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Télémétrie</b></legend>") ;
+	/*httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Télémétrie</b></legend>") ;
 		httpd_resp_sendstr_chunk(req, "<p><input id=\"futaba_telem\" name=\"telem\" type=\"radio\" value=\"0\"") ;
 		httpd_resp_sendstr_chunk(req, (config_ECU.use_telem == FUTABA ) ? "checked=\"\"" :" " ) ;
 		httpd_resp_sendstr_chunk(req, "><b>Désactivée</b>") ;
@@ -817,9 +833,9 @@ static esp_err_t configecu(httpd_req_t *req)
 		httpd_resp_sendstr_chunk(req, "<p><input id=\"no_telem\" name=\"telem\" type=\"radio\" value=\"2\"") ;
 		httpd_resp_sendstr_chunk(req, (config_ECU.use_telem == NONE ) ? "checked=\"\"" :" " ) ;
 		httpd_resp_sendstr_chunk(req, "><b>Futaba</b>") ;
-	httpd_resp_sendstr_chunk(req, "</fieldset><p>") ;
+	httpd_resp_sendstr_chunk(req, "</fieldset><p>") ;*/
 	/*Pompe 2*/
-	httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Pompe 2</b></legend>") ;
+	/*httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Pompe 2</b></legend>") ;
 		httpd_resp_sendstr_chunk(req, "<p><input id=\"no_pump2\" name=\"output_pump2\" type=\"radio\" value=\"0\"") ;
 		httpd_resp_sendstr_chunk(req, (config_ECU.output_pump2 == PPM) ? "checked=\"\"" :" " ) ;
 		httpd_resp_sendstr_chunk(req, "><b>Variateur</b>") ;
@@ -831,7 +847,7 @@ static esp_err_t configecu(httpd_req_t *req)
 		httpd_resp_sendstr_chunk(req, "<p><input id=\"output_pump2_ppm\" name=\"output_pump2\" type=\"radio\" value=\"2\"") ;
 		httpd_resp_sendstr_chunk(req, (config_ECU.output_pump2 == NONE) ? "checked=\"\"" :" " ) ;
 		httpd_resp_sendstr_chunk(req, "><b>Désactivée</b>") ;
-	httpd_resp_sendstr_chunk(req, "</fieldset><p>") ;
+	httpd_resp_sendstr_chunk(req, "</fieldset><p>") ;*/
 	/*Voie aux*/
 	httpd_resp_sendstr_chunk(req, "<p><input id=\"use_input2\" type=\"checkbox\"") ;
 	httpd_resp_sendstr_chunk(req, (config_ECU.use_input2 == YES) ? "checked=\"\"" :" " ) ;
@@ -1515,7 +1531,19 @@ static esp_err_t frontpage(httpd_req_t *req)
 	httpd_resp_sendstr_chunk(req, turbine_config.name);
 	httpd_resp_sendstr_chunk(req, "</h2>");*/
 	send_head(req) ;
-
+	WSContentButton(req,0, true) ;
+	WSContentButton(req,1, true) ;
+	WSContentButton(req,2, true) ;
+	WSContentButton(req,3, true) ;
+	WSContentButton(req,4, true) ;
+	WSContentButton(req,5, true) ;
+	WSContentButton(req,6, true) ;
+	WSContentButton(req,7, true) ;
+	WSContentButton(req,8, true) ;
+	WSContentButton(req,9, true) ;
+	WSContentButton(req,10, true) ;	
+	
+/*
 	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"configecu\">");
 	httpd_resp_sendstr_chunk(req, "<button>Paramètres ECU</button></form>");
 	httpd_resp_sendstr_chunk(req, "</form>");
@@ -1570,7 +1598,7 @@ static esp_err_t frontpage(httpd_req_t *req)
 	httpd_resp_sendstr_chunk(req, "<button class=\"button bred\">Couper le WiFi</button></form>");
 	httpd_resp_sendstr_chunk(req, "</form>");
 	httpd_resp_sendstr_chunk(req, "<p></p>");
-
+*/
 	Text2Html(req, "/html/footer.html");
 	httpd_resp_sendstr_chunk(req, NULL); //fin de la page
 	}
