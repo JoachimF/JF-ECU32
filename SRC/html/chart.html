@@ -1,0 +1,61 @@
+
+
+<canvas id="rpmpump" style="display: block; box-sizing: border-box; height: 300px; width: 600px;"></canvas>
+<canvas id="line-chart" style="display: block; box-sizing: border-box; height: 300px; width: 600px;"></canvas>
+<script
+    src="https://cdn.jsdelivr.net/npm/chart.js@4.0.1/dist/chart.umd.min.js"></script>
+<script>
+    //window.addEventListener("load", getData);
+
+	const chart1 = new Chart(document.getElementById("rpmpump"), {
+		type : 'line',
+		data : {
+			labels : [],
+			datasets : [
+					{
+						data : [],
+						label : "RPM/Pompe",
+						borderColor : "#3cba9f",
+						fill : false
+					}]
+		},
+		options : {
+			title : {
+				display : true,
+				text : 'Chart JS Line Chart Example'
+			}
+		}
+	});
+
+    var Params = function getData() {
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                var myObj = JSON.parse(this.responseText);
+                console.log(myObj);
+                var chartdata = myObj.data;
+                console.log(chartdata);
+                var labels = myObj.labels
+                console.log(labels);
+                var i = 0 ;
+                labels.forEach((label) => {
+                    chart1.data.labels.push(label) ;
+                }) ;
+                chart1.data.datasets.forEach((dataset) => {
+                    chartdata.forEach((data) => {
+                        dataset.data.push(data);
+                    });
+                });
+                chart1.update();
+                //chart1.data.dataset.data.value = chartdata;
+                //chart1.data.labels.value = labels;
+                //chart1.update() ;
+            }
+        };
+        xhr.open("GET", "/chartdata", true);
+        xhr.send();
+    }() ;
+
+    //setInterval(getData,2000) ;
+</script>
+

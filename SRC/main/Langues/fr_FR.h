@@ -29,6 +29,7 @@
   #define B_WIFI "Paramètres Wifi"
   #define B_SLIDER "Sliders"
   #define B_JAUGES "Jauges"
+  #define B_CHART "Courbe"
   #define B_START_ENGINE "Démarreur le moteur"
   #define B_STOP_ENGINE "Arrêter le moteur"
   #define B_MAJ "Mise à jour"
@@ -36,6 +37,9 @@
 
   #define B_SAVE "Sauvegarder"
   #define B_RETOUR "Retour"
+
+  #define B_STARTCALIBRATION "Démarrer la calibration"
+  #define B_STOPCALIBRATION "Arrêter la calibration"
 
   #define RD_THROTTLE_TYP "Voie des gaz"
   #define RD_GLOW_TYP "Type de bougie"
@@ -65,7 +69,25 @@
   #define CT_PUMP2_PPM "Variateur PPM"
   #define CT_PUMP2_DIS "Désactivée"
 
+  #define IN_NAME "Nom du moteur"
+  #define IN_GLOWPOWER "Puissance de la bougie 0-255"
+  #define IN_RPMMAX "RPM plein gaz"
+  #define IN_RPMIDLE "RPM ralenti"
+  #define IN_RPMMIN "RPM mini"
+  #define IN_TEMPSTART "Température de démarrage en °C"
+  #define IN_TEMPMAX "Température max en °C"
+  #define IN_DELAYACC "Délai d'accélération (0-30)"
+  #define IN_DELAYDEC "Délai de décélération (0-30)"
+  #define IN_DELAYSTAB "Délai de stabilité (0-30)"
+  #define IN_PUMP1MAX "PWM Max pompe 1 (0-1024)"
+  #define IN_PUMP1MIN "PWM Min pompe 1 (0-1024)"
+  #define IN_PUMP2MAX "PWM Max pompe 2 (0-1024)"
+  #define IN_PUMP2MIN "PWM Min pompe 2 (0-1024)"
+  #define IN_VANNE1MAX "PWM Max vanne 1 (0-1024)"
+  #define IN_VANNE2MAX "PWM Max vanne 2 (0-1024)"
+  #define IN_RPMSTARTER "RPM Allumage (0-10000RPM)"
 
+  #define SURE "Etes vous sur de vouloir"
   #define B_CONFIRM_SAVE "Confirmer la sauvegarde"
 
   #define D_DECIMAL_SEPARATOR ","

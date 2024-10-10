@@ -607,6 +607,28 @@ static esp_err_t logs(httpd_req_t *req)
 	return ESP_OK;
 }
 
+int find_param_radio(int param,char *buf,char *output)
+{
+	int len ;
+	char input[20] ;
+	char title[40] ;
+	sprintf(input,"rd_input_%d=",param) ;
+	len = find_value(input,buf,output) ;
+	ESP_LOGI(TAG, "%s=%s len=%d",GetTextIndexed(title, sizeof(title), param, htmlRadioParamEcu),output,len);
+	return len ;
+}
+
+int find_param_checkbox(int param,char *buf,char *output)
+{
+	int len ;
+	char input[20] ;
+	char title[40] ;
+	sprintf(input,"ch_input%d=",param) ;
+	len = find_value(input,buf,output) ;
+	ESP_LOGI(TAG, "%s=%s len=%d",GetTextIndexed(title, sizeof(title), param, htmlCheckParamEcu),output,len);
+	return len ;
+}
+
 void save_configecu(httpd_req_t *req)
 {
 	char *buf = malloc(strlen(req->uri)+1) ;
@@ -619,8 +641,8 @@ void save_configecu(httpd_req_t *req)
 	strcpy(buf,req->uri) ;
 //	ESP_LOGI(TAG, "buf=%s",buf);
 //	ESP_LOGI(TAG, "buf len=%d",strlen(buf));
-	len = find_value("input=",buf,param) ;
-	ESP_LOGI(TAG, "input=%c len=%d",*param,len);
+	//len = find_value("input=",buf,param) ;
+	len = find_param_radio(R_THROTTLE_TYP,buf,param) ;
 	if(len==1) {
 		if(*param == '0'){
 			config_ECU.input_type = PPM ;
@@ -628,8 +650,8 @@ void save_configecu(httpd_req_t *req)
 			config_ECU.input_type = SBUS ;
 		}
 	}
-	len = find_value("glow_type=",buf,param) ;
-	ESP_LOGI(TAG, "glow_type=%c len=%d",*param,len);
+	//len = find_value("glow_type=",buf,param) ;
+	len = find_param_radio(R_GLOW_TYP,buf,param) ;
 	if(len==1) {
 		if(*param == '0'){
 			config_ECU.glow_type = GAS ;
@@ -637,8 +659,8 @@ void save_configecu(httpd_req_t *req)
 			config_ECU.glow_type = KERO ;
 		}
 	}
-	len = find_value("start_type=",buf,param) ;
-	ESP_LOGI(TAG, "start_type=%c len=%d",*param,len);
+	//len = find_value("start_type=",buf,param) ;
+	len = find_param_radio(R_START_TYP,buf,param) ;
 	if(len==1) {
 		if(*param == '0'){
 			config_ECU.start_type = MANUAL ;
@@ -646,8 +668,8 @@ void save_configecu(httpd_req_t *req)
 			config_ECU.start_type = AUTO ;
 		}
 	}
-	len = find_value("output_pump1=",buf,param) ;
-	ESP_LOGI(TAG, "output_pump1=%c len=%d",*param,len);
+	//len = find_value("output_pump1=",buf,param) ;
+	len = find_param_radio(R_PUMP1_TYP,buf,param) ;
 	if(len==1) {
 		if(*param == '0'){
 			config_ECU.output_pump1 = PPM ;
@@ -655,8 +677,8 @@ void save_configecu(httpd_req_t *req)
 			config_ECU.output_pump1 = PWM ;
 		}
 	}
-	len = find_value("output_starter=",buf,param) ; 
-	ESP_LOGI(TAG, "output_starter=%c len=%d",*param,len);
+	//len = find_value("output_starter=",buf,param) ; 
+	len = find_param_radio(R_STARTER_TYP,buf,param) ;
 	if(len==1) {
 		if(*param == '0'){
 			config_ECU.output_starter = PPM ;
@@ -664,8 +686,8 @@ void save_configecu(httpd_req_t *req)
 			config_ECU.output_starter = PWM ;
 		}
 	}
-	len = find_value("telem=",buf,param) ;
-	ESP_LOGI(TAG, "telem=%c len=%d",*param,len);
+	//len = find_value("telem=",buf,param) ;
+	len = find_param_radio(R_TELEM_TYP,buf,param) ;
 	if(len==1) {
 		switch(*param){
 			case '0' : 
@@ -679,8 +701,8 @@ void save_configecu(httpd_req_t *req)
 			break ;
 		}
 	}
-	len = find_value("output_pump2=",buf,param) ;
-	ESP_LOGI(TAG, "output_pump2=%c len=%d",*param,len);
+	//len = find_value("output_pump2=",buf,param) ;
+	len = find_param_radio(R_PUMP2_TYP,buf,param) ;
 	if(len==1) {
 		switch(*param){
 			case '0' :
@@ -694,15 +716,16 @@ void save_configecu(httpd_req_t *req)
 			break;
 		}
 	}
-	len = find_value("use_input2=",buf,param) ;
-	ESP_LOGI(TAG, "use_input2=%c len=%d",*param,len);
+	//len = find_value("use_input2=",buf,param) ;
+	len = find_param_checkbox(C_AUX_EN,buf,param) ;
 	if(len == 2){
 		config_ECU.use_input2 = YES ;
 	}else{
 		config_ECU.use_input2 = NO ;
 	}
 	
-	len = find_value("use_led=",buf,param) ;
+	//len = find_value("use_led=",buf,param) ;
+	len = find_param_checkbox(C_LEDS_EN,buf,param) ;
 	ESP_LOGI(TAG, "use_led=%c len=%d",*param,len);
 	if(len == 2){
 		config_ECU.use_led = YES ;
@@ -712,6 +735,7 @@ void save_configecu(httpd_req_t *req)
 	write_nvs_ecu() ;
 	free(buf) ;
 }
+
 static esp_err_t configecu(httpd_req_t *req)
 {
 	ESP_LOGI(TAG, "config ECU req->uri=[%s]", req->uri);
@@ -731,7 +755,7 @@ static esp_err_t configecu(httpd_req_t *req)
 		esp_restart() ;
 	}	
 
-	ESP_LOGI("CONFIG_ECU","input : %d",config_ECU.input_type) ;
+	/*ESP_LOGI("CONFIG_ECU","input : %d",config_ECU.input_type) ;
 	ESP_LOGI("CONFIG_ECU","glow_type : %d",config_ECU.glow_type) ;	
 	ESP_LOGI("CONFIG_ECU","start_type : %d",config_ECU.start_type) ;
 	ESP_LOGI("CONFIG_ECU","output_pump1 : %d",config_ECU.output_pump1) ;
@@ -739,7 +763,7 @@ static esp_err_t configecu(httpd_req_t *req)
 	ESP_LOGI("CONFIG_ECU","output_starter : %d",config_ECU.output_starter) ;
 	ESP_LOGI("CONFIG_ECU","use_telem : %d",config_ECU.use_telem) ;
 	ESP_LOGI("CONFIG_ECU","use_input2 : %d",config_ECU.use_input2) ;
-	ESP_LOGI("CONFIG_ECU","use_led : %d",config_ECU.use_led) ;
+	ESP_LOGI("CONFIG_ECU","use_led : %d",config_ECU.use_led) ;*/
 
 	// Send HTML header
 	send_head(req) ;
@@ -754,119 +778,40 @@ static esp_err_t configecu(httpd_req_t *req)
 	
 	httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Paramètre de l'ECU&nbsp;</b></legend><form method=\"GET\" action=\"configecu\"><p>") ;
 	/*Voie des gaz*/
-	//for(int z = 0; z<7 ; z++)
-		WSRadio(req,0,config_ECU.input_type,true);
-		WSRadio(req,1,config_ECU.input_type,true);
-		WSRadio(req,2,config_ECU.input_type,true);
-		WSRadio(req,3,config_ECU.input_type,true);
-		WSRadio(req,4,config_ECU.input_type,true);
-		WSRadio(req,5,config_ECU.input_type,true);
-		WSRadio(req,6,config_ECU.input_type,true);
-	
-	/*httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Voie des gaz</b></legend>") ;
+	WSRadio(req,R_THROTTLE_TYP,config_ECU.input_type,true);
+	WSRadio(req,R_GLOW_TYP,config_ECU.glow_type,true);
+	WSRadio(req,R_START_TYP,config_ECU.start_type,true);
+	WSRadio(req,R_PUMP1_TYP,config_ECU.output_pump1,true);
+	WSRadio(req,R_STARTER_TYP,config_ECU.output_starter,true);
+	WSRadio(req,R_TELEM_TYP,config_ECU.use_telem,true);
+	WSRadio(req,R_PUMP2_TYP,config_ECU.output_pump2,true);
+	WSCheckBox(req,C_AUX_EN,config_ECU.use_input2,true) ;
+	WSCheckBox(req,C_LEDS_EN,config_ECU.use_led,true) ;
 
-		httpd_resp_sendstr_chunk(req, "<p><input id=\"input_ppm\" name=\"input\" type=\"radio\" value=\"0\"") ;
-		httpd_resp_sendstr_chunk(req, (config_ECU.input_type == PPM) ? "checked=\"\"" :" " ) ;
-		httpd_resp_sendstr_chunk(req, "><b>Standard</b>") ;
-		
-		httpd_resp_sendstr_chunk(req, "<p><input id=\"input_sbus\" name=\"input\" type=\"radio\" value=\"1\"") ;
-		httpd_resp_sendstr_chunk(req, (config_ECU.input_type == SBUS) ? "checked=\"\"" :" " ) ;
-		httpd_resp_sendstr_chunk(req, "><b>SBUS</b>") ;*/
 	
-	//httpd_resp_sendstr_chunk(req, "</fieldset><p>") ;
-	/*Type de bougie*/
-	
-
-	/*httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Type de bougie</b></legend>") ;
-		httpd_resp_sendstr_chunk(req, "<p><input id=\"glow_type_gas\" name=\"glow_type\" type=\"radio\" value=\"0\"") ;
-		httpd_resp_sendstr_chunk(req, (config_ECU.glow_type == GAS) ? "checked=\"\"" :" " ) ;
-		httpd_resp_sendstr_chunk(req, "><b>Gaz</b>") ;
-		
-		httpd_resp_sendstr_chunk(req, "<p><input id=\"glow_type_kero\" name=\"glow_type\" type=\"radio\" value=\"1\"") ;
-		httpd_resp_sendstr_chunk(req, (config_ECU.glow_type == KERO) ? "checked=\"\"" :" " ) ;
-		httpd_resp_sendstr_chunk(req, "><b>Kérostart</b>") ;
-	httpd_resp_sendstr_chunk(req, "</fieldset><p>") ;*/
-	/*Type de démarrage*/
-	/*httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Démarrage</b></legend>") ;
-		httpd_resp_sendstr_chunk(req, "<p><input id=\"start_type_manual\" name=\"start_type\" type=\"radio\" value=\"0\"") ;
-		httpd_resp_sendstr_chunk(req, (config_ECU.start_type == MANUAL ) ? "checked=\"\"" :" " ) ;
-		httpd_resp_sendstr_chunk(req, "><b>Manuel</b>") ;
-	
-		httpd_resp_sendstr_chunk(req, "<p><input id=\"start_type_auto\" name=\"start_type\" type=\"radio\" value=\"1\"") ;
-		httpd_resp_sendstr_chunk(req, (config_ECU.start_type == AUTO ) ? "checked=\"\"" :" " ) ;
-		httpd_resp_sendstr_chunk(req, "><b>Auto</b>") ;
-	httpd_resp_sendstr_chunk(req, "</fieldset><p>") ;*/
-	/*Type de pompe*/
-	/*httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Pompe 1</b></legend>") ;
-		httpd_resp_sendstr_chunk(req, "<p><input id=\"output_pump1_pwm\" name=\"output_pump1\" type=\"radio\" value=\"1\"") ;
-		httpd_resp_sendstr_chunk(req, (config_ECU.output_pump1 == PWM) ? "checked=\"\"" :" " ) ;
-		httpd_resp_sendstr_chunk(req, "><b>Moteur DC</b>") ;
-		
-		httpd_resp_sendstr_chunk(req, "<p><input id=\"output_pump1_ppm\" name=\"output_pump1\" type=\"radio\" value=\"0\"") ;
-		httpd_resp_sendstr_chunk(req, (config_ECU.output_pump1 == PPM) ? "checked=\"\"" :" " ) ;
-		httpd_resp_sendstr_chunk(req, "><b>Variateur</b>") ;
-	httpd_resp_sendstr_chunk(req, "</fieldset><p>") ;*/
-	/*Type de démarreur*/
-	/*httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Démarreur</b></legend>") ;
-		httpd_resp_sendstr_chunk(req, "<p><input id=\"output_starter_pwm\" name=\"output_starter\" type=\"radio\" value=\"1\"") ;
-		httpd_resp_sendstr_chunk(req, (config_ECU.output_starter == PWM) ? "checked=\"\"" :" " ) ;
-		httpd_resp_sendstr_chunk(req, "><b>Moteur DC</b>") ;
-		
-		httpd_resp_sendstr_chunk(req, "<p><input id=\"output_starter_ppm\" name=\"output_starter\" type=\"radio\" value=\"0\"") ;
-		httpd_resp_sendstr_chunk(req, (config_ECU.output_starter == PPM) ? "checked=\"\"" :" " ) ;
-		httpd_resp_sendstr_chunk(req, "><b>Variateur</b>") ;
-	httpd_resp_sendstr_chunk(req, "</fieldset><p>") ;*/
-	/*Type de télémétrie*/
-	/*httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Télémétrie</b></legend>") ;
-		httpd_resp_sendstr_chunk(req, "<p><input id=\"futaba_telem\" name=\"telem\" type=\"radio\" value=\"0\"") ;
-		httpd_resp_sendstr_chunk(req, (config_ECU.use_telem == FUTABA ) ? "checked=\"\"" :" " ) ;
-		httpd_resp_sendstr_chunk(req, "><b>Désactivée</b>") ;
-	
-		httpd_resp_sendstr_chunk(req, "<p><input id=\"use_frsky_telem\" name=\"telem\" type=\"radio\" value=\"1\"") ;
-		httpd_resp_sendstr_chunk(req, (config_ECU.use_telem == FRSKY ) ? "checked=\"\"" :" " ) ;
-		httpd_resp_sendstr_chunk(req, "><b>FrSky</b>") ;
-
-		httpd_resp_sendstr_chunk(req, "<p><input id=\"use_hott_telem\" name=\"telem\" type=\"radio\" value=\"3\"") ;
-		httpd_resp_sendstr_chunk(req, (config_ECU.use_telem == HOTT ) ? "checked=\"\"" :" " ) ;
-		httpd_resp_sendstr_chunk(req, "><b>FrSky</b>") ;
-		
-		httpd_resp_sendstr_chunk(req, "<p><input id=\"no_telem\" name=\"telem\" type=\"radio\" value=\"2\"") ;
-		httpd_resp_sendstr_chunk(req, (config_ECU.use_telem == NONE ) ? "checked=\"\"" :" " ) ;
-		httpd_resp_sendstr_chunk(req, "><b>Futaba</b>") ;
-	httpd_resp_sendstr_chunk(req, "</fieldset><p>") ;*/
-	/*Pompe 2*/
-	/*httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Pompe 2</b></legend>") ;
-		httpd_resp_sendstr_chunk(req, "<p><input id=\"no_pump2\" name=\"output_pump2\" type=\"radio\" value=\"0\"") ;
-		httpd_resp_sendstr_chunk(req, (config_ECU.output_pump2 == PPM) ? "checked=\"\"" :" " ) ;
-		httpd_resp_sendstr_chunk(req, "><b>Variateur</b>") ;
-
-		httpd_resp_sendstr_chunk(req, "<p><input id=\"output_pump2_pwm\" name=\"output_pump2\" type=\"radio\" value=\"1\"") ;
-		httpd_resp_sendstr_chunk(req, (config_ECU.output_pump2 == PWM) ? "checked=\"\"" :" " ) ;
-		httpd_resp_sendstr_chunk(req, "><b>Moteur DC</b>") ;
-		
-		httpd_resp_sendstr_chunk(req, "<p><input id=\"output_pump2_ppm\" name=\"output_pump2\" type=\"radio\" value=\"2\"") ;
-		httpd_resp_sendstr_chunk(req, (config_ECU.output_pump2 == NONE) ? "checked=\"\"" :" " ) ;
-		httpd_resp_sendstr_chunk(req, "><b>Désactivée</b>") ;
-	httpd_resp_sendstr_chunk(req, "</fieldset><p>") ;*/
-	/*Voie aux*/
-	httpd_resp_sendstr_chunk(req, "<p><input id=\"use_input2\" type=\"checkbox\"") ;
-	httpd_resp_sendstr_chunk(req, (config_ECU.use_input2 == YES) ? "checked=\"\"" :" " ) ;
-	httpd_resp_sendstr_chunk(req, " name=\"use_input2\"><b>Voie 2 Activée</b>") ;
-	/*Leds*/
-	httpd_resp_sendstr_chunk(req, "<p><input id=\"use_led\" type=\"checkbox\" " ) ;
-	httpd_resp_sendstr_chunk(req, (config_ECU.use_led == YES) ? "checked=\"\"" :" " ) ;
-	httpd_resp_sendstr_chunk(req, " name=\"use_led\"><b>Leds Activées</b>") ;
 	/* Save*/
-	httpd_resp_sendstr_chunk(req, "</p><p><button name=\"save\" type=\"submit\" class=\"button bgrn\">Sauvegarde</button>") ;
-	httpd_resp_sendstr_chunk(req, "</form></fieldset><p>") ;
+	WSSaveBouton(req) ;
 	
+
 	/*Retour*/	
-	httpd_resp_sendstr_chunk(req, "<p></p><form action=\"/\" method=\"get\"><button name="">Retour</button></form>") ;
+	WSRetourBouton(req) ;
+	//httpd_resp_sendstr_chunk(req, "<p></p><form action=\"/\" method=\"get\"><button name="">Retour</button></form>") ;
 
 	Text2Html(req, "/html/footer.html");
 	httpd_resp_sendstr_chunk(req, NULL); //fin de la page
 
 	return ESP_OK;
+}
+
+int find_param_input(int param,char *buf,char *output)
+{
+	int len ;
+	char input[20] ;
+	char title[40] ;
+	sprintf(input,"input_%d=",param) ;
+	len = find_value(input,buf,output) ;
+	ESP_LOGI(TAG, "%s=%s len=%d",GetTextIndexed(title, sizeof(title), param, htmlInputParamEng),output,len);
+	return len ;
 }
 
 void save_configturbine(httpd_req_t *req)
@@ -878,92 +823,78 @@ void save_configturbine(httpd_req_t *req)
 	strcpy(buf,req->uri) ;
 	ESP_LOGI(TAG, "Sauvegarde config turbine");
 	/*Nom*/
-	len = find_value("name=",buf,param) ;
-	ESP_LOGI(TAG, "name=%c len=%d",*param,len);
+	len = find_param_input(I_NAME,buf,param) ;
 	if(len>1) {
 		strcpy(turbine_config.name,param) ;
 	}
 	/*Puissance bougie*/
-	len = find_value("glow_power=",buf,param) ;
-	ESP_LOGI(TAG, "glow_power=%c len=%d",*param,len);
+	len = find_param_input(I_GLOWPOWER,buf,param) ;
 	if(len>1) {
 		turbine_config.glow_power = atoi(param) ;		
 	}
 	/*Max RPM*/
-	len = find_value("jet_full_power_rpm=",buf,param) ;
-	ESP_LOGI(TAG, "jet_full_power_rpm=%c len=%d",*param,len);
+	len = find_param_input(I_RPMMAX,buf,param) ;
 	if(len>1) {
 		turbine_config.jet_full_power_rpm = atoi(param) ;		
 	}
 	/*RPM ralenti*/
-	len = find_value("jet_idle_rpm=",buf,param) ;
-	ESP_LOGI(TAG, "jet_idle_rpm=%c len=%d",*param,len);
+	len = find_param_input(I_RPMIDLE,buf,param) ;
 	if(len>1) {
 		turbine_config.jet_idle_rpm = atoi(param) ;		
 	}
 	/*RPM mini*/
-	len = find_value("jet_min_rpm=",buf,param) ;
+	len = find_param_input(I_RPMMIN,buf,param) ;
 	ESP_LOGI(TAG, "jet_min_rpm=%c len=%d",*param,len);
 	if(len>1) {
 		turbine_config.jet_min_rpm = atoi(param) ;		
 	}
 	/*Start Temp.*/
-	len = find_value("start_temp=",buf,param) ;
-	ESP_LOGI(TAG, "start_temp=%c len=%d",*param,len);
+	len = find_param_input(I_TEMPSTART,buf,param) ;
 	if(len>1) {
 		turbine_config.start_temp = atoi(param) ;		
 	}
 	/*Max Temp.*/
-	len = find_value("max_temp=",buf,param) ;
-	ESP_LOGI(TAG, "max_temp=%c len=%d",*param,len);
+	len = find_param_input(I_TEMPMAX,buf,param) ;
 	if(len>1) {
 		turbine_config.max_temp = atoi(param) ;		
 	}
 	/*Délai de stabilité*/
-	len = find_value("stability_delay=",buf,param) ;
-	ESP_LOGI(TAG, "stability_delay=%c len=%d",*param,len);
+	len = find_param_input(I_DELAYSTAB,buf,param) ;
 	if(len>1) {
 		turbine_config.stability_delay = atoi(param) ;		
 	}	
 	/*Max pupm1*/
-	len = find_value("max_pump1=",buf,param) ;
-	ESP_LOGI(TAG, "max_pump1=%c len=%d",*param,len);
+	len = find_param_input(I_PUMP1MAX,buf,param) ;
 	if(len>1) {
 		turbine_config.max_pump1 = atoi(param) ;		
 	}
 	/*Min pump1*/
-	len = find_value("min_pump1=",buf,param) ;
-	ESP_LOGI(TAG, "min_pump1=%c len=%d",*param,len);
+	len = find_param_input(I_PUMP1MIN,buf,param) ;
 	if(len>1) {
 		turbine_config.min_pump1 = atoi(param) ;		
 	}	
 	/*Max pump2*/
-	len = find_value("max_pump2=",buf,param) ;
-	ESP_LOGI(TAG, "max_pump2=%c len=%d",*param,len);
+	len = find_param_input(I_PUMP2MAX,buf,param) ;
 	if(len>1) {
 		turbine_config.max_pump2 = atoi(param) ;		
 	}	
 	/*Min pump2*/
-	len = find_value("min_pump2=",buf,param) ;
-	ESP_LOGI(TAG, "min_pump2=%c len=%d",*param,len);
+	len = find_param_input(I_PUMP2MIN,buf,param) ;
 	if(len>1) {
 		turbine_config.min_pump2 = atoi(param) ;		
 	}
 	/*Max vanne1*/
-	len = find_value("max_vanne1=",buf,param) ;
-	ESP_LOGI(TAG, "max_vanne1=%c len=%d",*param,len);
+	len = find_param_input(I_VANNE1MAX,buf,param) ;
 	if(len>1) {
 		turbine_config.max_vanne1 = atoi(param) ;		
 	}	
 	/*Max vanne2*/
-	len = find_value("max_vanne2=",buf,param) ;
-	ESP_LOGI(TAG, "max_vanne2=%c len=%d",*param,len);
+	len = find_param_input(I_VANNE2MAX,buf,param) ;
 	if(len>1) {
 		turbine_config.max_vanne2 = atoi(param) ;		
 	}
 	/*RPM Start Starter*/
-	len = find_value("starter_rpm_start=",buf,param) ;
-	ESP_LOGI(TAG, "starter_rpm_start=%c len=%d",*param,len);
+	len = find_param_input(I_RPMSTARTER,buf,param) ;
 	if(len>1) {
 		turbine_config.starter_rpm_start = atoi(param) ;		
 	}
@@ -1038,10 +969,12 @@ static esp_err_t wifi_get_handler(httpd_req_t *req)
 	httpd_resp_sendstr_chunk(req, tmp) ;
 	httpd_resp_sendstr_chunk(req, "\" name=\"retry\" type=\"number\" min=\"1\" max=\"50\"></p><p>");
 	
-	httpd_resp_sendstr_chunk(req, "<button name=\"save\" type=\"submit\" class=\"button bgrn\">Sauvegarde</button>") ;
-	httpd_resp_sendstr_chunk(req, "</form></fieldset>") ;
+	//httpd_resp_sendstr_chunk(req, "<button name=\"save\" type=\"submit\" class=\"button bgrn\">Sauvegarde</button>") ;
+	//httpd_resp_sendstr_chunk(req, "</form></fieldset>") ;
+	WSSaveBouton(req) ;
+	WSRetourBouton(req) ;
 
-	httpd_resp_sendstr_chunk(req, "<p></p><form action=\"/\" method=\"get\"><button name="">Retour</button></form>") ;
+//	httpd_resp_sendstr_chunk(req, "<p></p><form action=\"/\" method=\"get\"><button name="">Retour</button></form>") ;
 	
 	Text2Html(req, "/html/footer.html");
 	httpd_resp_sendstr_chunk(req, NULL); //fin de la page
@@ -1057,9 +990,12 @@ static esp_err_t calibrations(httpd_req_t *req)
 	send_head(req) ;
 
 	// Send buttons
-	httpd_resp_sendstr_chunk(req, "<p></p><form action=\"starter_calibration\" method=\"get\"><button name="">Calibrer le démarreur</button></form>") ;
+	WSBouton(req,BT_STARTCALIBRATION) ;
+	//httpd_resp_sendstr_chunk(req, "<p></p><form action=\"starter_calibration\" method=\"get\"><button name="">Calibrer le démarreur</button></form>") ;
 
-	httpd_resp_sendstr_chunk(req, "<p></p><form action=\"/\" method=\"get\"><button name="">Retour</button></form>") ;
+	
+	WSRetourBouton(req) ;
+	//httpd_resp_sendstr_chunk(req, "<p></p><form action=\"/\" method=\"get\"><button name="">Retour</button></form>") ;
 
 	// Send footer
 	Text2Html(req, "/html/footer.html");
@@ -1076,7 +1012,8 @@ static esp_err_t starter_calibration_page(httpd_req_t *req)
 	send_head(req) ;
 
 	// Send buttons
-	httpd_resp_sendstr_chunk(req, "<p></p><form action=\"stop_starter_calibration\" method=\"get\"><button name="">Arrêter la calibration</button></form>") ;
+	WSBouton(req,BT_STOPCALIBRATION) ;
+	//httpd_resp_sendstr_chunk(req, "<p></p><form action=\"stop_starter_calibration\" method=\"get\"><button name="">"B_STOPCALIBRATION"</button></form>") ;
 
 	// Send footer
 	Text2Html(req, "/html/footer.html");
@@ -1103,7 +1040,7 @@ static esp_err_t configmoteur(httpd_req_t *req)
 	char * addr1 = strstr(req->uri, "save=");
 	if (addr1 != NULL) save_configturbine(req) ; // Paramètres a sauvagarder
 		
-	char tmp[10] ;
+	//char tmp[10] ;
 	// Send HTML header
 	send_head(req) ;
 	/*httpd_resp_sendstr_chunk(req, "<!DOCTYPE html><html>");
@@ -1112,117 +1049,33 @@ static esp_err_t configmoteur(httpd_req_t *req)
 	httpd_resp_sendstr_chunk(req, "<h2>");
 	httpd_resp_sendstr_chunk(req, turbine_config.name);
 	httpd_resp_sendstr_chunk(req, "</h2></div>");*/
-		
+
 	httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Paramètres du moteur&nbsp;</b></legend><form method=\"GET\" action=\"configmoteur\"><p>") ;
-
-	httpd_resp_sendstr_chunk(req, "<b>Nom du moteur</b><br>");
-	httpd_resp_sendstr_chunk(req, "<input id=\"name\" placeholder=\"\" value=\"");
-	httpd_resp_sendstr_chunk(req, turbine_config.name) ;
-	httpd_resp_sendstr_chunk(req, "\" name=\"name\" minlength=\"1\" maxlength=\"20\"></p><p>");
-
-	httpd_resp_sendstr_chunk(req, "<b>Puissance de la bougie 0-255</b><br>");
-	httpd_resp_sendstr_chunk(req, "<input id=\"glow_power\" placeholder=\"\" value=\"");
-	itoa(turbine_config.glow_power,tmp,10) ;
-	httpd_resp_sendstr_chunk(req, tmp) ;
-	httpd_resp_sendstr_chunk(req, "\" name=\"glow_power\" type=\"number\" min=\"0\" max=\"255\"></p><p>");
-
-	httpd_resp_sendstr_chunk(req, "<b>RPM plein gaz</b><br>");
-	httpd_resp_sendstr_chunk(req, "<input id=\"jet_full_power_rpm\" placeholder=\"\" value=\"");
-	itoa(turbine_config.jet_full_power_rpm,tmp,10) ;
-	httpd_resp_sendstr_chunk(req, tmp) ;
-	httpd_resp_sendstr_chunk(req, "\" name=\"jet_full_power_rpm\" type=\"number\" min=\"0\" max=\"300000\"></p><p>");
-
-	httpd_resp_sendstr_chunk(req, "<b>RPM ralenti</b><br>");
-	httpd_resp_sendstr_chunk(req, "<input id=\"jet_idle_rpm\" placeholder=\"\" value=\"");
-	itoa(turbine_config.jet_idle_rpm,tmp,10) ;
-	httpd_resp_sendstr_chunk(req, tmp) ;
-	httpd_resp_sendstr_chunk(req, "\" name=\"\"  type=\"number\" min=\"0\" max=\"300000\"></p><p>");
-
-	httpd_resp_sendstr_chunk(req, "<b>RPM mini</b><br>");
-	httpd_resp_sendstr_chunk(req, "<input id=\"jet_min_rpm\" placeholder=\"\" value=\"");
-	itoa(turbine_config.jet_min_rpm,tmp,10) ;
-	httpd_resp_sendstr_chunk(req, tmp) ;
-	httpd_resp_sendstr_chunk(req, "\" name=\"jet_min_rpm\"  type=\"number\" min=\"0\" max=\"100000\"></p><p>");
-
-	httpd_resp_sendstr_chunk(req, "<b>Température de démarrage en °C</b><br>");
-	httpd_resp_sendstr_chunk(req, "<input id=\"start_temp\" placeholder=\"\" value=\"");
-	itoa(turbine_config.start_temp,tmp,10) ;
-	httpd_resp_sendstr_chunk(req, tmp) ;
-	httpd_resp_sendstr_chunk(req, "\" name=\"start_temp\"  type=\"number\" min=\"0\" max=\"500\"></p><p>");
-
-	httpd_resp_sendstr_chunk(req, "<b>Température max en °C</b><br>");
-	httpd_resp_sendstr_chunk(req, "<input id=\"max_temp\" placeholder=\"\" value=\"");
-	itoa(turbine_config.max_temp,tmp,10) ;
-	httpd_resp_sendstr_chunk(req, tmp) ;
-	httpd_resp_sendstr_chunk(req, "\" name=\"max_temp\"  type=\"number\" min=\"0\" max=\"1000\"></p><p>");
-
-	httpd_resp_sendstr_chunk(req, "<b>Délai d'accélération (0-100)</b><br>");
-	httpd_resp_sendstr_chunk(req, "<input id=\"acceleration_delay\" placeholder=\"\" value=\"");
-	itoa(turbine_config.acceleration_delay,tmp,10) ;
-	httpd_resp_sendstr_chunk(req, tmp) ;
-	httpd_resp_sendstr_chunk(req, "\" name=\"acceleration_delay\"  type=\"number\" min=\"0\" max=\"30\"></p><p>");
-
-	httpd_resp_sendstr_chunk(req, "<b>Délai de décélération (0-100)</b><br>");
-	httpd_resp_sendstr_chunk(req, "<input id=\"deceleration_delay\" placeholder=\"\" value=\"");
-	itoa(turbine_config.deceleration_delay,tmp,10) ;
-	httpd_resp_sendstr_chunk(req, tmp) ;
-	httpd_resp_sendstr_chunk(req, "\" name=\"deceleration_delay\"  type=\"number\" min=\"0\" max=\"30\"></p><p>");
-
-	httpd_resp_sendstr_chunk(req, "<b>Délai de stabilité (0-100)</b><br>");
-	httpd_resp_sendstr_chunk(req, "<input id=\"stability_delay\" placeholder=\"\" value=\"");
-	itoa(turbine_config.stability_delay,tmp,10) ;
-	httpd_resp_sendstr_chunk(req, tmp) ;
-	httpd_resp_sendstr_chunk(req, "\" name=\"stability_delay\"  type=\"number\" min=\"0\" max=\"30\"></p><p>");
-
-	httpd_resp_sendstr_chunk(req, "<b>PWM Max pompe 1 (0-1024)</b><br>");
-	httpd_resp_sendstr_chunk(req, "<input id=\"max_pump1\" placeholder=\"\" value=\"");
-	itoa(turbine_config.max_pump1,tmp,10) ;
-	httpd_resp_sendstr_chunk(req, tmp) ;
-	httpd_resp_sendstr_chunk(req, "\" name=\"max_pump1\"  type=\"number\" min=\"0\" max=\"1024\"></p><p>");
-
-	httpd_resp_sendstr_chunk(req, "<b>PWM Min pompe 1 (0-1024)</b><br>");
-	httpd_resp_sendstr_chunk(req, "<input id=\"min_pump1\" placeholder=\"\" value=\"");
-	itoa(turbine_config.min_pump1,tmp,10) ;
-	httpd_resp_sendstr_chunk(req, tmp) ;
-	httpd_resp_sendstr_chunk(req, "\" name=\"min_pump1\" type=\"number\" min=\"0\" max=\"1024\"></p><p>");
-
-	httpd_resp_sendstr_chunk(req, "<b>PWM Max pompe 2 (0-1024)</b><br>");
-	httpd_resp_sendstr_chunk(req, "<input id=\"max_pump2\" placeholder=\"\" value=\"");
-	itoa(turbine_config.max_pump2,tmp,10) ;
-	httpd_resp_sendstr_chunk(req, tmp) ;
-	httpd_resp_sendstr_chunk(req, "\" name=\"max_pump2\" type=\"number\" min=\"0\" max=\"1024\"></p><p>");
-
-	httpd_resp_sendstr_chunk(req, "<b>PWM Min pompe 2 (0-1024)</b><br>");
-	httpd_resp_sendstr_chunk(req, "<input id=\"min_pump2\" placeholder=\"\" value=\"");
-	itoa(turbine_config.min_pump2,tmp,10) ;
-	httpd_resp_sendstr_chunk(req, tmp) ;
-	httpd_resp_sendstr_chunk(req, "\" name=\"min_pump2\" type=\"number\" min=\"0\" max=\"1024\"></p><p>");
-
-	httpd_resp_sendstr_chunk(req, "<b>PWM Max vanne 1 (0-1024)</b><br>");
-	httpd_resp_sendstr_chunk(req, "<input id=\"max_vanne1\" placeholder=\"\" value=\"");
-	itoa(turbine_config.max_vanne1,tmp,10) ;
-	httpd_resp_sendstr_chunk(req, tmp) ;
-	httpd_resp_sendstr_chunk(req, "\" name=\"max_vanne1\" type=\"number\" min=\"0\" max=\"1024\"></p><p>");
-
-	httpd_resp_sendstr_chunk(req, "<b>PWM Max vanne 2 (0-1024)</b><br>");
-	httpd_resp_sendstr_chunk(req, "<input id=\"max_vanne2\" placeholder=\"\" value=\"");
-	itoa(turbine_config.max_vanne2,tmp,10) ;
-	httpd_resp_sendstr_chunk(req, tmp) ;
-	httpd_resp_sendstr_chunk(req, "\" name=\"max_vanne2\" type=\"number\" min=\"0\" max=\"1024\"></p><p>");
-
-	httpd_resp_sendstr_chunk(req, "<b>RPM Allumage (0-5000RPM)</b><br>");
-	httpd_resp_sendstr_chunk(req, "<input id=\"starter_rpm_start\" placeholder=\"\" value=\"");
-	itoa(turbine_config.starter_rpm_start,tmp,10) ;
-	httpd_resp_sendstr_chunk(req, tmp) ;
-	httpd_resp_sendstr_chunk(req, "\" name=\"starter_rpm_start\" type=\"number\" min=\"0\" max=\"5000\"></p><p>");	
-
-	httpd_resp_sendstr_chunk(req, "<button name=\"save\" type=\"submit\" class=\"button bgrn\">Sauvegarde</button>") ;
-	httpd_resp_sendstr_chunk(req, "</form></fieldset>") ;
+	WSInputBox(req,I_NAME,0,turbine_config.name,TEXT,true) ;
+	WSInputBox(req,I_GLOWPOWER,turbine_config.glow_power,NULL,NUMBER,true) ;
+	WSInputBox(req,I_RPMMAX,turbine_config.jet_full_power_rpm,NULL,NUMBER,true) ;
+	WSInputBox(req,I_RPMIDLE,turbine_config.jet_idle_rpm,NULL,NUMBER,true) ;
+	WSInputBox(req,I_RPMMIN,turbine_config.jet_min_rpm,NULL,NUMBER,true) ;
+	WSInputBox(req,I_TEMPSTART,turbine_config.start_temp,NULL,NUMBER,true) ;
+	WSInputBox(req,I_TEMPMAX,turbine_config.max_temp,NULL,NUMBER,true) ;
+	WSInputBox(req,I_DELAYACC,turbine_config.acceleration_delay,NULL,NUMBER,false) ;
+	WSInputBox(req,I_DELAYDEC,turbine_config.deceleration_delay,NULL,NUMBER,false) ;
+	WSInputBox(req,I_DELAYSTAB,turbine_config.stability_delay,NULL,NUMBER,true) ;
+	WSInputBox(req,I_PUMP1MAX,turbine_config.max_pump1,NULL,NUMBER,true) ;
+	WSInputBox(req,I_PUMP1MIN,turbine_config.min_pump1,NULL,NUMBER,true) ;
+	WSInputBox(req,I_PUMP2MAX,turbine_config.max_pump2,NULL,NUMBER,true) ;
+	WSInputBox(req,I_PUMP2MIN,turbine_config.min_pump2,NULL,NUMBER,true) ;
+	WSInputBox(req,I_VANNE1MAX,turbine_config.max_vanne1,NULL,NUMBER,true) ;
+	WSInputBox(req,I_VANNE2MAX,turbine_config.max_vanne2,NULL,NUMBER,true) ;
+	WSInputBox(req,I_RPMSTARTER,turbine_config.starter_rpm_start,NULL,NUMBER,true) ;
+	
+	WSSaveBouton(req) ;
+	/*httpd_resp_sendstr_chunk(req, "<button name=\"save\" type=\"submit\" class=\"button bgrn\">Sauvegarde</button>") ;
+	httpd_resp_sendstr_chunk(req, "</form></fieldset>") ;*/
 
 	httpd_resp_sendstr_chunk(req, "<p></p><form action=\"calibrations\" method=\"get\"><button name="">Calibrations</button></form>") ;	
-
-	httpd_resp_sendstr_chunk(req, "<p></p><form action=\"/\" method=\"get\"><button name="">Retour</button></form>") ;
-	
+	//httpd_resp_sendstr_chunk(req, "<p></p><form action=\"/\" method=\"get\"><button name="">Retour</button></form>") ;
+	WSRetourBouton(req) ;
 	Text2Html(req, "/html/footer.html");
 	httpd_resp_sendstr_chunk(req, NULL); //fin de la page
 
@@ -1260,6 +1113,19 @@ static const char* get_path_from_uri(char *dest, const char *uri, size_t destsiz
 
     // retourne le pointeur ver les chemin (sans la base)
     return dest;
+}
+
+static esp_err_t chart_get_handler(httpd_req_t *req){
+	httpd_resp_sendstr_chunk(req, "<!DOCTYPE html><html>");
+	Text2Html(req, "/html/head.html");
+	Text2Html(req, "/html/head2.html");
+	httpd_resp_sendstr_chunk(req, "<h2>");
+	httpd_resp_sendstr_chunk(req, turbine_config.name);
+	httpd_resp_sendstr_chunk(req, "</h2>");
+	Text2Html(req, "/html/chart.html");
+	Text2Html(req, "/html/footer.html");
+	httpd_resp_sendstr_chunk(req, NULL); //fin de la page
+	return ESP_OK;
 }
 
 static esp_err_t gauges_get_handler(httpd_req_t *req){
@@ -1370,7 +1236,29 @@ static esp_err_t g_params_get_handler(httpd_req_t *req){
 	cJSON_Delete(myjson) ;
 	free(my_json_string) ; 
 	return ESP_OK;
-}		
+}
+
+static esp_err_t g_chartdata_get_handler(httpd_req_t *req){
+	//char labels[500] ;
+	//char datas[200] ;
+	static cJSON *myjson;
+	cJSON *labels,*datas;
+	myjson = cJSON_CreateObject();
+
+	labels = cJSON_CreateIntArray(turbine_config.power_table.RPM,50); 
+	cJSON_AddItemToObject(myjson,"labels",labels) ;
+	datas = cJSON_CreateIntArray(turbine_config.power_table.pump,50);
+	cJSON_AddItemToObject(myjson,"data",datas) ;
+	
+	char *my_json_string = cJSON_Print(myjson) ;
+	httpd_resp_set_type(req, "application/json") ;
+	httpd_resp_sendstr_chunk(req, my_json_string) ; //fin de la page
+
+	httpd_resp_sendstr_chunk(req, NULL); //fin de la page
+	cJSON_Delete(myjson) ;
+	free(my_json_string) ; 
+	return ESP_OK;
+}
 
 static esp_err_t readings_get_handler(httpd_req_t *req){
 	static cJSON *myjson;
@@ -1457,7 +1345,7 @@ static esp_err_t frontpage(httpd_req_t *req)
 {
 	//ESP_LOGI(TAG, "root_get_handler req->uri=[%s]", req->uri);
     char filepath[20];
-	static int i=0 ;
+	//static int i=0 ;
     //ESP_LOGI(TAG, "URI : %s", req->uri);
 	xTimerStop( xTimer60s,0) ;
     const char *filename = get_path_from_uri(filepath, req->uri, sizeof(filepath));
@@ -1520,85 +1408,30 @@ static esp_err_t frontpage(httpd_req_t *req)
 	//	events_get_handler(req) ;
 	else if(strcmp(filename, "/upgrade") == 0) 
 		upgrade_get_handler(req) ;
+	else if(strcmp(filename, "/chart") == 0) 
+		chart_get_handler(req) ;
+	else if(strcmp(filename, "/chartdata") == 0) 
+		g_chartdata_get_handler(req) ;
 	else if(strcmp(filename, "/") == 0 ) 
 	{
-		// Send HTML header
+		// Frontpage
 	
-	/*httpd_resp_sendstr_chunk(req, "<!DOCTYPE html><html>");
-	Text2Html(req, "/html/head.html");
-
-	httpd_resp_sendstr_chunk(req, "<h2>");
-	httpd_resp_sendstr_chunk(req, turbine_config.name);
-	httpd_resp_sendstr_chunk(req, "</h2>");*/
 	send_head(req) ;
-	WSContentButton(req,0, true) ;
-	WSContentButton(req,1, true) ;
-	WSContentButton(req,2, true) ;
-	WSContentButton(req,3, true) ;
-	WSContentButton(req,4, true) ;
-	WSContentButton(req,5, true) ;
-	WSContentButton(req,6, true) ;
-	WSContentButton(req,7, true) ;
-	WSContentButton(req,8, true) ;
-	WSContentButton(req,9, true) ;
-	WSContentButton(req,10, true) ;	
 	
-/*
-	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"configecu\">");
-	httpd_resp_sendstr_chunk(req, "<button>Paramètres ECU</button></form>");
-	httpd_resp_sendstr_chunk(req, "</form>");
-	httpd_resp_sendstr_chunk(req, "<p></p>");
+	WSContentButton(req,BT_PARAMECU, true) ;
+	WSContentButton(req,BT_PARAM_MOTEUR, true) ;
+	WSContentButton(req,BT_INFORMATION, true) ;
+	WSContentButton(req,BT_LOG, true) ;
+	WSContentButton(req,BT_WIFI, true) ;
+	WSContentButton(req,BT_SLIDER, true) ;
+	WSContentButton(req,BT_JAUGES, true) ;
+	WSContentButton(req,BT_CHART, true) ;
+	WSContentButton(req,BT_MAJ, true) ;
+	WSContentButton(req,BT_CUT_WIFI, true) ;
+	WSContentButton(req,BT_START_ENGINE, true) ;
+	WSContentButton(req,BT_STOP_ENGINE, true) ;
 	
-	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"configmoteur\">");
-	httpd_resp_sendstr_chunk(req, "<button>Paramètres moteur</button></form>");
-	httpd_resp_sendstr_chunk(req, "</form>");
-	httpd_resp_sendstr_chunk(req, "<p></p>");
-	
-	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"info\">");
-	httpd_resp_sendstr_chunk(req, "<button>Information</button></form>");
-	httpd_resp_sendstr_chunk(req, "</form>");
-	httpd_resp_sendstr_chunk(req, "<p></p>");
-	
-	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"logs\">");
-	httpd_resp_sendstr_chunk(req, "<button>Logs</button></form>");
-	httpd_resp_sendstr_chunk(req, "</form>");
-	httpd_resp_sendstr_chunk(req, "<p></p>");
 
-	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"wifi\">");
-	httpd_resp_sendstr_chunk(req, "<button>WiFi</button></form>");
-	httpd_resp_sendstr_chunk(req, "</form>");
-	httpd_resp_sendstr_chunk(req, "<p></p>");
-
-	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"slider\">");
-	httpd_resp_sendstr_chunk(req, "<button>Slider</button></form>");
-	httpd_resp_sendstr_chunk(req, "</form>");
-	httpd_resp_sendstr_chunk(req, "<p></p>");
-
-	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"gauges\">");
-	httpd_resp_sendstr_chunk(req, "<button>Jauges</button></form>");
-	httpd_resp_sendstr_chunk(req, "</form>");
-	httpd_resp_sendstr_chunk(req, "<p></p>");
-
-	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"start\">");
-	httpd_resp_sendstr_chunk(req, "<button>Start engine</button></form>");
-	httpd_resp_sendstr_chunk(req, "</form>");
-	httpd_resp_sendstr_chunk(req, "<p></p>");
-
-	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"stop\">");
-	httpd_resp_sendstr_chunk(req, "<button>Stop engine</button></form>");
-	httpd_resp_sendstr_chunk(req, "</form>");
-	httpd_resp_sendstr_chunk(req, "<p></p>");
-
-	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"upgrade\">");
-	httpd_resp_sendstr_chunk(req, "<button class=\"button bred\">Mise à jour</button></form>");
-	httpd_resp_sendstr_chunk(req, "</form>");
-	httpd_resp_sendstr_chunk(req, "<p></p>");
-
-	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"stopwifi\">");
-	httpd_resp_sendstr_chunk(req, "<button class=\"button bred\">Couper le WiFi</button></form>");
-	httpd_resp_sendstr_chunk(req, "</form>");
-	httpd_resp_sendstr_chunk(req, "<p></p>");
-*/
 	Text2Html(req, "/html/footer.html");
 	httpd_resp_sendstr_chunk(req, NULL); //fin de la page
 	}

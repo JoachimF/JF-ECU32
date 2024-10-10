@@ -16,25 +16,22 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "Langues/fr_FR.h"
+#include "html.h"
 
 #include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
+#include "esp_log.h"
 #include "esp_http_server.h"
 #include "jf-ecu32.h"
 
 const uint16_t CHUNKED_BUFFER_SIZE = 500;                // Chunk buffer size (needs to be well below stack space (4k for ESP8266, 8k for ESP32) but large enough to cache some small messages)
 
 #define pgm_read_byte(addr) (*(const unsigned char *)(addr))
-#define PSTR(x) (x)
-#define nullptr                                     NULL
+//#define PSTR(x) (x)
+//#define nullptr                                     NULL
 
-const char HTTP_SNS_HR[] = "<tr><td colspan=2 style='font-size:2px'><hr/></td></tr>";
-
-enum ParamEcuRadiosEnum{
-  R_THROTTLE_TYP,R_GLOW_TYP,R_START_TYP,R_PUMP1_TYP,
-  R_STARTER_TYP,R_TELEM_TYP,R_PUMP2_TYP
-} ;
+//const char HTTP_SNS_HR[] = "<tr><td colspan=2 style='font-size:2px'><hr/></td></tr>";
 
 const char htmlRadioParamEcu[]  =
   RD_THROTTLE_TYP "|" RD_GLOW_TYP "|" RD_START_TYP "|" RD_PUMP1_TYP "|" 
@@ -52,29 +49,48 @@ const char htmlRadioParamEcuChoicesTxt[]  =
   CT_TELEM_DIS "&" CT_TELEM_FR "&" CT_TELEM_FUT "&" CT_TELEM_GRA "|"
   CT_PUMP2_DC "&" CT_PUMP2_PPM "&" CT_PUMP2_DIS;
 
-
-enum ParamEcuCheckEnum{
-  C_AUX_EN,C_LEDS_EN
-} ;
-
 const char htmlCheckParamEcu[]  =
   CH_AUX_EN "|" CH_LEDS_EN ;
 
-enum BoutonFrontpageEnum {
-  BT_PARAMECU, BT_PARAM_MOTEUR,
-  BT_INFORMATION, BT_LOG, BT_WIFI, BT_SLIDER, BT_JAUGES,
-  BT_START_ENGINE, BT_STOP_ENGINE, BT_MAJ, BT_CUT_WIFI } ;
 
 const char htmlBoutonFrontpage[]  =
   B_PARAMECU "|" B_PARAM_MOTEUR "|"
   B_INFORMATION "|" B_LOG "|" B_WIFI "|" B_SLIDER "|" B_JAUGES "|"
+  B_STARTCALIBRATION "|" B_STOPCALIBRATION "|"
+  B_CHART "|"
   B_START_ENGINE "|" B_STOP_ENGINE"|" B_MAJ "|" B_CUT_WIFI ;
 
 
 const char BoutonFrontpageAction[]  =
   "configecu|configmoteur|"
-  "info|logs|wifi|slider|gauges|"
+  "info|logs|wifi|slider|gauges|starter_calibration|stop_starter_calibration|"
+  "chart|"
   "start|stop|upgrade|stopwifi";
+
+const char htmlInputParamEng[] =
+  IN_NAME "|" IN_GLOWPOWER "|" 
+  IN_RPMMAX "|" IN_RPMIDLE "|" IN_RPMMIN "|" 
+  IN_TEMPSTART "|" IN_TEMPMAX "|" 
+  IN_DELAYACC "|" IN_DELAYDEC "|" IN_DELAYSTAB "|" 
+  IN_PUMP1MAX "|" IN_PUMP1MIN "|" IN_PUMP2MAX "|" IN_PUMP2MIN "|" 
+  IN_VANNE1MAX "|" IN_VANNE2MAX "|" 
+  IN_RPMSTARTER ;
+
+const uint32_t htmlParamEngMinMax[2][17] =
+ {{MIN_NAME,MIN_GLOWPOWER,
+  MIN_RPMMAX,MIN_RPMIDLE,MIN_RPMMIN,
+  MIN_TEMPSTART,MIN_TEMPMAX,
+  MIN_DELAYACC,MIN_DELAYDEC,MIN_DELAYSTAB,
+  MIN_PUMP1MAX,MIN_PUMP1MIN,MIN_PUMP2MAX,MIN_PUMP2MIN,
+  MIN_VANNE1MAX,MIN_VANNE2MAX,
+  MIN_RPMSTARTER},
+  {MAX_NAME,MAX_GLOWPOWER,
+  MAX_RPMMAX,MAX_RPMIDLE,MAX_RPMMIN,
+  MAX_TEMPSTART,MAX_TEMPMAX,
+  MAX_DELAYACC,MAX_DELAYDEC,MAX_DELAYSTAB,
+  MAX_PUMP1MAX,MAX_PUMP1MIN,MAX_PUMP2MAX,MAX_PUMP2MIN,
+  MAX_VANNE1MAX,MAX_VANNE2MAX,
+  MAX_RPMSTARTER}} ;
 
 enum BoutonParmEcuEnum {
   BT_SAVE, BT_RETOUR  };
@@ -155,11 +171,11 @@ void WSContentButton(httpd_req_t *req,uint32_t title_index, bool show) {
   title_index,show ? "block":"none",GetTextIndexed(action, sizeof(action), title_index, BoutonFrontpageAction));
   httpd_resp_sendstr_chunk(req,buffer) ;
 
-  if (title_index >= BT_START_ENGINE) {
-    char confirm[100];
-    sprintf(buffer," onsubmit='return confirm(\"%s\");'><button name='%s' class='button bred'>%s</button></form></p>",
-      GetTextIndexed(confirm, sizeof(confirm), title_index, kButtonConfirm),
-      (!title_index) ? PSTR("rst") : PSTR("non"),
+  if (title_index == BT_START_ENGINE || title_index == BT_CUT_WIFI) {
+    //char confirm[100];
+    sprintf(buffer," onsubmit='return confirm(\"%s %s?\");'><button name='red_%ld' class='button bred'>%s</button></form></p>",
+      SURE,GetTextIndexed(title, sizeof(title), title_index, htmlBoutonFrontpage),
+      title_index,
       GetTextIndexed(title, sizeof(title), title_index, htmlBoutonFrontpage));
     httpd_resp_sendstr_chunk(req,buffer) ;
 
@@ -180,10 +196,59 @@ void WSRadio(httpd_req_t *req,uint32_t title_index,uint8_t param, bool show)
   httpd_resp_sendstr_chunk(req,buffer) ;
   for(int i=0;i < choices ; i++)
   {
-    sprintf(buffer,"<p><input id=\"input_%ld_%d\" name=\"input_%ld\" type=\"radio\" value=\"%d\"",title_index,i,title_index,i) ;
+    sprintf(buffer,"<p><input id=\"rd_input_%ld_%d\" name=\"rd_input_%ld\" type=\"radio\" value=\"%d\"",title_index,i,title_index,i) ;
     sprintf(buffer+strlen(buffer),(param == i) ? "checked=\"\"" : " ") ;
     sprintf(buffer+strlen(buffer),"><b>%s</b>",GetTextChoice(title, sizeof(title), title_index,i, htmlRadioParamEcuChoicesTxt)) ;
     httpd_resp_sendstr_chunk(req,buffer) ;
   }
   httpd_resp_sendstr_chunk(req, "</fieldset><p>") ;
+  ESP_LOGI("CONFIG_ECU","%s : %d",GetTextIndexed(title, sizeof(title), title_index,htmlRadioParamEcuChoicesTxt),param) ;
+}
+
+void WSCheckBox(httpd_req_t *req,uint32_t title_index,uint8_t param, bool show)
+{
+  char title[100];
+  char buffer[500] ;
+  sprintf(buffer,"<p><input id=\"ch_input%ld\" type=\"checkbox\"",title_index) ;
+  sprintf(buffer+strlen(buffer),(param == YES) ? "checked=\"\"" : " ") ;
+  sprintf(buffer+strlen(buffer)," name=\"ch_input%ld\"><b>%s</b>",title_index,GetTextIndexed(title, sizeof(title), title_index, htmlCheckParamEcu)) ;
+  httpd_resp_sendstr_chunk(req,buffer) ;
+}
+
+void WSInputBox(httpd_req_t *req,uint32_t title_index,uint32_t intparam,char *charparam, int type, bool show)
+{
+  char title[100];
+  char buffer[500] ;
+  sprintf(buffer,"<b>%s</b><br>",GetTextIndexed(title, sizeof(title), title_index, htmlInputParamEng)) ;
+  switch(type)
+  {
+    case NUMBER : 
+      sprintf(buffer+strlen(buffer),"<input id=\"input_%ld\" placeholder=\"\" value=\"%ld\" name=\"input_%ld\" type=\"number\" min=\"%ld\" max=\"%ld\"></p><p>",title_index,intparam,title_index,htmlParamEngMinMax[0][title_index],htmlParamEngMinMax[1][title_index]);
+      break ;
+    case TEXT :
+      sprintf(buffer+strlen(buffer),"<input id=\"input_%ld\" placeholder=\"\" value=\"%s\" name=\"input_%ld\" minlength=\"%ld\" maxlength=\"%ld\"></p><p>",title_index,charparam,title_index,htmlParamEngMinMax[0][title_index],htmlParamEngMinMax[1][title_index]);
+      break ;
+  }
+  httpd_resp_sendstr_chunk(req,buffer) ;
+}
+
+void WSSaveBouton(httpd_req_t *req)
+{
+  const char htmlBoutonSave[] = "</p><p><button name=\"save\" type=\"submit\" class=\"button bgrn\">"B_SAVE"</button></form></fieldset><p>" ;
+  httpd_resp_sendstr_chunk(req, htmlBoutonSave) ;
+}
+
+void WSRetourBouton(httpd_req_t *req)
+{
+  const char htmlBoutonRetour[] = "<p></p><form action=\"/\" method=\"get\"><button name="">"B_RETOUR"</button></form>" ;
+  httpd_resp_sendstr_chunk(req,htmlBoutonRetour ) ;
+}
+
+void WSBouton(httpd_req_t *req,int bouton)
+{
+  char title[20] ;
+  char action[20] ;
+  char html[200] ;
+  sprintf(html,"<p></p><form action=\"%s\" method=\"get\"><button name="">%s</button></form>",GetTextIndexed(action, sizeof(action), bouton, BoutonFrontpageAction),GetTextIndexed(title, sizeof(title), bouton, htmlInputParamEng)) ;
+  httpd_resp_sendstr_chunk(req,html) ;
 }
