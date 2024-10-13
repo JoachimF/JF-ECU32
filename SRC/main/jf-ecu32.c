@@ -41,6 +41,7 @@
 #include "nvs_ecu.h"
 #include "inputs.h"
 #include "error.h"
+#include "Langues/fr_FR.h"
 
 
 
@@ -104,43 +105,51 @@ void get_time_up(_engine_t *engine, uint8_t *sec, uint8_t *min, uint8_t *heure)
     get_time(engine->time_up,sec,min,heure);
 }
 
+/*Renvoie le nombre total d'heure/minutes/secondes de fonctionnement du moteur*/
 void get_time_total(_engine_t *engine, uint8_t *sec, uint8_t *min, uint8_t *heure)
 {
     get_time(engine->time_up,sec,min,heure);
 }
 
+/*Renvoie le nombre de secondes depuis l'allumage de l'ECU*/
 uint8_t get_secondes_up(_engine_t *engine)
 {
     return engine->time_up % 60 ;
 
 }
+
+/*Renvoie le nombre de minutes depuis l'allumage de l'ECU*/
 uint8_t get_minutes_up(_engine_t *engine)
 {
     return (engine->time_up % 3600)/60 ;
 }
 
+/*Renvoie le nombre de heure depuis l'allumage de l'ECU*/
 uint8_t get_heures_up(_engine_t *engine)
 {
     return engine->time_up / 3600 ;
 }
 
+/*Renvoie le nombre total de secondes de fonctionnement du moteur*/
 uint8_t get_secondes_total(_engine_t *engine)
 {
     return engine->time % 60 ;
 
 }
 
+/*Renvoie le nombre total de minutes de fonctionnement du moteur*/
 uint8_t get_minutes_total(_engine_t *engine)
 {
     return (engine->time % 3600)/60 ;
 }
 
+/*Renvoie le nombre total de heures de fonctionnement du moteur*/
 uint16_t get_heures_total(_engine_t *engine)
 {
     return engine->time / 3600 ;
 }
 
-void set_power_func_us(_PUMP_t *config ,int32_t value)
+void set_power_func_us(_PUMP_t *config ,float value)
 {
     mcpwm_set_duty_in_us(config->config.MCPWM_UNIT, config->config.MCPWM_TIMER, config->config.MCPWM_GEN, value);
     config->value = value ;
@@ -149,8 +158,26 @@ void set_power_func_us(_PUMP_t *config ,int32_t value)
 
 void set_power_func(_PUMP_t *config ,float value)
 {
+    ESP_LOGI("set_power_func", "Value = %f", value);
     mcpwm_set_duty(config->config.MCPWM_UNIT, config->config.MCPWM_TIMER, config->config.MCPWM_GEN, value);
-    config->value = value ;
+    config->value = value  ;
+    ESP_LOGI("set_power_func", "config->value = %f", config->value);
+}
+
+/*Configure la valeur de puissance de 0.0-100.0 en PWM, en PPM la valeur est convertie entre 1000us et 2000us*/
+void set_power(_PUMP_t *peripheral, float value)
+{
+    if(peripheral->config.ppm_pwm == PWM) // Valeur en pourcent 0-100
+    {
+        mcpwm_set_duty(peripheral->config.MCPWM_UNIT, peripheral->config.MCPWM_TIMER, peripheral->config.MCPWM_GEN, value);        
+    }
+    else    // Valeur en microsecondes 1000-2000
+    {
+        uint32_t value_us;
+        value_us = (value * 10) + 1000;
+        mcpwm_set_duty_in_us(peripheral->config.MCPWM_UNIT, peripheral->config.MCPWM_TIMER, peripheral->config.MCPWM_GEN, value_us);
+    }
+    peripheral->value = value  ;
 }
 
 uint32_t get_pump_power_int(_PUMP_t *pump)
@@ -163,11 +190,24 @@ float get_pump_power_float(_PUMP_t *pump)
     return pump->value ;
 }
 
+float get_starter_power(_PUMP_t *starter)
+{
+    return starter->value ;
+}
+
+/*Renvoie la valeur en pourcent de la puissance demandé en cours*/
+float get_power(_PUMP_t *starter)
+{
+    return starter->value ;
+}
+
+/*Renvoie la valeur de la bouige de la puissance demandé en cours de 0-255*/
 uint8_t get_glow_power(_GLOW_t *glow)
 {
     return glow->value ;
 }
 
+/*Renvoie la valeur d'une vanne de la puissance demandé en cours de 0-255*/
 uint8_t get_vanne_power(_VALVE_t *vanne)
 {
     return vanne->value ;
@@ -175,6 +215,7 @@ uint8_t get_vanne_power(_VALVE_t *vanne)
 
 
 
+/*Configure la valeur de puissance de 0-255*/
 void set_power_ledc(_ledc_config *config ,uint32_t value)
 {
     ESP_ERROR_CHECK(ledc_set_duty(LEDC_LOW_SPEED_MODE, config->ledc_channel, value));
@@ -261,8 +302,9 @@ void init_pwm_outputs(_pwm_config *config)
 // IDF 4.3.4
 void init_mcpwm(void) // IDF 4.3.4
 {
-    printf("initializing mcpwm servo control gpio......\n");
-
+    ESP_LOGI(TAG,"initializing mcpwm servo control gpio......");
+    
+    
     turbine.pump1.config.MCPWM_GEN = MCPWM_GEN_A ;
     if(turbine.pump1.config.ppm_pwm == PWM){
         turbine.pump1.config.MCPWM = MCPWM0A ;
@@ -275,7 +317,8 @@ void init_mcpwm(void) // IDF 4.3.4
         turbine.pump1.config.MCPWM_UNIT = MCPWM_UNIT_1 ; 
     }
     
-    ESP_LOGI(TAG,"MCPWM_UNIT init outputs") ;
+    
+    ESP_LOGI(TAG,"MCPWM_UNIT init outputs %s %d",ST_PUMP2,turbine.pump2.config.ppm_pwm) ;
     if(turbine.pump2.config.ppm_pwm != NONE)
     {
         turbine.pump2.config.MCPWM_GEN = MCPWM_GEN_B ;
@@ -293,6 +336,7 @@ void init_mcpwm(void) // IDF 4.3.4
         }
         init_pwm_outputs(&turbine.pump2.config) ;
     }
+
     
     turbine.starter.config.MCPWM_TIMER = MCPWM_TIMER_2 ;
     turbine.starter.config.MCPWM_GEN = MCPWM_GEN_A ;
@@ -302,13 +346,15 @@ void init_mcpwm(void) // IDF 4.3.4
     else
         turbine.starter.config.MCPWM_UNIT = MCPWM_UNIT_1 ;
     
+    ESP_LOGI(TAG,"MCPWM_UNIT init outputs %s %s",ST_PUMP1,turbine.pump1.config.ppm_pwm ? "PPM" : "PWM" ) ;
     init_pwm_outputs(&turbine.pump1.config) ;
+    ESP_LOGI(TAG,"MCPWM_UNIT init outputs %s %s",ST_STARTER,turbine.starter.config.ppm_pwm ? "PPM" : "PWM") ;
     init_pwm_outputs(&turbine.starter.config) ;
 
 
     
     //2. initial mcpwm configuration
-    printf("Configuring Initial Parameters of mcpwm......\n");
+    ESP_LOGI(TAG,"Configuring Initial Parameters of mcpwm......");
 
     //Config pour PWM
     pwm_config[0].frequency = 10000;    //frequency = 10000Hz, pour les moteur DC

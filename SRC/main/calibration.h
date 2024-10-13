@@ -20,8 +20,23 @@
 #ifndef _CALIBRATION_H_
 #define _CALIBRATION_H_
 
+#include "freertos/queue.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+
+typedef struct _chart_data_ {
+  uint32_t data;
+  float label;
+  bool end ;
+  float power_start ;
+  uint32_t rpmstart ;
+  float powermin ;
+  uint32_t rpmmax ;
+} _chart_data_t ;
 
 extern TaskHandle_t starter_calibration_h ;
+//extern int calib_end ;
+extern QueueHandle_t *Q_Calibration_Values ;
 
 void starter_calibration() ;
 void stop_starter_cal() ;

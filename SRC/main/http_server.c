@@ -33,6 +33,7 @@
 #include "esp_http_server.h"
 #include "esp_wifi.h"
 #include "cJSON.h"
+#include <math.h>
 
 #include "esp_heap_trace.h"
 
@@ -1016,6 +1017,7 @@ static esp_err_t starter_calibration_page(httpd_req_t *req)
 	//httpd_resp_sendstr_chunk(req, "<p></p><form action=\"stop_starter_calibration\" method=\"get\"><button name="">"B_STOPCALIBRATION"</button></form>") ;
 
 	// Send footer
+	Text2Html(req, "/html/chart_starter.html");
 	Text2Html(req, "/html/footer.html");
 	httpd_resp_sendstr_chunk(req, NULL); //fin de la page
 	
@@ -1072,8 +1074,8 @@ static esp_err_t configmoteur(httpd_req_t *req)
 	WSSaveBouton(req) ;
 	/*httpd_resp_sendstr_chunk(req, "<button name=\"save\" type=\"submit\" class=\"button bgrn\">Sauvegarde</button>") ;
 	httpd_resp_sendstr_chunk(req, "</form></fieldset>") ;*/
-
-	httpd_resp_sendstr_chunk(req, "<p></p><form action=\"calibrations\" method=\"get\"><button name="">Calibrations</button></form>") ;	
+	WSBouton(req,BT_CALIBRATION) ;
+	//httpd_resp_sendstr_chunk(req, "<p></p><form action=\"calibrations\" method=\"get\"><button name="">Calibrations</button></form>") ;	
 	//httpd_resp_sendstr_chunk(req, "<p></p><form action=\"/\" method=\"get\"><button name="">Retour</button></form>") ;
 	WSRetourBouton(req) ;
 	Text2Html(req, "/html/footer.html");
@@ -1260,6 +1262,43 @@ static esp_err_t g_chartdata_get_handler(httpd_req_t *req){
 	return ESP_OK;
 }
 
+float decround(float f, int places) { 
+      float multiplier = pow(10, places); 
+      return round((int)(f*multiplier+0.5))/multiplier; 
+} 
+ 
+
+static esp_err_t g_chartstarter_get_handler(httpd_req_t *req){
+	//char labels[500] ;
+	//char datas[200] ;
+	_chart_data_t c_datas_rx ;
+	BaseType_t Q_Result ;
+	static cJSON *myjson;
+	//cJSON *labels,*datas;
+	if(Q_Calibration_Values != NULL)
+	{
+		myjson = cJSON_CreateObject();
+		Q_Result = xQueueReceive(Q_Calibration_Values,&c_datas_rx,100) ;
+		if(Q_Result == pdTRUE)
+		{
+			cJSON_AddNumberToObject(myjson,"data",c_datas_rx.data);
+			cJSON_AddNumberToObject(myjson,"labels",decround(c_datas_rx.label,1));
+			cJSON_AddNumberToObject(myjson,"end",c_datas_rx.end);
+			cJSON_AddNumberToObject(myjson,"power_start",c_datas_rx.power_start);
+			cJSON_AddNumberToObject(myjson,"rpmstart",c_datas_rx.rpmstart);
+			cJSON_AddNumberToObject(myjson,"powermin",c_datas_rx.powermin);
+			cJSON_AddNumberToObject(myjson,"rpmmax",c_datas_rx.rpmmax);
+			char *my_json_string = cJSON_Print(myjson) ;
+			httpd_resp_set_type(req, "application/json") ;
+			httpd_resp_sendstr_chunk(req, my_json_string) ; //fin de la page
+			httpd_resp_sendstr_chunk(req, NULL); //fin de la page
+			cJSON_Delete(myjson) ;
+			free(my_json_string) ; 
+		}
+	}
+	return ESP_OK;
+}
+
 static esp_err_t readings_get_handler(httpd_req_t *req){
 	static cJSON *myjson;
 	char status[50] ;
@@ -1412,6 +1451,8 @@ static esp_err_t frontpage(httpd_req_t *req)
 		chart_get_handler(req) ;
 	else if(strcmp(filename, "/chartdata") == 0) 
 		g_chartdata_get_handler(req) ;
+	else if(strcmp(filename, "/chart_starter_cal") == 0) 
+		g_chartstarter_get_handler(req) ;
 	else if(strcmp(filename, "/") == 0 ) 
 	{
 		// Frontpage

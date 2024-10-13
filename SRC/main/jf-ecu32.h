@@ -175,7 +175,7 @@ typedef struct _GLOW_{
 
 typedef struct _PUMP_{
   uint32_t target ;
-  uint32_t value ;
+  float value ;
   bool state; // On - Off
   bool new_target ;
   _pwm_config config ;
@@ -265,12 +265,18 @@ void vTimer60sCallback( TimerHandle_t pxTimer ) ;
 void ecu_task(void * pvParameters ) ;
 void inputs_task(void * pvParameters) ;
 void init_mcpwm(void) ;
-void set_power_func_us(_PUMP_t *config ,int32_t value) ;
+void set_power_func_us(_PUMP_t *config ,float value) ;
 void set_power_func(_PUMP_t *config ,float value) ;
+void set_power(_PUMP_t *starter ,float value) ;
+
 float get_pump_power_float(_PUMP_t *config) ;
+float get_starter_power(_PUMP_t *config) ;
+
 uint32_t get_pump_power_int(_PUMP_t *config) ;
 uint8_t get_glow_power(_GLOW_t *config) ;
 uint8_t get_vanne_power(_VALVE_t *config) ;
+float get_starter_power(_PUMP_t *config) ;
+float get_power(_PUMP_t *starter) ;
 
 /***Gestion du temps  */
 void get_time_total(_engine_t *engine, uint8_t *sec, uint8_t *min, uint8_t *heure) ;
@@ -281,6 +287,7 @@ void get_time_up(_engine_t *engine,uint8_t *,uint8_t *,uint8_t *) ;
 uint8_t get_heures_up(_engine_t * engine) ;
 uint8_t get_minutes_up(_engine_t * engine) ;
 uint8_t get_secondes_up(_engine_t * engine) ;
+
 /*Gestion des deltas*/
 void set_delta_RPM(_engine_t * engine,uint32_t) ;
 uint32_t get_delta_RPM(_engine_t * engine) ;

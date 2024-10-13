@@ -23,10 +23,14 @@
 #include "jf-ecu32.h"
 #include "inputs.h"
 #include "esp_log.h"
+#include "freertos/queue.h"
 
 static const char *TAG = "Calibration";
 
 TaskHandle_t starter_calibration_h ;
+QueueHandle_t *Q_Calibration_Values ;
+
+//int calib_end ;
 
 void starter_calibration() 
 {
@@ -37,88 +41,128 @@ void starter_calibration()
 */
     float pwm_perc = 0 ;
     float pwm_perc_start,pwm_perc_min ;
+    _chart_data_t c_datas = {
+        .rpmmax = 0 ,
+        .powermin = 0 ,
+        .power_start = 0 ,
+        .rpmstart = 0 
+    };
+
     uint32_t max_rpm ;
     int error = 0 ;
+    c_datas.end = 0 ;
     
+
+    Q_Calibration_Values = xQueueCreate(1,sizeof(_chart_data_t)) ;
+
     ESP_LOGI(TAG, "Démarrage de la calibration du démarreur");
 
     ESP_LOGI(TAG, "Recherche de la valeur de mise en rotation du démarreur");
     while(get_RPM(&turbine) == 0 && error == 0) // Trouver le minimum PWM pour démarrer le moteur
     {
-        turbine.starter.set_power(&turbine.starter.config,pwm_perc) ;
-        pwm_perc += 0.1 ;
+        set_power(&turbine.starter,pwm_perc) ;
+        /* MODE TEST*/
         if(pwm_perc > 8)
-            turbine.RPM = pwm_perc * 500 ; // Mode test
+            turbine.RPM = pwm_perc * 500 ;
         else
             turbine.RPM = 0 ;
+        /* MODE TEST*/ 
+        vTaskDelay(100 / portTICK_PERIOD_MS);
+        c_datas.data = get_RPM(&turbine) ;
+        c_datas.label = pwm_perc ;
+        c_datas.rpmstart = pwm_perc ;
+        c_datas.rpmstart = c_datas.data ;
+        xQueueSendToFront(Q_Calibration_Values,&c_datas,0) ; 
+        pwm_perc += 0.1 ; 
         if(pwm_perc > 25)
             error = 1 ;
-        ESP_LOGI(TAG, "PWM : %f",pwm_perc);
-        ESP_LOGI(TAG, "RPM : %u",get_RPM(&turbine));
+        ESP_LOGI(TAG, "PWM : %f",get_starter_power(&turbine.starter));
+        ESP_LOGI(TAG, "RPM : %lu",get_RPM(&turbine));
         vTaskDelay(100 / portTICK_PERIOD_MS);
     }
     if(error != 0)
     {
+        set_power(&turbine.starter,0) ;
         ESP_LOGI(TAG, "Erreur le démarreur ne tourne pas : %f",pwm_perc);
         ESP_LOGI(TAG, "Fin de la tache calibration du démarreur");
         starter_calibration_h = NULL ;
-        vTaskDelete( NULL );
-        
+        c_datas.end = 1 ;
+        xQueueSendToFront(Q_Calibration_Values,&c_datas,0) ;
+        vTaskDelete( NULL );        
     }
     pwm_perc_start = pwm_perc ;
+    c_datas.power_start = pwm_perc_start ;
+    c_datas.rpmstart = c_datas.data ;
     ESP_LOGI(TAG, "Valeur de mise en rotation du démarreur : %f",pwm_perc);
     
     ESP_LOGI(TAG, "Recherche de la valeur minimale de rotation du démarreur");
     while(get_RPM(&turbine) > 0 && error == 0) //Descendre le PWM pour trouver a quel moment le moteur s'arrête
     {
-        turbine.starter.set_power(&turbine.starter.config,pwm_perc) ;
+         set_power(&turbine.starter,pwm_perc) ;
         pwm_perc -= 0.1 ;
+        /* MODE TEST*/
         if(pwm_perc > 6)
-            turbine.RPM = pwm_perc * 500 ; // Mode test
+            turbine.RPM = pwm_perc * 500 ;
         else
             turbine.RPM = 0 ;
-
+        /* MODE TEST*/
+        vTaskDelay(100 / portTICK_PERIOD_MS);
+        c_datas.data = get_RPM(&turbine) ;
+        c_datas.label = pwm_perc ;
+        c_datas.powermin = pwm_perc ;
+        xQueueSendToFront(Q_Calibration_Values,&c_datas,0) ; 
         if(pwm_perc < 1)
             error = 1 ;
-        ESP_LOGI(TAG, "PWM : %f",pwm_perc);
-        ESP_LOGI(TAG, "RPM : %u",get_RPM(&turbine));
-        vTaskDelay(100 / portTICK_PERIOD_MS);
+        ESP_LOGI(TAG, "PWM : %f",get_starter_power(&turbine.starter));
+        ESP_LOGI(TAG, "RPM : %lu",get_RPM(&turbine));        
     }
     if(error != 0)
     {
+        set_power(&turbine.starter,0) ;
         ESP_LOGI(TAG, "Erreur le démarreur ne s'arrete pas : %f",pwm_perc);
         ESP_LOGI(TAG, "Fin de la tache calibration du démarreur");
         starter_calibration_h = NULL ;
+        c_datas.end = 1 ;
+        xQueueSendToFront(Q_Calibration_Values,&c_datas,0) ;
         vTaskDelete( NULL );    
     }
     pwm_perc_min = pwm_perc ;
+    //c_datas.powermin = pwm_perc_min ;
     ESP_LOGI(TAG, "Valeur minimale de rotation du démarreur : %f",pwm_perc);
 
     ESP_LOGI(TAG, "Recherche de la vitesse maximale de rotation du démarreur");
     for(float i=pwm_perc_start;i<100;i++) //accélérer pour avoir le régime max
     {
-        turbine.starter.set_power(&turbine.starter.config,i) ;
+        set_power(&turbine.starter,i) ;
+        /* MODE TEST*/
         if(i > 6)
             turbine.RPM = i * 200 ; // Mode test
         else
             turbine.RPM = 0 ;
-        ESP_LOGI(TAG, "PWM : %f",i) ;
-        ESP_LOGI(TAG, "RPM : %u",get_RPM(&turbine));
+        /* MODE TEST*/
+        ESP_LOGI(TAG, "PWM : %f",get_starter_power(&turbine.starter)) ;
+        ESP_LOGI(TAG, "RPM : %lu",get_RPM(&turbine));
         vTaskDelay(100 / portTICK_PERIOD_MS);
+        c_datas.data = get_RPM(&turbine) ;
+        c_datas.label = i ;
+        c_datas.rpmmax = c_datas.data ;
+        xQueueSendToFront(Q_Calibration_Values,&c_datas,0) ; 
     }
     vTaskDelay(500 / portTICK_PERIOD_MS);
     max_rpm = get_RPM(&turbine) ;
-    ESP_LOGI(TAG, "Valeur maximale de rotation du démarreur : %ld",max_rpm);
-
+    c_datas.end = 1 ;
+    //c_datas.rpmmax = max_rpm ;
+    xQueueSendToFront(Q_Calibration_Values,&c_datas,0) ;
+    ESP_LOGI(TAG, "Valeur maximale de rotation du démarreur : %lu",max_rpm);
     ESP_LOGI(TAG, "Fin de la calibration du démarreur");
     
-    turbine.starter.set_power(&turbine.starter.config,0) ;
-
+    set_power(&turbine.starter,0) ;
     turbine_config.starter_pwm_perc_start = pwm_perc_start ; // PWM à laquelle le démarreur commence a tourner
     turbine_config.starter_pwm_perc_min = pwm_perc_min ; // PWM à laquelle le démarreur cale
     turbine_config.starter_max_rpm = max_rpm ; // RPM max du démarreur
     ESP_LOGI(TAG, "Fin de la tache calibration du démarreur");
     starter_calibration_h = NULL ;
+    //calib_end = 1 ;
     vTaskDelete( NULL );
 }
 
@@ -129,7 +173,7 @@ if( starter_calibration_h != NULL )
         ESP_LOGI(TAG, "Fin de la tache calibration du démarreur");
         vTaskDelete( starter_calibration_h );
     }
-    turbine.starter.set_power(&turbine.starter.config,0) ;
+    set_power(&turbine.starter,0) ;
 }
 
 bool isCalibrated()

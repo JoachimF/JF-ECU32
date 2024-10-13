@@ -56,14 +56,14 @@ const char htmlCheckParamEcu[]  =
 const char htmlBoutonFrontpage[]  =
   B_PARAMECU "|" B_PARAM_MOTEUR "|"
   B_INFORMATION "|" B_LOG "|" B_WIFI "|" B_SLIDER "|" B_JAUGES "|"
-  B_STARTCALIBRATION "|" B_STOPCALIBRATION "|"
+  B_CALIBRATION "|" B_STARTCALIBRATION "|" B_STOPCALIBRATION "|"
   B_CHART "|"
   B_START_ENGINE "|" B_STOP_ENGINE"|" B_MAJ "|" B_CUT_WIFI ;
 
 
 const char BoutonFrontpageAction[]  =
   "configecu|configmoteur|"
-  "info|logs|wifi|slider|gauges|starter_calibration|stop_starter_calibration|"
+  "info|logs|wifi|slider|gauges|calibrations|starter_calibration|stop_starter_calibration|"
   "chart|"
   "start|stop|upgrade|stopwifi";
 
@@ -246,9 +246,9 @@ void WSRetourBouton(httpd_req_t *req)
 
 void WSBouton(httpd_req_t *req,int bouton)
 {
-  char title[20] ;
+  char title[50] ;
   char action[20] ;
   char html[200] ;
-  sprintf(html,"<p></p><form action=\"%s\" method=\"get\"><button name="">%s</button></form>",GetTextIndexed(action, sizeof(action), bouton, BoutonFrontpageAction),GetTextIndexed(title, sizeof(title), bouton, htmlInputParamEng)) ;
+  sprintf(html,"<p></p><form action=\"%s\" method=\"get\"><button name="">%s</button></form>",GetTextIndexed(action, sizeof(action), bouton, BoutonFrontpageAction),GetTextIndexed(title, sizeof(title), bouton, htmlBoutonFrontpage)) ;
   httpd_resp_sendstr_chunk(req,html) ;
 }

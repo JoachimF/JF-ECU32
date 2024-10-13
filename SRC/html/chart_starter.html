@@ -1,0 +1,91 @@
+
+
+<canvas id="rpmpump" style="display: block; box-sizing: border-box; height: 300px; width: 600px;"></canvas>
+<div class="card">
+    <table>
+      <tbody>
+          <tr>
+              <td>Power Start</td>
+              <td>RPM Start</td>
+          </tr>
+          <tr>
+              <td id=power_start>0</td>
+              <td id=rpmstart>0</td>
+          </tr>
+          <tr>
+              <td>Power Min</td>
+              <td>RPM Max</td>
+          </tr>
+          <tr>
+              <td id=powermin>0</td>
+              <td id=rpmmax>0</td>
+          </tr>
+      </tbody>
+    </table>
+  </div>
+<script
+    src="https://cdn.jsdelivr.net/npm/chart.js@4.0.1/dist/chart.umd.min.js"></script>
+<script>
+    //window.addEventListener("load", getData);
+
+	const chart1 = new Chart(document.getElementById("rpmpump"), {
+		type : 'line',
+		data : {
+			labels : [],
+			datasets : [
+					{
+						data : [],
+						label : "RPM/Starter",
+						borderColor : "#3cba9f",
+						fill : false
+					}]
+		},
+		options : {
+			title : {
+				display : true,
+				text : 'Chart JS Line Chart Example'
+			}
+		}
+	});
+
+    function getData() {
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                var myObj = JSON.parse(this.responseText);
+                console.log(myObj);
+                var chartdata = myObj.data;
+                //console.log(chartdata);
+                var labels = myObj.labels ;
+                //console.log(labels);
+                var end = myObj.end ;
+                var i = 0 ;
+                chart1.data.labels.push(labels.toFixed(1)) ;
+                chart1.data.datasets.forEach((dataset) => {
+                        dataset.data.push(chartdata);
+                });
+                var power_start = myObj.power_start ;
+                var rpmmax = myObj.rpmmax ;
+                var powermin = myObj.powermin ;
+                var rpmstart = myObj.rpmstart ;
+                document.getElementById('power_start').innerHTML = power_start.toFixed(1);
+                document.getElementById('rpmstart').innerHTML = rpmstart;
+                document.getElementById('powermin').innerHTML = powermin.toFixed(1);
+                document.getElementById('rpmmax').innerHTML = rpmmax;
+                if(end == 1 )
+                {
+                    clearInterval(refreshIntervalId) ;
+                }
+                chart1.update();
+                //chart1.data.dataset.data.value = chartdata;
+                //chart1.data.labels.value = labels;
+                //chart1.update() ;
+            }
+        };
+        xhr.open("GET", "/chart_starter_cal", true);
+        xhr.send();
+    }
+
+    var refreshIntervalId = setInterval(getData,100) ;
+</script>
+

@@ -57,7 +57,13 @@
         "rtc_ctrl.h": "c",
         "rmt_rx.h": "c",
         "onewire_bus_impl_rmt.h": "c",
-        "compare": "c"
+        "compare": "c",
+        "deque": "c",
+        "list": "c",
+        "string": "c",
+        "string_view": "c",
+        "initializer_list": "c",
+        "regex": "c"
     },
     "idf.espIdfPathWin": "C:\\Users\\Boby\\esp\\v5.0.7\\esp-idf",
     "idf.pythonBinPathWin": "C:\\Users\\Boby\\.espressif5\\python_env\\idf5.0_py3.11_env\\Scripts\\python.exe",

@@ -38,6 +38,7 @@
   #define B_SAVE "Sauvegarder"
   #define B_RETOUR "Retour"
 
+  #define B_CALIBRATION "Calibration"
   #define B_STARTCALIBRATION "Démarrer la calibration"
   #define B_STOPCALIBRATION "Arrêter la calibration"
 
@@ -89,6 +90,12 @@
 
   #define SURE "Etes vous sur de vouloir"
   #define B_CONFIRM_SAVE "Confirmer la sauvegarde"
+
+  #define ST_STARTER "Démarreur"
+  #define ST_PUMP1 "Pompe 1"
+  #define ST_PUMP2 "Pompe 2"
+
+
 
   #define D_DECIMAL_SEPARATOR ","
 
