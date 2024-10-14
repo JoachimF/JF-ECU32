@@ -203,11 +203,13 @@ typedef struct _engine_ {
   uint32_t GAZ ;
   uint32_t Aux ;
   uint32_t RPM ;
+  uint32_t RPMs[10] ;
   uint32_t RPM_delta ; //RPM secondes
   uint64_t RPM_period ;
   bool WDT_RPM ;
   uint16_t RPM_sec ;
   uint32_t EGT ;
+  uint32_t EGTs[10] ;
   uint32_t EGT_delta ; //Degrées secondes
   float GLOW_CURRENT ;
   float DS18B20_temp ;
@@ -260,6 +262,7 @@ void head_logs_file(void) ;
 void log_task( void * pvParameters ) ;
 void create_timers(void) ;
 void start_timers(void) ;
+void vTimer100msCallback( TimerHandle_t pxTimer ) ;
 void vTimer1sCallback( TimerHandle_t pxTimer ) ;
 void vTimer60sCallback( TimerHandle_t pxTimer ) ;
 void ecu_task(void * pvParameters ) ;
@@ -268,6 +271,7 @@ void init_mcpwm(void) ;
 void set_power_func_us(_PUMP_t *config ,float value) ;
 void set_power_func(_PUMP_t *config ,float value) ;
 void set_power(_PUMP_t *starter ,float value) ;
+void set_power_vanne(_VALVE_t *vanne, uint32_t value) ;
 
 float get_pump_power_float(_PUMP_t *config) ;
 float get_starter_power(_PUMP_t *config) ;

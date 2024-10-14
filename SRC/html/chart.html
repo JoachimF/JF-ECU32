@@ -1,7 +1,8 @@
 
 
 <canvas id="rpmpump" style="display: block; box-sizing: border-box; height: 300px; width: 600px;"></canvas>
-<canvas id="line-chart" style="display: block; box-sizing: border-box; height: 300px; width: 600px;"></canvas>
+<canvas id="timerpm" style="display: block; box-sizing: border-box; height: 300px; width: 600px;"></canvas>
+<canvas id="timeegt" style="display: block; box-sizing: border-box; height: 300px; width: 600px;"></canvas>
 <script
     src="https://cdn.jsdelivr.net/npm/chart.js@4.0.1/dist/chart.umd.min.js"></script>
 <script>
@@ -22,10 +23,74 @@
 		options : {
 			title : {
 				display : true,
-				text : 'Chart JS Line Chart Example'
+				text : 'RPM by pump value'
 			}
 		}
 	});
+
+    const chart2 = new Chart(document.getElementById("timerpm"), {
+	type : 'line',
+	data : {
+		labels : [],
+		datasets : [
+				{
+					data : [],
+					label : "RPM",
+					borderColor : "#3cba9f",
+					fill : false
+				}]
+	},
+	options : {
+		title : {
+			display : true,
+			text : 'RPM'
+		},
+		scales: {
+                y : {
+                    type: 'linear', //RPM
+                    min : 0 ,
+                    max : 1000
+                },
+                x : {
+                    type: 'linear', //Temps en ms
+                    min : 0 ,
+                    max : 1000
+                },
+            }
+        }
+    });
+    
+    const chart3 = new Chart(document.getElementById("timeegt"), {
+	type : 'line',
+	data : {
+		labels : [],
+		datasets : [
+				{
+					data : [],
+					label : "EGT",
+					borderColor : "#3cba9f",
+					fill : false
+				}]
+	},
+	options : {
+		title : {
+			display : true,
+			text : 'EGT'
+		},
+		scales: {
+                y : {
+                    type: 'linear', //RPM
+                    min : 0 ,
+                    max : 1000
+                },
+                x : {
+                    type: 'linear', //Temps en ms
+                    min : 0 ,
+                    max : 1000
+                },
+            }
+        }
+    });
 
     var Params = function getData() {
         var xhr = new XMLHttpRequest();
@@ -56,6 +121,61 @@
         xhr.send();
     }() ;
 
-    //setInterval(getData,2000) ;
+    var maxtime = 1000 ;
+    var max_rpm = 0 ;
+
+    function getData2() {
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                var myObj = JSON.parse(this.responseText);
+                //console.log(myObj);
+                var egt = myObj.egt;
+                //console.log(egt);
+                var rpm = myObj.rpm;
+                //console.log(rpm);
+                var ticks = myObj.ticks;
+                //console.log(ticks);
+                //Chart
+                if(rpm > max_rpm)
+                {
+                    max_rpm = rpm ;
+                    //console.log("chart y update");
+                    chart2.config.options.scales.y.max = max_rpm + 1000 ;
+                }
+                if(ticks > maxtime)
+                {
+                    chart2.config.options.scales.x.min = ticks - 990 ;
+                    chart2.config.options.scales.x.max = ticks + 10  ;
+                    //console.log("chart2 X update");
+                }
+                
+                chart2.data.labels.push(ticks) ;
+                chart2.data.datasets.forEach((dataset) => {
+                        dataset.data.push(rpm);
+                });
+                //console.log("chart update");
+                chart2.update();
+
+                if(ticks > maxtime)
+                {
+                    chart3.config.options.scales.x.min = ticks - 990 ;
+                    chart3.config.options.scales.x.max = ticks + 10  ;
+                    //console.log("chart3 X update");
+                }
+                
+                chart3.data.labels.push(ticks) ;
+                chart3.data.datasets.forEach((dataset) => {
+                        dataset.data.push(egt);
+                });
+                //console.log("chart3 update");
+                chart3.update();
+            }
+        };
+        xhr.open("GET", "/readings", true);
+        xhr.send();
+    }
+
+    var refreshIntervalId = setInterval(getData2,100) ;
 </script>
 

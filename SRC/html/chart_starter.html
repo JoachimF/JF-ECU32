@@ -22,12 +22,13 @@
           </tr>
       </tbody>
     </table>
-  </div>
-<script
-    src="https://cdn.jsdelivr.net/npm/chart.js@4.0.1/dist/chart.umd.min.js"></script>
+</div>
+<canvas id="timerpm" style="display: block; box-sizing: border-box; height: 300px; width: 600px;"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.0.1/dist/chart.umd.min.js"></script>
 <script>
     //window.addEventListener("load", getData);
-
+    var maxtime = 1000 ;
 	const chart1 = new Chart(document.getElementById("rpmpump"), {
 		type : 'line',
 		data : {
@@ -43,11 +44,43 @@
 		options : {
 			title : {
 				display : true,
-				text : 'Chart JS Line Chart Example'
+				text : 'RPM by Starter power'
 			}
 		}
 	});
+    const chart2 = new Chart(document.getElementById("timerpm"), {
+		type : 'line',
+		data : {
+			labels : [],
+			datasets : [
+					{
+						data : [],
+						label : "RPM/Time",
+						borderColor : "#3cba9f",
+						fill : false
+					}]
+		},
+		options : {
+			title : {
+				display : true,
+				text : 'RPM in time'
+			},
+            scales: {
+                y : {
+                    type: 'linear', //RPM
+                    min : 0 ,
+                    max : 1000
+                },
+                x : {
+                    type: 'linear', //Temps en ms
+                    min : 0 ,
+                    max : maxtime
+                },
+            }
+		}
+	});
 
+    var max_rpm = 0 ;
     function getData() {
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function () {
@@ -77,9 +110,25 @@
                     clearInterval(refreshIntervalId) ;
                 }
                 chart1.update();
-                //chart1.data.dataset.data.value = chartdata;
-                //chart1.data.labels.value = labels;
-                //chart1.update() ;
+
+                var rpm = myObj.rpm ;
+                var time = myObj.time ;
+                if(rpm > max_rpm)
+                {
+                    max_rpm = rpm ;
+                    chart2.config.options.scales.y.max = max_rpm + 1000 ;
+                }
+                if(time > maxtime)
+                {
+                    chart2.config.options.scales.x.min = time - 990 ;
+                    chart2.config.options.scales.x.max = time + 10  ;
+                }
+                
+                chart2.data.labels.push(time) ;
+                chart2.data.datasets.forEach((dataset) => {
+                        dataset.data.push(rpm);
+                });
+                chart2.update();
             }
         };
         xhr.open("GET", "/chart_starter_cal", true);

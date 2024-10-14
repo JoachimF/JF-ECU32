@@ -19,6 +19,10 @@
 #ifndef __HTTP_SERVER_H_
 #define __HTTP_SERVER_H_
 
+#include "freertos/FreeRTOS.h"
+
+
+
 typedef struct {
 	char url[32];
 	char parameter[128];

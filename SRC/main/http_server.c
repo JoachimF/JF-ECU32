@@ -50,6 +50,7 @@
 
 extern TimerHandle_t xTimer60s ;
 static const char *TAG = "HTTP";
+TickType_t Ticks ;
 
 #define STORAGE_NAMESPACE "storage"
 
@@ -1018,6 +1019,7 @@ static esp_err_t starter_calibration_page(httpd_req_t *req)
 
 	// Send footer
 	Text2Html(req, "/html/chart_starter.html");
+	WSRetourBouton(req) ;
 	Text2Html(req, "/html/footer.html");
 	httpd_resp_sendstr_chunk(req, NULL); //fin de la page
 	
@@ -1042,16 +1044,8 @@ static esp_err_t configmoteur(httpd_req_t *req)
 	char * addr1 = strstr(req->uri, "save=");
 	if (addr1 != NULL) save_configturbine(req) ; // Paramètres a sauvagarder
 		
-	//char tmp[10] ;
 	// Send HTML header
 	send_head(req) ;
-	/*httpd_resp_sendstr_chunk(req, "<!DOCTYPE html><html>");
-	Text2Html(req, "/html/head.html");
-
-	httpd_resp_sendstr_chunk(req, "<h2>");
-	httpd_resp_sendstr_chunk(req, turbine_config.name);
-	httpd_resp_sendstr_chunk(req, "</h2></div>");*/
-
 	httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Paramètres du moteur&nbsp;</b></legend><form method=\"GET\" action=\"configmoteur\"><p>") ;
 	WSInputBox(req,I_NAME,0,turbine_config.name,TEXT,true) ;
 	WSInputBox(req,I_GLOWPOWER,turbine_config.glow_power,NULL,NUMBER,true) ;
@@ -1127,11 +1121,14 @@ static esp_err_t chart_get_handler(httpd_req_t *req){
 	Text2Html(req, "/html/chart.html");
 	Text2Html(req, "/html/footer.html");
 	httpd_resp_sendstr_chunk(req, NULL); //fin de la page
+	Ticks = xTaskGetTickCount() ;
 	return ESP_OK;
 }
 
 static esp_err_t gauges_get_handler(httpd_req_t *req){
 	httpd_resp_sendstr_chunk(req, "<!DOCTYPE html><html>");
+	httpd_resp_sendstr_chunk(req, "<script src=\"https://cdn.jsdelivr.net/npm/chart.js@4.0.1/dist/chart.umd.min.js\">") ;
+	httpd_resp_sendstr_chunk(req, "</script>") ;
 	Text2Html(req, "/html/head.html");
 	Text2Html(req, "/html/head2.html");
 	httpd_resp_sendstr_chunk(req, "<h2>");
@@ -1144,6 +1141,7 @@ static esp_err_t gauges_get_handler(httpd_req_t *req){
 	httpd_resp_sendstr_chunk(req, "</script>") ;
 	Text2Html(req, "/html/footer.html");
 	httpd_resp_sendstr_chunk(req, NULL); //fin de la page
+	Ticks = xTaskGetTickCount() ;
 	return ESP_OK;
 }
 
@@ -1288,6 +1286,8 @@ static esp_err_t g_chartstarter_get_handler(httpd_req_t *req){
 			cJSON_AddNumberToObject(myjson,"rpmstart",c_datas_rx.rpmstart);
 			cJSON_AddNumberToObject(myjson,"powermin",c_datas_rx.powermin);
 			cJSON_AddNumberToObject(myjson,"rpmmax",c_datas_rx.rpmmax);
+			cJSON_AddNumberToObject(myjson,"rpm",c_datas_rx.rpm);
+			cJSON_AddNumberToObject(myjson,"time",c_datas_rx.time);
 			char *my_json_string = cJSON_Print(myjson) ;
 			httpd_resp_set_type(req, "application/json") ;
 			httpd_resp_sendstr_chunk(req, my_json_string) ; //fin de la page
@@ -1302,10 +1302,11 @@ static esp_err_t g_chartstarter_get_handler(httpd_req_t *req){
 static esp_err_t readings_get_handler(httpd_req_t *req){
 	static cJSON *myjson;
 	char status[50] ;
-	char errors[200] ;
+	char errors[200] ;	
+
 	uint8_t minutes,secondes ;
 	//ESP_LOGI(TAG, "readings_get_handler req->uri=[%s]", req->uri);
-	get_time_up(&turbine,&secondes,&minutes,NULL) ;
+	get_time_total(&turbine,&secondes,&minutes,NULL) ;
 	//uint32_t rpm = 0 ;
 	//ESP_LOGI(TAG, "cJSON_CreateObject");
 	myjson = cJSON_CreateObject();
@@ -1338,6 +1339,8 @@ static esp_err_t readings_get_handler(httpd_req_t *req){
 		sprintf(status,"%02d:%02d",minutes,secondes);
 		//ESP_LOGI(TAG, "time : %s", status);
 		cJSON_AddStringToObject(myjson, "time", status);
+
+		cJSON_AddNumberToObject(myjson, "ticks",xTaskGetTickCount() - Ticks);
 	
 //	}xSemaphoreGive(xTimeMutex) ;
 	//ESP_LOGI(TAG, "Send http");

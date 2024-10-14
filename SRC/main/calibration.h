@@ -32,6 +32,8 @@ typedef struct _chart_data_ {
   uint32_t rpmstart ;
   float powermin ;
   uint32_t rpmmax ;
+  uint32_t rpm ;
+  uint32_t time ;
 } _chart_data_t ;
 
 extern TaskHandle_t starter_calibration_h ;

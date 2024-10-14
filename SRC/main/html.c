@@ -247,7 +247,7 @@ void WSRetourBouton(httpd_req_t *req)
 void WSBouton(httpd_req_t *req,int bouton)
 {
   char title[50] ;
-  char action[20] ;
+  char action[50] ;
   char html[200] ;
   sprintf(html,"<p></p><form action=\"%s\" method=\"get\"><button name="">%s</button></form>",GetTextIndexed(action, sizeof(action), bouton, BoutonFrontpageAction),GetTextIndexed(title, sizeof(title), bouton, htmlBoutonFrontpage)) ;
   httpd_resp_sendstr_chunk(req,html) ;

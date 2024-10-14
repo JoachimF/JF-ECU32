@@ -1,10 +1,5 @@
-// Get current sensor readings when the page loads
+ 
 window.addEventListener("load", getReadings);
-
-//<canvas data-type="linear-gauge" data-width="400" data-height="150" data-min-value="0" data-max-value="220" data-major-ticks="0,20,40,60,80,100,120,140,160,180,200,220" 
-//data-minor-ticks="2" data-stroke-ticks="true" data-highlights="false" data-color-plate="#fff" data-border-shadow-width="0" data-borders="false" data-bar-begin-circle="false" 
-//data-bar-width="10" data-tick-side="left" data-number-side="left" data-needle-side="left" data-needle-type="line" data-needle-width="3" data-color-needle="#222" data-color-needle-end="#222"
-//data-animation-duration="1500" data-animation-rule="linear" data-animation-target="plate" width="400" height="150" style="width: 400px; height: 150px;"></canvas>
 
 //Create Temperature Gauge
 var gaugeRC = new LinearGauge({
@@ -155,13 +150,81 @@ var gaugeRPMconf = {
 	animationRule: "linear",
 };
 
+const chart2 = new Chart(document.getElementById("timerpm"), {
+	type : 'line',
+	data : {
+		labels : [],
+		datasets : [
+				{
+					data : [],
+					label : "RPM",
+					borderColor : "#3cba9f",
+					fill : false
+				}]
+	},
+	options : {
+		title : {
+			display : true,
+			text : 'RPM'
+		},
+		scales: {
+                y : {
+                    type: 'linear', //RPM
+                    min : 0 ,
+                    max : 1000
+                },
+                x : {
+                    type: 'linear', //Temps en ms
+                    min : 0 ,
+                    max : 1000
+                },
+            }
+        }
+    });
+	const chart3 = new Chart(document.getElementById("timeegt"), {
+		type : 'line',
+		data : {
+			labels : [],
+			datasets : [
+					{
+						data : [],
+						label : "EGT",
+						borderColor : "#3cba9f",
+						fill : false
+					}]
+		},
+		options : {
+			title : {
+				display : true,
+				text : 'EGT'
+			},
+			scales: {
+					y : {
+						type: 'linear', //RPM
+						min : 0 ,
+						max : 1000
+					},
+					x : {
+						type: 'linear', //Temps en ms
+						min : 0 ,
+						max : 1000
+					},
+				}
+			}
+		});
+
 // Function to get current readings on the webpage when it loads for the first time
+var maxtime = 1000 ;
+var max_rpm = 0 ;
+//var ticks = 0 ;
+
 function getReadings() {
 	var xhr = new XMLHttpRequest();
 	xhr.onreadystatechange = function () {
-		if (this.readyState == 4 && this.status == 200) {
+		if (this.readyState == 4 && this.status == 200) 
+		{
 			var myObj = JSON.parse(this.responseText);
-			console.log(myObj);
+			//console.log(myObj);
 			var ppm_gaz = myObj.ppm_gaz;
 			var ppm_aux = myObj.ppm_aux;
 			var egt = myObj.egt;
@@ -175,10 +238,48 @@ function getReadings() {
 			var status = myObj.status;
 			var error = myObj.error;
 			var time = myObj.time;
+			var rpm2 = myObj.rpm;
+			var ticks = myObj.ticks;
+			//Gauges
 			gaugeRC.value = ppm_gaz;
 			gaugeRC_aux.value = ppm_aux;
 			gaugeEGT.value = egt;
 			gaugeRPM.value = rpm;
+			//Chart
+			if(rpm2 > max_rpm)
+			{
+				max_rpm = rpm2 ;
+				//console.log("chart y update");
+				chart2.config.options.scales.y.max = max_rpm + 1000 ;
+			}
+			if(ticks > maxtime)
+			{
+				chart2.config.options.scales.x.min = ticks - 990 ;
+				chart2.config.options.scales.x.max = ticks + 10  ;
+				//console.log("chart X update");
+			}
+			
+			chart2.data.labels.push(ticks) ;
+			chart2.data.datasets.forEach((dataset) => {
+					dataset.data.push(rpm2);
+			});
+			//console.log("chart update");
+			chart2.update();
+
+			if(ticks > maxtime)
+                {
+                    chart3.config.options.scales.x.min = ticks - 990 ;
+                    chart3.config.options.scales.x.max = ticks + 10  ;
+                    //console.log("chart3 X update");
+                }
+                
+                chart3.data.labels.push(ticks) ;
+                chart3.data.datasets.forEach((dataset) => {
+                        dataset.data.push(egt);
+                });
+                //console.log("chart3 update");
+            chart3.update();
+			//Text
 			document.getElementById('pump1').innerHTML = pump1;
 			document.getElementById('pump2').innerHTML = pump2;
 			document.getElementById('vanne1').innerHTML = vanne1;
@@ -193,12 +294,13 @@ function getReadings() {
 	xhr.open("GET", "/readings", true);
 	xhr.send();
 }
-setInterval(getReadings,200) ;
+setInterval(getReadings,100) ;
 
 var Params = function() {
 	var xhr = new XMLHttpRequest();
 	xhr.onreadystatechange = function () {
-		if (this.readyState == 4 && this.status == 200) {
+		if (this.readyState == 4 && this.status == 200) 
+		{
 			var myObj = JSON.parse(this.responseText);
 			console.log(myObj);
 			var egt_hli = myObj.egt_red;
@@ -241,49 +343,3 @@ var Params = function() {
 	xhr.open("GET", "/g_params", true);
 	xhr.send();
 }(); // <--- () causes self execution
-
-
-
-/*
-if (!!window.EventSource) {
-	var source = new EventSource("/events");
-
-	source.addEventListener(
-		"open",
-		function (e) {
-			console.log("Events Connected");
-		},
-		false
-	);
-
-	source.addEventListener(
-		"error",
-		function (e) {
-			if (e.target.readyState != EventSource.OPEN) {
-				console.log("Events Disconnected");
-			}
-		},
-		false
-	);
-
-	source.addEventListener(
-		"message",
-		function (e) {
-			console.log("message", e.data);
-		},
-		false
-	);
-
-	source.addEventListener(
-		"new_readings",
-		function (e) {
-			console.log("new_readings", e.data);
-			var myObj = JSON.parse(e.data);
-			console.log(myObj);
-			gaugeTemp.value = myObj.temperature;
-			gaugeHum.value = myObj.humidity;
-            gaugeRC.value = temp ;
-		},
-		false
-	);
-}*/

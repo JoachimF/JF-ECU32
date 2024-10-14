@@ -55,6 +55,7 @@ TaskHandle_t xecuHandle ;
 TaskHandle_t xinputsHandle ;
 
 //Timers
+TimerHandle_t xTimer100ms ;
 TimerHandle_t xTimer1s ;
 TimerHandle_t xTimer60s ;
 
@@ -99,6 +100,7 @@ void get_time(uint32_t _time_up, uint8_t *sec, uint8_t *min, uint8_t *heure)
     }
 }
 
+/*Renvoie le nombre total d'heure/minutes/secondes de fonctionnement du moteur*/
 void get_time_up(_engine_t *engine, uint8_t *sec, uint8_t *min, uint8_t *heure)
 {
     //ESP_LOGI("get_time_up", "engine->time_up : %ld",engine->time_up);
@@ -108,7 +110,7 @@ void get_time_up(_engine_t *engine, uint8_t *sec, uint8_t *min, uint8_t *heure)
 /*Renvoie le nombre total d'heure/minutes/secondes de fonctionnement du moteur*/
 void get_time_total(_engine_t *engine, uint8_t *sec, uint8_t *min, uint8_t *heure)
 {
-    get_time(engine->time_up,sec,min,heure);
+    get_time(engine->time,sec,min,heure);
 }
 
 /*Renvoie le nombre de secondes depuis l'allumage de l'ECU*/
@@ -213,10 +215,16 @@ uint8_t get_vanne_power(_VALVE_t *vanne)
     return vanne->value ;
 }
 
-
+/*Configure la valeur d'une vanne ou bougie de puissance de 0-255*/
+void set_power_vanne(_VALVE_t *vanne, uint32_t value)
+{
+    ESP_ERROR_CHECK(ledc_set_duty(LEDC_LOW_SPEED_MODE, vanne->config.ledc_channel, value));
+    ESP_ERROR_CHECK(ledc_update_duty(LEDC_LOW_SPEED_MODE, vanne->config.ledc_channel));
+    vanne->value = value ;
+}
 
 /*Configure la valeur de puissance de 0-255*/
-void set_power_ledc(_ledc_config *config ,uint32_t value)
+void set_power_ledc(_ledc_config *config, uint32_t value)
 {
     ESP_ERROR_CHECK(ledc_set_duty(LEDC_LOW_SPEED_MODE, config->ledc_channel, value));
     ESP_ERROR_CHECK(ledc_update_duty(LEDC_LOW_SPEED_MODE, config->ledc_channel));
@@ -540,6 +548,13 @@ void create_timers(void)
     //xRPMmutex = xSemaphoreCreateBinary() ;
     //xSemaphoreGive(xRPMmutex) ;
     //xGAZmutex = xSemaphoreCreateMutex() ;
+    xTimer100ms = xTimerCreate("Timer100ms",       // Just a text name, not used by the kernel.
+                            ( 100 /portTICK_PERIOD_MS ),   // The timer period in ticks.
+                            pdTRUE,        // The timers will auto-reload themselves when they expire.
+                            ( void * ) 3,  // Assign each timer a unique id equal to its array index.
+                            vTimer100msCallback // Each timer calls the same callback when it expires.
+                            );
+
     xTimer1s = xTimerCreate("Timer1s",       // Just a text name, not used by the kernel.
                             ( 1000 /portTICK_PERIOD_MS ),   // The timer period in ticks.
                             pdTRUE,        // The timers will auto-reload themselves when they expire.
@@ -555,12 +570,47 @@ void create_timers(void)
                             );
 
 
+
+
 }
 
 void start_timers(void)
 {
+    xTimerStart( xTimer100ms, 0 ) ;
     xTimerStart( xTimer1s, 0 ) ;
     xTimerStart( xTimer60s, 0 ) ;
+}
+
+void vTimer100msCallback( TimerHandle_t pxTimer ) //toutes les 100 millisecondes
+{
+    turbine.RPMs[0] = turbine.RPM ;
+    for(int i=1; i<9; i++)
+        turbine.RPMs[i] = turbine.RPMs[i+1] ;
+
+    turbine.EGTs[0] = turbine.EGT ;
+    for(int i=1; i<9; i++)
+        turbine.EGTs[i] = turbine.EGTs[i+1] ;
+
+    /* Simulation RPM */
+    uint32_t rpm1=0,pump1=0,pump2=0,rpm2=0,res=0,PUMP ;
+    PUMP = get_power(&turbine.pump1) ;
+    for(int i=0;i<50;i++)
+    {
+        if(PUMP >= turbine_config.power_table.pump[i])
+        {
+            pump1 = turbine_config.power_table.pump[i] ;
+            rpm1 = turbine_config.power_table.RPM[i] ;
+        }
+        else if(PUMP <= turbine_config.power_table.pump[i])
+        {
+            pump2 = turbine_config.power_table.pump[i] ;
+            rpm2 = turbine_config.power_table.RPM[i] ;
+            i = 50 ;
+        }
+        linear_interpolation(pump1,rpm1,pump2,rpm2,PUMP,&res) ;
+    }
+    //ESP_LOGI(TAG, "RPM : %ld",res);
+    turbine.RPM = res ;
 }
 
 void vTimer1sCallback( TimerHandle_t pxTimer ) //toutes les secondes
@@ -581,7 +631,7 @@ void vTimer1sCallback( TimerHandle_t pxTimer ) //toutes les secondes
     turbine.time++ ;
     if(isEngineRun())
         turbine.time_up++ ;
-    
+    //ESP_LOGI(TAG,"secondes : %ld",turbine.time) ;
     set_delta_RPM(&turbine,get_RPM(&turbine)-rpm_prec) ;
     set_delta_EGT(&turbine,get_EGT(&turbine)-egt_prec) ;
     

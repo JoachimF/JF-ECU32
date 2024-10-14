@@ -366,37 +366,36 @@ void app_main()
 	// *********** Simulation *********
 	int32_t time = 0 ;    //printf("Timer: %lld μs\n", Timer1/1000); 
 	strcpy(turbine.error_message,"OVERHEAT");
+	
 	while(1){
 		for(int32_t i=0;i<100;i++)
 		{
-			turbine.pump1.value+=1;
-			turbine.pump2.value+=2;
-			turbine.vanne1.value+=1;
-			turbine.vanne2.value+=1;
-			turbine.glow.value+=2;
-			turbine.EGT ++ ;
-			turbine.GAZ ++ ;
+			set_power(&turbine.pump1,i*10) ;
+			set_power(&turbine.pump2,i) ;
+			set_power_vanne(&turbine.vanne1,i) ;
+			set_power_vanne(&turbine.vanne2,i) ;
+			set_power_vanne(&turbine.glow,i) ;
+			turbine.EGT = i*8 ;
+			turbine.GAZ = i*10 ;
 			time_ecu = esp_timer_get_time() - timer_old ;
 			timer_old = esp_timer_get_time();
 			//ESP_LOGI(TAG,"EGT : %d ; GAZ : %d",turbine.EGT,turbine.GAZ) ;
 			vTaskDelay(200 / portTICK_PERIOD_MS);
 		}
-		for(int32_t i=0 ; i<100;i++)
+		for(int32_t i=100 ; i>0;i--)
 		{
-				turbine.pump1.value-=1;
-				turbine.pump2.value-=2;
-				turbine.vanne1.value-=1;
-				turbine.vanne2.value-=1;
-				turbine.glow.value-=2;
+			set_power(&turbine.pump1,i*10) ;
+			set_power(&turbine.pump2,i) ;
+			set_power_vanne(&turbine.vanne1,i) ;
+			set_power_vanne(&turbine.vanne2,i) ;
+			set_power_vanne(&turbine.glow,i) ;
 			//if( xSemaphoreTake(xTimeMutex,( TickType_t ) 10) == pdTRUE ) {
-				turbine.EGT -- ;
-				turbine.GAZ -- ;
-				//ESP_LOGI(TAG,"EGT : %d ; GAZ : %d",turbine.EGT,turbine.GAZ) ;
+			turbine.EGT = i*8 ;
+			turbine.GAZ = i*10 ;
+			//ESP_LOGI(TAG,"EGT : %d ; GAZ : %d",turbine.EGT,turbine.GAZ) ;
 			//}xSemaphoreGive(xTimeMutex) ;
 				vTaskDelay(200 / portTICK_PERIOD_MS);
 		}
-	
-		
 		//set_kero_pump_target(36000);
 		//vTaskDelay(3000 / portTICK_PERIOD_MS);
 		//set_kero_pump_target(54000);
