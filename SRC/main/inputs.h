@@ -33,9 +33,9 @@
 #define ECU_ONEWIRE_BUS_GPIO    4
 #define ECU_ONEWIRE_MAX_DS18B20 1
 
-#define RPM_PIN 21
+#define RPM_PIN 34//21
 #define RMT_RX_GPIO_NUM  26     /*!< GPIO number for Throttle */
-#define RMT_AUX_GPIO_NUM 22     /*!< GPIO number for Aux */
+#define RMT_AUX_GPIO_NUM 35//22     /*!< GPIO number for Aux */
 
 // SPI capteur température
 #define MISO_GPIO_NUM 19     /*!< GPIO number for MISO */
@@ -45,8 +45,8 @@
 // I2C capteur courant bougie
 #define I2C_PORT 0
 #define I2C_ADDR INA219_ADDR_GND_GND
-#define SDA_GPIO 34
-#define SCL_GPIO 35
+#define SDA_GPIO 22 //34
+#define SCL_GPIO 21 //35
 
 
 #if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(4, 0, 0)

@@ -75,6 +75,6 @@
         "ESP_ROM_ELF_DIR": "C:\\Users\\Boby\\.espressif5\\tools\\esp-rom-elfs\\20220823/"
     },
     "idf.gitPathWin": "C:\\Users\\Boby\\.espressif5\\tools\\idf-git\\2.39.2\\cmd\\git.exe",
-    "idf.portWin": "COM11",
+    "idf.portWin": "COM5",
     "idf.flashType": "UART"
 }

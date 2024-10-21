@@ -29,6 +29,9 @@
 #include "wifi.h"
 #include "nvs_ecu.h"
 #include "inputs.h"
+#include "imu.h"
+
+#include "simulator.h"
 
 #define TAG	"MAIN"
 #define NUM_OF_SPIN_TASKS   6
@@ -346,6 +349,10 @@ void app_main()
     xTaskCreatePinnedToCore(task_glow_current, "GLOW Current", configMINIMAL_STACK_SIZE * 8, NULL, (configMAX_PRIORITIES -1 )|( 1UL | portPRIVILEGE_BIT ), &task_glow_current_h,1);
     vTaskSuspend(task_glow_current_h);
 
+	ESP_LOGI(TAG, "Initializing IMU Task\n");  // Glow current
+    xTaskCreatePinnedToCore(task_imu, "IMU", configMINIMAL_STACK_SIZE * 8, NULL, (configMAX_PRIORITIES -1 )|( 1UL | portPRIVILEGE_BIT ), &xIMUHandle,1);
+    vTaskSuspend(xIMUHandle);
+
     //xSemaphoreGive(sync_stats_task);
 	/* Htop */
 
@@ -357,17 +364,20 @@ void app_main()
 	vTaskDelay(2000 / portTICK_PERIOD_MS);
 	//turbine.EGT = 1000 ;
 	//turbine.GAZ = 1000 ;
-	#if 0
+
+	start_simulator() ;
+	#if 1
 	while(1)
 	{
 		vTaskDelay(100 / portTICK_PERIOD_MS);
 	}
 	#else
 	// *********** Simulation *********
-	int32_t time = 0 ;    //printf("Timer: %lld μs\n", Timer1/1000); 
-	strcpy(turbine.error_message,"OVERHEAT");
+	//int32_t time = 0 ;    //printf("Timer: %lld μs\n", Timer1/1000); 
+	//strcpy(turbine.error_message,"OVERHEAT");
 	
-	while(1){
+	
+	/*while(1){
 		for(int32_t i=0;i<100;i++)
 		{
 			set_power(&turbine.pump1,i*10) ;
@@ -407,6 +417,6 @@ void app_main()
 		//set_kero_pump_target(143000);
 		//vTaskDelay(3000 / portTICK_PERIOD_MS);
 		//vTaskDelay(400 / portTICK_PERIOD_MS);
-		}
+		}*/
 	#endif
 }

@@ -22,7 +22,7 @@
 //#include "driver/mcpwm_prelude.h" // IDF 5.0
 #include <stdio.h>
 #include "esp_system.h"
-#include "esp_system.h"
+//#include "esp_system.h"
 #include "driver/gpio.h"
 #include "esp_wifi.h"
 #include <string.h>
@@ -79,7 +79,10 @@ bool isEngineRun(void)
 
 void linear_interpolation(uint32_t rpm1,uint32_t pump1,uint32_t rpm2,uint32_t pump2,uint32_t rpm,uint32_t *res) //RPM,PUMP,RPM,PUMP
 {
-    *res =  pump1 + ((pump2-pump1)* (rpm - rpm1))/(rpm2-rpm1) ;
+    if(rpm2-rpm1 != 0)
+        *res =  pump1 + ((pump2-pump1)* (rpm - rpm1))/(rpm2-rpm1) ;
+    else
+        *res = 0 ;
     //ESP_LOGI(TAG,"RPM1 : %d ; pump1 : %d , RPM1 : %d ; pump1 : %d , rpm : %d , res : %d",rpm1,pump1,rpm2,pump2,rpm,*res);
 }
 
@@ -209,18 +212,23 @@ uint8_t get_glow_power(_GLOW_t *glow)
     return glow->value ;
 }
 
-/*Renvoie la valeur d'une vanne de la puissance demandé en cours de 0-255*/
+/*Renvoie la valeur d'une vanne de la puissance demandé en cours de 0-1024*/
 uint8_t get_vanne_power(_VALVE_t *vanne)
 {
     return vanne->value ;
 }
 
-/*Configure la valeur d'une vanne ou bougie de puissance de 0-255*/
+/*Configure la valeur d'une vanne ou bougie de puissance de 0-1024*/
 void set_power_vanne(_VALVE_t *vanne, uint32_t value)
 {
     ESP_ERROR_CHECK(ledc_set_duty(LEDC_LOW_SPEED_MODE, vanne->config.ledc_channel, value));
     ESP_ERROR_CHECK(ledc_update_duty(LEDC_LOW_SPEED_MODE, vanne->config.ledc_channel));
     vanne->value = value ;
+}
+
+void set_power_glow(_VALVE_t *vanne, uint32_t value)
+{
+    set_power_vanne(vanne, value) ;
 }
 
 /*Configure la valeur de puissance de 0-255*/
@@ -542,37 +550,7 @@ void log_task( void * pvParameters )
 	vTaskDelete(xlogHandle);
 }
 
-void create_timers(void)
-{
-    //xTimeMutex = xSemaphoreCreateMutex() ;
-    //xRPMmutex = xSemaphoreCreateBinary() ;
-    //xSemaphoreGive(xRPMmutex) ;
-    //xGAZmutex = xSemaphoreCreateMutex() ;
-    xTimer100ms = xTimerCreate("Timer100ms",       // Just a text name, not used by the kernel.
-                            ( 100 /portTICK_PERIOD_MS ),   // The timer period in ticks.
-                            pdTRUE,        // The timers will auto-reload themselves when they expire.
-                            ( void * ) 3,  // Assign each timer a unique id equal to its array index.
-                            vTimer100msCallback // Each timer calls the same callback when it expires.
-                            );
 
-    xTimer1s = xTimerCreate("Timer1s",       // Just a text name, not used by the kernel.
-                            ( 1000 /portTICK_PERIOD_MS ),   // The timer period in ticks.
-                            pdTRUE,        // The timers will auto-reload themselves when they expire.
-                            ( void * ) 1,  // Assign each timer a unique id equal to its array index.
-                            vTimer1sCallback // Each timer calls the same callback when it expires.
-                            );
-
-    xTimer60s = xTimerCreate("Timer60s",       // Just a text name, not used by the kernel.
-                            ( 60000 /portTICK_PERIOD_MS ),   // The timer period in ticks.
-                            pdFALSE,        // The timers will auto-reload themselves when they expire.
-                            ( void * ) 2,  // Assign each timer a unique id equal to its array index.
-                            vTimer60sCallback // Each timer calls the same callback when it expires.
-                            );
-
-
-
-
-}
 
 void start_timers(void)
 {
@@ -590,27 +568,6 @@ void vTimer100msCallback( TimerHandle_t pxTimer ) //toutes les 100 millisecondes
     turbine.EGTs[0] = turbine.EGT ;
     for(int i=1; i<9; i++)
         turbine.EGTs[i] = turbine.EGTs[i+1] ;
-
-    /* Simulation RPM */
-    uint32_t rpm1=0,pump1=0,pump2=0,rpm2=0,res=0,PUMP ;
-    PUMP = get_power(&turbine.pump1) ;
-    for(int i=0;i<50;i++)
-    {
-        if(PUMP >= turbine_config.power_table.pump[i])
-        {
-            pump1 = turbine_config.power_table.pump[i] ;
-            rpm1 = turbine_config.power_table.RPM[i] ;
-        }
-        else if(PUMP <= turbine_config.power_table.pump[i])
-        {
-            pump2 = turbine_config.power_table.pump[i] ;
-            rpm2 = turbine_config.power_table.RPM[i] ;
-            i = 50 ;
-        }
-        linear_interpolation(pump1,rpm1,pump2,rpm2,PUMP,&res) ;
-    }
-    //ESP_LOGI(TAG, "RPM : %ld",res);
-    turbine.RPM = res ;
 }
 
 void vTimer1sCallback( TimerHandle_t pxTimer ) //toutes les secondes
@@ -667,6 +624,38 @@ void vTimer60sCallback( TimerHandle_t pxTimer )
     mdns_free();
     if(isEngineRun())
         horametre_save() ;
+}
+
+void create_timers(void)
+{
+    //xTimeMutex = xSemaphoreCreateMutex() ;
+    //xRPMmutex = xSemaphoreCreateBinary() ;
+    //xSemaphoreGive(xRPMmutex) ;
+    //xGAZmutex = xSemaphoreCreateMutex() ;
+    xTimer100ms = xTimerCreate("Timer100ms",       // Just a text name, not used by the kernel.
+                            ( 100 /portTICK_PERIOD_MS ),   // The timer period in ticks.
+                            pdTRUE,        // The timers will auto-reload themselves when they expire.
+                            ( void * ) 3,  // Assign each timer a unique id equal to its array index.
+                            vTimer100msCallback // Each timer calls the same callback when it expires.
+                            );
+
+    xTimer1s = xTimerCreate("Timer1s",       // Just a text name, not used by the kernel.
+                            ( 1000 /portTICK_PERIOD_MS ),   // The timer period in ticks.
+                            pdTRUE,        // The timers will auto-reload themselves when they expire.
+                            ( void * ) 1,  // Assign each timer a unique id equal to its array index.
+                            vTimer1sCallback // Each timer calls the same callback when it expires.
+                            );
+
+    xTimer60s = xTimerCreate("Timer60s",       // Just a text name, not used by the kernel.
+                            ( 60000 /portTICK_PERIOD_MS ),   // The timer period in ticks.
+                            pdFALSE,        // The timers will auto-reload themselves when they expire.
+                            ( void * ) 2,  // Assign each timer a unique id equal to its array index.
+                            vTimer60sCallback // Each timer calls the same callback when it expires.
+                            );
+
+
+
+
 }
 
 void ecu_task(void * pvParameters ) 

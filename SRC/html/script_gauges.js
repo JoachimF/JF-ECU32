@@ -280,8 +280,8 @@ function getReadings() {
                 //console.log("chart3 update");
             chart3.update();
 			//Text
-			document.getElementById('pump1').innerHTML = pump1;
-			document.getElementById('pump2').innerHTML = pump2;
+			document.getElementById('pump1').innerHTML = pump1.toFixed(1);
+			document.getElementById('pump2').innerHTML = pump2.toFixed(1);
 			document.getElementById('vanne1').innerHTML = vanne1;
 			document.getElementById('vanne2').innerHTML = vanne2;
 			document.getElementById('glow').innerHTML = glow;

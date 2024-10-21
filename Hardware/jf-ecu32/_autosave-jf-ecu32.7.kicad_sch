@@ -4267,7 +4267,7 @@
     (property "Value" "Conn_01x06" (at 245.11 34.29 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Footprint" "Connector_JST:JST_PH_B6B-PH-K_1x06_P2.00mm_Vertical" (at 242.57 31.75 0)
+    (property "Footprint" "" (at 242.57 31.75 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "~" (at 242.57 31.75 0)

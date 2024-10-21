@@ -128,14 +128,17 @@ typedef struct _configEngine_{
   uint8_t acceleration_delay ; // délais d'accélération
   uint8_t deceleration_delay ; // délais de décélération
   uint8_t stability_delay ; // coefficient I dans l'asservissement en vitesse
+  
   //Pumps
   uint16_t max_pump1 ; // puissance max de la pompe 1
   uint16_t min_pump1 ; // puissance min de la pompe 1
   uint16_t max_pump2 ; // puissance max de la pompe 1
   uint16_t min_pump2 ; // puissance min de la pompe 1
+  
   //Vannes
   uint16_t max_vanne1 ; // puissance max de la vanne 1
   uint16_t max_vanne2 ; // puissance max de la vanne 2
+  
   // Paramètre du démarreur
   uint16_t starter_rpm_start ; // vitesse du starter pour l'allumage ex : start_starter
   float starter_pwm_perc_start ; // PWM à laquelle le démarreur commence a tourner
@@ -259,19 +262,24 @@ void set_kero_pump_target(uint32_t RPM) ;
 
 void update_curve_file(void) ;
 void head_logs_file(void) ;
-void log_task( void * pvParameters ) ;
+
 void create_timers(void) ;
 void start_timers(void) ;
-void vTimer100msCallback( TimerHandle_t pxTimer ) ;
-void vTimer1sCallback( TimerHandle_t pxTimer ) ;
-void vTimer60sCallback( TimerHandle_t pxTimer ) ;
+
+//void vTimer100msCallback( TimerHandle_t pxTimer ) ;
+//void vTimer1sCallback( TimerHandle_t pxTimer ) ;
+//void vTimer60sCallback( TimerHandle_t pxTimer ) ;
+
+void log_task( void * pvParameters ) ;
 void ecu_task(void * pvParameters ) ;
 void inputs_task(void * pvParameters) ;
+
 void init_mcpwm(void) ;
 void set_power_func_us(_PUMP_t *config ,float value) ;
 void set_power_func(_PUMP_t *config ,float value) ;
 void set_power(_PUMP_t *starter ,float value) ;
 void set_power_vanne(_VALVE_t *vanne, uint32_t value) ;
+void set_power_glow(_VALVE_t *vanne, uint32_t value) ;
 
 float get_pump_power_float(_PUMP_t *config) ;
 float get_starter_power(_PUMP_t *config) ;

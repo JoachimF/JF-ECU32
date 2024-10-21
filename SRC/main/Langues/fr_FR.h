@@ -84,9 +84,10 @@
   #define IN_PUMP1MIN "PWM Min pompe 1 (0-1024)"
   #define IN_PUMP2MAX "PWM Max pompe 2 (0-1024)"
   #define IN_PUMP2MIN "PWM Min pompe 2 (0-1024)"
-  #define IN_VANNE1MAX "PWM Max vanne 1 (0-1024)"
-  #define IN_VANNE2MAX "PWM Max vanne 2 (0-1024)"
+  #define IN_VANNE1MAX "PWM Max vanne 1 (0-255)"
+  #define IN_VANNE2MAX "PWM Max vanne 2 (0-255)"
   #define IN_RPMSTARTER "RPM Allumage (0-10000RPM)"
+  #define IN_MAXSTARTERRPM "RPM Max du démarreur"
 
   #define SURE "Etes vous sur de vouloir"
   #define B_CONFIRM_SAVE "Confirmer la sauvegarde"

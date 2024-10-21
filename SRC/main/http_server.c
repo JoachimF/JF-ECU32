@@ -47,6 +47,7 @@
 #include "error.h"
 #include "calibration.h"
 #include "html.h"
+#include "imu.h"
 
 extern TimerHandle_t xTimer60s ;
 static const char *TAG = "HTTP";
@@ -403,45 +404,55 @@ static esp_err_t root_post_handler(httpd_req_t *req)
 		len = find_value("pwmSliderValue1=",content,param) ;
 		if(len > 0)
 		{
-			turbine.pump1.value = atoi(param) ;
+			/*turbine.pump1.value = atoi(param) ;
 			if(turbine.pump1.config.ppm_pwm == PPM)
 				set_power_func_us(&turbine.pump1,atoi(param)) ;
 			else
-				set_power_func(&turbine.pump1,atof(param)/20) ;
+				set_power_func(&turbine.pump1,atof(param)/20) ;*/
+			set_power(&turbine.pump1,atof(param)) ;
 		}
 
 		len = find_value("pwmSliderValue2=",content,param) ;
 		if(len > 0)
 		{
-			turbine.pump2.value = atoi(param) ;
+			set_power(&turbine.pump2,atof(param)) ;
+			/*turbine.pump2.value = atoi(param) ;
 			if(turbine.pump2.config.ppm_pwm == PPM)
 				set_power_func_us(&turbine.pump2,atoi(param)) ;
 			else
-				set_power_func(&turbine.pump2,atof(param)/20) ;
+				set_power_func(&turbine.pump2,atof(param)/20) ;*/
 		}
 
 		len = find_value("pwmSliderValue3=",content,param) ;
 		if(len > 0)
 		{
-			turbine.starter.value = atoi(param) ;
+			set_power(&turbine.starter,atof(param)) ;
+			/*turbine.starter.value = atoi(param) ;
 			if(turbine.starter.config.ppm_pwm == PPM)
 				set_power_func_us(&turbine.starter,atoi(param)) ;
 			else
-				set_power_func(&turbine.starter,atof(param)/20) ;
+				set_power_func(&turbine.starter,atof(param)/20) ;*/
 		}
 		//Vanne 1
 		len = find_value("pwmSliderValue4=",content,param) ;
 		if(len > 0)
 		{
-			turbine.vanne1.value = atoi(param) ;
-			turbine.vanne1.set_power(&turbine.vanne1.config,atoi(param)) ;
+			//turbine.vanne1.value = atoi(param) ;
+			param_int32 = atoi(param) ;
+			if(param_int32 > turbine_config.max_vanne1)
+				param_int32 = turbine_config.max_vanne1 ;
+			set_power_vanne(&turbine.vanne1,param_int32) ;
 		}
 		//Vanne 2
 		len = find_value("pwmSliderValue5=",content,param) ;
 		if(len > 0)
 		{
-			turbine.vanne2.value = atoi(param) ;
-			turbine.vanne2.set_power(&turbine.vanne2.config,atoi(param)) ;
+			param_int32 = atoi(param) ;
+			if(param_int32 > turbine_config.max_vanne2)
+				param_int32 = turbine_config.max_vanne2 ;
+			set_power_vanne(&turbine.vanne2,param_int32) ;
+			/*turbine.vanne2.value = atoi(param) ;
+			turbine.vanne2.set_power(&turbine.vanne2.config,atoi(param)) ;*/
 		}
 		// GLOW
 		len = find_value("pwmSliderValue6=",content,param) ;
@@ -450,8 +461,9 @@ static esp_err_t root_post_handler(httpd_req_t *req)
 			param_int32 = atoi(param) ;
 			if(param_int32 > turbine_config.glow_power)
 				param_int32 = turbine_config.glow_power ;
-			turbine.glow.value = param_int32 ;	
-			turbine.glow.set_power(&turbine.glow.config,param_int32) ;
+			set_power_glow(&turbine.glow,param_int32) ;
+			//turbine.glow.value = param_int32 ;	
+			//turbine.glow.set_power(&turbine.glow.config,param_int32) ;
 		}
 		//ESP_LOGI(TAG,"%s",content) ;
 		/* Send a simple response */
@@ -900,6 +912,10 @@ void save_configturbine(httpd_req_t *req)
 	if(len>1) {
 		turbine_config.starter_rpm_start = atoi(param) ;		
 	}
+	len = find_param_input(I_MAXSTARTERRPM,buf,param) ;
+	if(len>1) {
+		turbine_config.starter_max_rpm = atoi(param) ;		
+	}
 	write_nvs_turbine() ;
 	free(buf) ;
 }
@@ -1019,6 +1035,7 @@ static esp_err_t starter_calibration_page(httpd_req_t *req)
 
 	// Send footer
 	Text2Html(req, "/html/chart_starter.html");
+	WSBouton(req,BT_SAVE_ST_CAL) ;
 	WSRetourBouton(req) ;
 	Text2Html(req, "/html/footer.html");
 	httpd_resp_sendstr_chunk(req, NULL); //fin de la page
@@ -1064,6 +1081,7 @@ static esp_err_t configmoteur(httpd_req_t *req)
 	WSInputBox(req,I_VANNE1MAX,turbine_config.max_vanne1,NULL,NUMBER,true) ;
 	WSInputBox(req,I_VANNE2MAX,turbine_config.max_vanne2,NULL,NUMBER,true) ;
 	WSInputBox(req,I_RPMSTARTER,turbine_config.starter_rpm_start,NULL,NUMBER,true) ;
+	WSInputBox(req,I_MAXSTARTERRPM,turbine_config.starter_max_rpm,NULL,NUMBER,true) ;
 	
 	WSSaveBouton(req) ;
 	/*httpd_resp_sendstr_chunk(req, "<button name=\"save\" type=\"submit\" class=\"button bgrn\">Sauvegarde</button>") ;
@@ -1302,11 +1320,13 @@ static esp_err_t g_chartstarter_get_handler(httpd_req_t *req){
 static esp_err_t readings_get_handler(httpd_req_t *req){
 	static cJSON *myjson;
 	char status[50] ;
-	char errors[200] ;	
+	char errors[200] ;
+	mpu6050_acce_value_t acce;	
 
-	uint8_t minutes,secondes ;
+	uint8_t heures,minutes,secondes ;
 	//ESP_LOGI(TAG, "readings_get_handler req->uri=[%s]", req->uri);
-	get_time_total(&turbine,&secondes,&minutes,NULL) ;
+	get_time_total(&turbine,&secondes,&minutes,&heures) ;
+
 	//uint32_t rpm = 0 ;
 	//ESP_LOGI(TAG, "cJSON_CreateObject");
 	myjson = cJSON_CreateObject();
@@ -1336,11 +1356,20 @@ static esp_err_t readings_get_handler(httpd_req_t *req){
 		get_errors(errors); 
 		cJSON_AddStringToObject(myjson, "error", errors);
 		//ESP_LOGI(TAG, "minutes,secondes");
-		sprintf(status,"%02d:%02d",minutes,secondes);
+		sprintf(status,"%02d:%02d:%02d",heures,minutes,secondes);
 		//ESP_LOGI(TAG, "time : %s", status);
 		cJSON_AddStringToObject(myjson, "time", status);
 
 		cJSON_AddNumberToObject(myjson, "ticks",xTaskGetTickCount() - Ticks);
+
+		if(xQueueReceive(xQueueIMU, &acce, portMAX_DELAY)) {
+			cJSON_AddNumberToObject(myjson, "accx", acce.acce_x);
+			cJSON_AddNumberToObject(myjson, "accy", acce.acce_y);
+			cJSON_AddNumberToObject(myjson, "accz", acce.acce_z);
+
+		}else {
+				ESP_LOGE(TAG, "xQueueReceive fail");
+		}
 	
 //	}xSemaphoreGive(xTimeMutex) ;
 	//ESP_LOGI(TAG, "Send http");
@@ -1411,6 +1440,9 @@ static esp_err_t frontpage(httpd_req_t *req)
 		starter_calibration_page(req) ;
 	else if(strcmp(filename, "/stop_starter_calibration") == 0) 
 		stop_starter_calibration(req) ;
+	else if(strcmp(filename, "/save_st_calibration") == 0) 
+		write_nvs_turbine() ;
+		
 	else if(strcmp(filename, "/logs") == 0) 
 		logs(req) ;
 	else if(strcmp(filename, "/slider") == 0) 
@@ -1443,7 +1475,10 @@ static esp_err_t frontpage(httpd_req_t *req)
 		}*/
 	}
 	else if(strcmp(filename, "/readings") == 0) 
+	{
+		vTaskResume(xIMUHandle) ;
 		readings_get_handler(req) ;
+	}
 	else if(strcmp(filename, "/g_params") == 0) 
 		g_params_get_handler(req) ;
 	//else if(strcmp(filename, "/events") == 0) 
@@ -1459,7 +1494,7 @@ static esp_err_t frontpage(httpd_req_t *req)
 	else if(strcmp(filename, "/") == 0 ) 
 	{
 		// Frontpage
-	
+	vTaskSuspend(xIMUHandle);
 	send_head(req) ;
 	
 	WSContentButton(req,BT_PARAMECU, true) ;
@@ -1478,6 +1513,21 @@ static esp_err_t frontpage(httpd_req_t *req)
 
 	Text2Html(req, "/html/footer.html");
 	httpd_resp_sendstr_chunk(req, NULL); //fin de la page
+	}
+	else if (strstr(buf,"GET / ") && !strstr(buf,"Upgrade: websocket")) {
+		ESP_LOGI(TAG,"Sending /");
+		netconn_write(conn, HTML_HEADER, sizeof(HTML_HEADER)-1,NETCONN_NOCOPY);
+		netconn_write(conn, root_html_start,root_html_len,NETCONN_NOCOPY);
+		netconn_close(conn);
+		netconn_delete(conn);
+		netbuf_delete(inbuf);
+	}
+
+	// default page websocket
+	else if(strstr(buf,"GET / ") && strstr(buf,"Upgrade: websocket")) {
+		ESP_LOGI(TAG,"Requesting websocket on /");
+		ws_server_add_client(conn,buf,buflen,"/",websocket_callback);
+		netbuf_delete(inbuf);
 	}
 	
 

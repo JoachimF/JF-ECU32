@@ -56,14 +56,14 @@ const char htmlCheckParamEcu[]  =
 const char htmlBoutonFrontpage[]  =
   B_PARAMECU "|" B_PARAM_MOTEUR "|"
   B_INFORMATION "|" B_LOG "|" B_WIFI "|" B_SLIDER "|" B_JAUGES "|"
-  B_CALIBRATION "|" B_STARTCALIBRATION "|" B_STOPCALIBRATION "|"
+  B_CALIBRATION "|" B_STARTCALIBRATION "|" B_STOPCALIBRATION "|" B_SAVE "|"
   B_CHART "|"
   B_START_ENGINE "|" B_STOP_ENGINE"|" B_MAJ "|" B_CUT_WIFI ;
 
 
 const char BoutonFrontpageAction[]  =
   "configecu|configmoteur|"
-  "info|logs|wifi|slider|gauges|calibrations|starter_calibration|stop_starter_calibration|"
+  "info|logs|wifi|slider|gauges|calibrations|starter_calibration|stop_starter_calibration|save_st_calibration|"
   "chart|"
   "start|stop|upgrade|stopwifi";
 
@@ -74,7 +74,7 @@ const char htmlInputParamEng[] =
   IN_DELAYACC "|" IN_DELAYDEC "|" IN_DELAYSTAB "|" 
   IN_PUMP1MAX "|" IN_PUMP1MIN "|" IN_PUMP2MAX "|" IN_PUMP2MIN "|" 
   IN_VANNE1MAX "|" IN_VANNE2MAX "|" 
-  IN_RPMSTARTER ;
+  IN_RPMSTARTER "|" IN_MAXSTARTERRPM ;
 
 const uint32_t htmlParamEngMinMax[2][17] =
  {{MIN_NAME,MIN_GLOWPOWER,

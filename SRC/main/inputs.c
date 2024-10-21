@@ -35,6 +35,13 @@
 #include "freertos/semphr.h"
 #include <ina219.h>
 #include "ds18b20.h"
+
+#define IMU 1
+
+#ifdef IMU
+    #include "imu.h"
+#endif
+
 #include "onewire_bus_impl_rmt.h"
 #include <max31855.h>
 
@@ -277,6 +284,8 @@ void init_inputs(void)
     gpio_isr_handler_add(RPM_PIN, gpio_isr_handler, (void *)RPM_PIN);
     gpio_intr_enable(RPM_PIN) ;
 
+    ESP_LOGI("RPM","Initialized");
+
     ESP_LOGI("PPM","Init PPM");
 
     //voie des gaz
@@ -324,9 +333,18 @@ void init_inputs(void)
     ESP_ERROR_CHECK(rmt_enable(rx_ppm_aux_chan)) ;
     ESP_ERROR_CHECK(rmt_receive(rx_ppm_aux_chan, aux_raw_symbols, sizeof(aux_raw_symbols), &receive_config));
     ESP_LOGI(TAG, "Receive AUX ranges initialized\n");
+
+    ESP_LOGI("PPM","Initialized");
     
     //init_ds18b20() ;
     ESP_LOGI(TAG, "DS18B20 initialized\n");
+
+    #ifdef IMU
+    //init MPU6050
+    i2c_sensor_mpu6050_init() ;
+    ESP_LOGI(TAG, "MPU6050 initialized\n");
+
+    #endif
 }
 
 /*bool Get_RPM(uint32_t *rpm) 
