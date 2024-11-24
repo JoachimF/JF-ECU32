@@ -261,6 +261,7 @@ void task_egt(void *pvParameter)
     }
 }
 
+/* Initialisation des entrées de la carte */
 void init_inputs(void) 
 {
     //** GPTIMER pour RPM
@@ -366,6 +367,7 @@ void init_inputs(void)
     return 0 ;
 }*/
 
+/*Remet à 0 les RPM par manque d'impulsion */
 void Reset_RPM() 
 {
     //ESP_LOGI(TAG,"Reset RPM") ;
@@ -378,16 +380,19 @@ void Reset_RPM()
     }*/
 }
 
+/* Renvoie la valeur du manche de gaz */
 uint32_t get_gaz(struct _engine_ * engine)
 {
     return engine->GAZ;
 }
 
+/* Renvoie la valeur de la voie auxilaire */
 uint32_t get_aux(struct _engine_ * engine)
 {
     return engine->Aux ;
 }
 
+/* Renvoie la valeur des RPM */
 uint32_t get_RPM(struct _engine_ * engine)
 {
     uint32_t rpm_tmp ;
@@ -398,11 +403,13 @@ uint32_t get_RPM(struct _engine_ * engine)
 
 }
 
+/* Renvoie la valeur des EGT */
 uint32_t get_EGT(struct _engine_ * engine)
 {
     return engine->EGT ;
 }
 
+/* Renvoie la valeur du courant dans la bougie */
 float get_GLOW_CURRENT(struct _engine_ * engine)
 {
     return engine->GLOW_CURRENT ;

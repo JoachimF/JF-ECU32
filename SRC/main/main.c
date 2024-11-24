@@ -30,6 +30,7 @@
 #include "nvs_ecu.h"
 #include "inputs.h"
 #include "imu.h"
+#include "websocket.h"
 
 #include "simulator.h"
 
@@ -143,7 +144,7 @@ static void directorySPIFFS(char * path) {
 	DIR* dir = opendir(path);
 	assert(dir != NULL);
 	while (true) {
-		struct dirent*pe = readdir(dir);
+		struct dirent *pe = readdir(dir);
 		if (!pe) break;
 		ESP_LOGI(TAG,"d_name=%s/%s d_ino=%d d_type=%x", path, pe->d_name,pe->d_ino, pe->d_type);
 	}
@@ -353,12 +354,15 @@ void app_main()
     xTaskCreatePinnedToCore(task_imu, "IMU", configMINIMAL_STACK_SIZE * 8, NULL, (configMAX_PRIORITIES -1 )|( 1UL | portPRIVILEGE_BIT ), &xIMUHandle,1);
     vTaskSuspend(xIMUHandle);
 
+	xTaskCreatePinnedToCore(ws_task, "WS_TASK", configMINIMAL_STACK_SIZE * 8, NULL, (configMAX_PRIORITIES -1 )|( 1UL | portPRIVILEGE_BIT ), &xWSHandle,1);
+	vTaskSuspend(xWSHandle);
+
     //xSemaphoreGive(sync_stats_task);
 	/* Htop */
 
 	/* Demarrage des taches*/
 	//xSemaphoreGive(ecu_task_start) ;
-	xSemaphoreGive(http_task_start) ;
+	xSemaphoreGive(http_task_start) ;	
 	//xSemaphoreGive(log_task_start) ;
 	
 	vTaskDelay(2000 / portTICK_PERIOD_MS);

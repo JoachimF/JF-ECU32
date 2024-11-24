@@ -20,6 +20,20 @@
 #ifndef _WEBSOCKET_H_
 #define _WEBSOCKET_H_
 
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/queue.h"
+#include "freertos/event_groups.h"
+#include "freertos/message_buffer.h"
+#include "esp_http_server.h"
+
 extern MessageBufferHandle_t xMessageBufferToClient;
+extern TaskHandle_t xWSHandle ;
+void ws_task(void* pvParameters) ;
+
+
+esp_err_t handle_ws_req(httpd_req_t *req) ;
+void setup_websocket_server(void) ;
+
 
 #endif

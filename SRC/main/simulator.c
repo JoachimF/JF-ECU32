@@ -109,7 +109,7 @@ void vTimer100msSIMCallback( TimerHandle_t pxTimer ) //toutes les 100 millisecon
                 sim_heat = get_power(&turbine.pump1)*10 - sim_flow ;
                 sim_egt = turbine.EGT + sim_heat * 0.02 ;
                 sim_rpm = sim_energy - sim_frottement + res / 10 ;     
-                ESP_LOGI(TAG,"Mode RUN frot : %f flow : %f nrj : %f pump : %0.1f heat : %0.1f egt : %lu rpm : %lu",sim_frottement,sim_flow,sim_energy,get_power(&turbine.pump1),sim_heat,sim_egt,sim_rpm) ;
+                ESP_LOGD(TAG,"Mode RUN frot : %f flow : %f nrj : %f pump : %0.1f heat : %0.1f egt : %lu rpm : %lu",sim_frottement,sim_flow,sim_energy,get_power(&turbine.pump1),sim_heat,sim_egt,sim_rpm) ;
             }
             else //Moteur ne tourne pas
             {
@@ -124,7 +124,7 @@ void vTimer100msSIMCallback( TimerHandle_t pxTimer ) //toutes les 100 millisecon
                     STARTER_PWR = get_power(&turbine.starter) ; //Starter on
                     //void linear_interpolation(uint32_t rpm1,uint32_t pump1,uint32_t rpm2,uint32_t pump2,uint32_t rpm,uint32_t *res)
                     linear_interpolation(0,0,100,turbine_config.starter_max_rpm,STARTER_PWR,&res) ;
-                    ESP_LOGI(TAG,"Starter power : %ld RPM : %ld",STARTER_PWR,res) ;
+                    ESP_LOGD(TAG,"Starter power : %ld RPM : %ld",STARTER_PWR,res) ;
                     sim_rpm = ((sim_rpm * 2+res) ) / 3 ;
                 }    
             }

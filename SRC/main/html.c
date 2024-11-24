@@ -62,10 +62,10 @@ const char htmlBoutonFrontpage[]  =
 
 
 const char BoutonFrontpageAction[]  =
-  "configecu|configmoteur|"
-  "info|logs|wifi|slider|gauges|calibrations|starter_calibration|stop_starter_calibration|save_st_calibration|"
-  "chart|"
-  "start|stop|upgrade|stopwifi";
+  "c_ecu|c_moteur|"
+  "c_info|c_logs|c_wifi|c_slider|c_gauges|c_cals|c_st_cal|stop_st_cal|save_st_cal|"
+  "c_chart|"
+  "c_start|c_stop|c_upgrade|c_stopwifi";
 
 const char htmlInputParamEng[] =
   IN_NAME "|" IN_GLOWPOWER "|" 
@@ -99,7 +99,7 @@ const char htmlBoutonParamEcu[]  =
   B_SAVE "|" B_RETOUR  ;
 
 const char htmlBoutonParamEcuAction[]  =
-  "|configecu|/|";
+  "|c_ecu|/|";
 
 const char kButtonConfirm[]  = B_CONFIRM_SAVE ;
 

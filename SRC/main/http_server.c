@@ -48,10 +48,12 @@
 #include "calibration.h"
 #include "html.h"
 #include "imu.h"
+#include "websocket.h"
 
 extern TimerHandle_t xTimer60s ;
 static const char *TAG = "HTTP";
 TickType_t Ticks ;
+httpd_handle_t server = NULL;
 
 #define STORAGE_NAMESPACE "storage"
 
@@ -1107,7 +1109,7 @@ static esp_err_t slider(httpd_req_t *req)
 
 
 
-static const char* get_path_from_uri(char *dest, const char *uri, size_t destsize)
+const char* get_path_from_uri(char *dest, const char *uri, size_t destsize)
 {
     size_t pathlen = strlen(uri);
 
@@ -1339,11 +1341,11 @@ static esp_err_t readings_get_handler(httpd_req_t *req){
 		//ESP_LOGI(TAG, "get_EGT");
 		cJSON_AddNumberToObject(myjson, "egt", get_EGT(&turbine));
 		//ESP_LOGI(TAG, "get_RPM");
-		cJSON_AddNumberToObject(myjson, "rpm", get_RPM(&turbine));
+		cJSON_AddNumberToObject(myjson, "rpm", get_EGT(&turbine));
 		//ESP_LOGI(TAG, "pump1");
-		cJSON_AddNumberToObject(myjson, "pump1", turbine.pump1.value);
+		cJSON_AddNumberToObject(myjson, "pump1", get_power(&turbine.pump1));
 		//ESP_LOGI(TAG, "pump2");
-		cJSON_AddNumberToObject(myjson, "pump2", turbine.pump2.value);
+		cJSON_AddNumberToObject(myjson, "pump2", get_power(&turbine.pump2));
 		//ESP_LOGI(TAG, "vanne1");
 		cJSON_AddNumberToObject(myjson, "vanne1", get_vanne_power(&turbine.vanne1));
 		//ESP_LOGI(TAG, "vanne2");
@@ -1411,6 +1413,89 @@ esp_err_t upgrade_get_handler(httpd_req_t *req)
 }
 
 
+static esp_err_t configs(httpd_req_t *req)
+{
+//ESP_LOGI(TAG, "root_get_handler req->uri=[%s]", req->uri);
+    char filepath[20];
+	esp_err_t err ;
+	//static int i=0 ;
+    //ESP_LOGI(TAG, "URI : %s", req->uri);
+	xTimerStop( xTimer60s,0) ;
+    const char *filename = get_path_from_uri(filepath, req->uri, sizeof(filepath));
+
+    if (!filename) 
+    {
+        ESP_LOGE(TAG, "Filename is too long");
+        // retourne une erreur 500 (Internal Server Error)
+        httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Filename too long");
+        return ESP_FAIL;
+    }
+	//ESP_LOGI(TAG, "File : %s", filename);
+	err = ESP_OK ;
+
+	if(strcmp(filename, "/c_ecu") == 0) 
+		err = configecu(req) ;
+	else if(strcmp(filename, "/c_moteur") == 0) 
+		err = configmoteur(req) ;
+	else if(strcmp(filename, "/c_cals") == 0) 
+		err = calibrations(req) ;
+	else if(strcmp(filename, "/c_st_cal") == 0) 
+		err = starter_calibration_page(req) ;
+	else if(strcmp(filename, "/c_stop_st_cal") == 0) 
+		err = stop_starter_calibration(req) ;
+	else if(strcmp(filename, "/c_save_st_cal") == 0) 
+		write_nvs_turbine() ;
+	else if(strcmp(filename, "/c_start") == 0) 
+		turbine.phase_fonctionnement = START ;
+	else if(strcmp(filename, "/c_stop") == 0) 
+		turbine.phase_fonctionnement = STOP ;
+	else if(strcmp(filename, "/c_slider") == 0) 
+		slider(req) ;
+	else if(strcmp(filename, "/c_logs") == 0) 
+		logs(req) ;
+	else if(strcmp(filename, "/c_slider") == 0) 
+		slider(req) ;
+	else if(strcmp(filename, "/c_curves.txt") == 0) 
+		curves_get_handler(req) ;
+	else if(strcmp(filename, "/c_logs.txt") == 0) 
+		logs_get_handler(req) ;
+	else if(strcmp(filename, "/c_wifi") == 0) 
+		wifi_get_handler(req) ;
+	else if(strcmp(filename, "/c_stopwifi") == 0) {
+		ESP_ERROR_CHECK(esp_wifi_stop() );
+		vTaskDelete( xWebHandle ); }
+	else if(strcmp(filename, "/c_gauges") == 0) 
+	{
+//		ESP_ERROR_CHECK( heap_trace_start(HEAP_TRACE_LEAKS) );
+		gauges_get_handler(req) ;
+		/*i++ ;
+		if(i>10)
+		{
+			ESP_ERROR_CHECK( heap_trace_stop() );
+			heap_trace_dump();
+			i = 0 ;
+		}*/
+	}
+	else if(strcmp(filename, "/readings") == 0) 
+	{
+		vTaskResume(xIMUHandle) ;
+		readings_get_handler(req) ;
+	}
+	else if(strcmp(filename, "/c_g_params") == 0) 
+		g_params_get_handler(req) ;
+	//else if(strcmp(filename, "/events") == 0) 
+	//	events_get_handler(req) ;
+	else if(strcmp(filename, "/c_upgrade") == 0) 
+		upgrade_get_handler(req) ;
+	else if(strcmp(filename, "/c_chart") == 0) 
+		chart_get_handler(req) ;
+	else if(strcmp(filename, "/c_chartdata") == 0) 
+		g_chartdata_get_handler(req) ;
+	// Courbe calibration du démarreur
+	else if(strcmp(filename, "/c_chart_starter_cal") == 0) 
+		g_chartstarter_get_handler(req) ;
+	return err ;	
+}
 
 static esp_err_t frontpage(httpd_req_t *req)
 {
@@ -1421,6 +1506,13 @@ static esp_err_t frontpage(httpd_req_t *req)
 	xTimerStop( xTimer60s,0) ;
     const char *filename = get_path_from_uri(filepath, req->uri, sizeof(filepath));
 	
+	/*if (req->method != HTTP_GET)
+    {
+		ESP_LOGI(TAG, "Non HTTP_GET request method : %d",req->method);
+		//ESP_LOGI(TAG, "frontpage req->uri=[%s]", req->uri);
+		handle_ws_req(req);
+	}*/
+
     if (!filename) 
     {
         ESP_LOGE(TAG, "Filename is too long");
@@ -1430,7 +1522,7 @@ static esp_err_t frontpage(httpd_req_t *req)
     }
 	//ESP_LOGI(TAG, "File : %s", filename);
 
-	if(strcmp(filename, "/configecu") == 0) 
+	/*if(strcmp(filename, "/configecu") == 0) 
 		configecu(req) ;
 	else if(strcmp(filename, "/configmoteur") == 0) 
 		configmoteur(req) ;
@@ -1466,13 +1558,13 @@ static esp_err_t frontpage(httpd_req_t *req)
 	{
 //		ESP_ERROR_CHECK( heap_trace_start(HEAP_TRACE_LEAKS) );
 		gauges_get_handler(req) ;
-		/*i++ ;
-		if(i>10)
-		{
-			ESP_ERROR_CHECK( heap_trace_stop() );
-			heap_trace_dump();
-			i = 0 ;
-		}*/
+		//i++ ;
+		//if(i>10)
+		//{
+		//	ESP_ERROR_CHECK( heap_trace_stop() );
+		//	heap_trace_dump();
+		//	i = 0 ;
+		//}
 	}
 	else if(strcmp(filename, "/readings") == 0) 
 	{
@@ -1489,10 +1581,14 @@ static esp_err_t frontpage(httpd_req_t *req)
 		chart_get_handler(req) ;
 	else if(strcmp(filename, "/chartdata") == 0) 
 		g_chartdata_get_handler(req) ;
+	// Courbe calibration du démarreur
 	else if(strcmp(filename, "/chart_starter_cal") == 0) 
 		g_chartstarter_get_handler(req) ;
+	// Websocket 
+	//else if(strcmp(filename, "/ws") == 0) 
+	//	handle_ws_req(req) ;
 	else if(strcmp(filename, "/") == 0 ) 
-	{
+	{*/
 		// Frontpage
 	vTaskSuspend(xIMUHandle);
 	send_head(req) ;
@@ -1513,23 +1609,7 @@ static esp_err_t frontpage(httpd_req_t *req)
 
 	Text2Html(req, "/html/footer.html");
 	httpd_resp_sendstr_chunk(req, NULL); //fin de la page
-	}
-	else if (strstr(buf,"GET / ") && !strstr(buf,"Upgrade: websocket")) {
-		ESP_LOGI(TAG,"Sending /");
-		netconn_write(conn, HTML_HEADER, sizeof(HTML_HEADER)-1,NETCONN_NOCOPY);
-		netconn_write(conn, root_html_start,root_html_len,NETCONN_NOCOPY);
-		netconn_close(conn);
-		netconn_delete(conn);
-		netbuf_delete(inbuf);
-	}
-
-	// default page websocket
-	else if(strstr(buf,"GET / ") && strstr(buf,"Upgrade: websocket")) {
-		ESP_LOGI(TAG,"Requesting websocket on /");
-		ws_server_add_client(conn,buf,buflen,"/",websocket_callback);
-		netbuf_delete(inbuf);
-	}
-	
+	//}
 
 	return ESP_OK;
 }
@@ -1537,7 +1617,7 @@ static esp_err_t frontpage(httpd_req_t *req)
 /* Function to start the web server */
 esp_err_t start_server(const char *base_path, int port)
 {
-	httpd_handle_t server = NULL;
+	
 	httpd_config_t config = HTTPD_DEFAULT_CONFIG();
 	config.stack_size = 16392 ; // Default 4K -> 20K
 	config.server_port = port;
@@ -1554,15 +1634,32 @@ esp_err_t start_server(const char *base_path, int port)
 	}
 
 	/* URI handler for get */
+	httpd_uri_t _config_get_handler = {
+		.uri		 = "/c_*",
+		.method		 = HTTP_GET,
+		.handler	 = configs, //root_get_handler,
+		//.user_ctx  = server_data	// Pass server data as context
+	};
+	httpd_register_uri_handler(server, &_config_get_handler);
+
 	httpd_uri_t _root_get_handler = {
-		.uri		 = "/*",
+		.uri		 = "/",
 		.method		 = HTTP_GET,
 		.handler	 = frontpage, //root_get_handler,
 		//.user_ctx  = server_data	// Pass server data as context
 	};
-
 	httpd_register_uri_handler(server, &_root_get_handler);
 
+	httpd_uri_t _ws_get_handler = {
+		.uri		 = "/ws*",
+		.method		 = HTTP_GET,
+		.handler	 = handle_ws_req, //root_get_handler,
+		//.user_ctx  = server_data	// Pass server data as context
+		.is_websocket = true
+	};
+	httpd_register_uri_handler(server, &_ws_get_handler);
+
+	
 
 	/* URI handler for post */
 	httpd_uri_t _root_post_handler = {
@@ -1573,7 +1670,7 @@ esp_err_t start_server(const char *base_path, int port)
 	};
 	httpd_register_uri_handler(server, &_root_post_handler);
 
-
+	//setup_websocket_server(server) ;
 
 	return ESP_OK;
 }
@@ -1591,6 +1688,8 @@ void http_server_task(void *pvParameters)
 	// Start Server
 	ESP_LOGI(TAG, "Starting server on %s", url);
 	ESP_ERROR_CHECK(start_server("/spiffs", CONFIG_WEB_PORT));
+	http_task_start = NULL ;
+	vTaskDelete(NULL) ;
 	
 	//URL_t urlBuf;
 	while(1) {

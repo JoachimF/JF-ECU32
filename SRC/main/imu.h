@@ -23,10 +23,12 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/queue.h"
+#include "freertos/message_buffer.h"
 #include "mpu6050.h"
 
 extern TaskHandle_t xIMUHandle ;
 extern QueueHandle_t xQueueIMU ;
+extern MessageBufferHandle_t xMessageBufferToClient;
 
 void i2c_sensor_mpu6050_init(void) ;
 void task_imu(void *pvParameter) ;

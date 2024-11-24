@@ -1,7 +1,6 @@
+var websocket = new WebSocket('ws://'+location.hostname+'/ws');
  
-window.addEventListener("load", getReadings);
-
-//Create Temperature Gauge
+ //Create Temperature Gauge
 var gaugeRC = new LinearGauge({
     renderTo: "rc-gauge",
 	units: "µS",
@@ -167,6 +166,7 @@ const chart2 = new Chart(document.getElementById("timerpm"), {
 			display : true,
 			text : 'RPM'
 		},
+		animations : false,
 		scales: {
                 y : {
                     type: 'linear', //RPM
@@ -194,6 +194,7 @@ const chart2 = new Chart(document.getElementById("timerpm"), {
 					}]
 		},
 		options : {
+			animations : false,
 			title : {
 				display : true,
 				text : 'EGT'
@@ -218,7 +219,8 @@ var maxtime = 1000 ;
 var max_rpm = 0 ;
 //var ticks = 0 ;
 
-function getReadings() {
+//window.addEventListener("load", getReadings);
+/*function getReadings() {
 	var xhr = new XMLHttpRequest();
 	xhr.onreadystatechange = function () {
 		if (this.readyState == 4 && this.status == 200) 
@@ -293,8 +295,8 @@ function getReadings() {
 	};
 	xhr.open("GET", "/readings", true);
 	xhr.send();
-}
-setInterval(getReadings,100) ;
+}*/
+//setInterval(getReadings,100) ;
 
 var Params = function() {
 	var xhr = new XMLHttpRequest();
@@ -340,6 +342,115 @@ var Params = function() {
 			gaugeRPM.draw() ;
 		}
 	};
-	xhr.open("GET", "/g_params", true);
+	xhr.open("GET", "/c_g_params", true);
 	xhr.send();
 }(); // <--- () causes self execution
+
+
+
+
+function sendText(name) {
+	console.log('sendText');
+	var data = {};
+	data["id"] = name;
+	console.log('data=', data);
+	json_data = JSON.stringify(data);
+	console.log('json_data=' + json_data);
+	websocket.send(json_data);
+}
+
+websocket.onopen = function(evt) {
+	console.log('WebSocket connection opened');
+	var data = {};
+	data["id"] = "init";
+	console.log('data=', data);
+	json_data = JSON.stringify(data);
+	console.log('json_data=' + json_data);
+	websocket.send(json_data);
+	//document.getElementById("datetime").innerHTML = "WebSocket is connected!";
+}
+
+websocket.onclose = function(evt) {
+	console.log('Websocket connection closed');
+	//document.getElementById("datetime").innerHTML = "WebSocket closed";
+}
+
+websocket.onerror = function(evt) {
+	console.log('Websocket error: ' + evt);
+	//document.getElementById("datetime").innerHTML = "WebSocket error????!!!1!!";
+}
+
+websocket.onmessage = function(evt) {
+	var msg = evt.data;
+	var myObj = JSON.parse(msg);
+	//console.log("msg=" + msg);
+
+	//console.log(myObj);
+	var ppm_gaz = myObj.ppm_gaz;
+	var ppm_aux = myObj.ppm_aux;
+	var egt = myObj.egt;
+	var rpm = myObj.rpm/1000;
+	var rpmtxt = myObj.rpm;
+	var pump1 = myObj.pump1;
+	var pump2 = myObj.pump2;
+	var glow = myObj.glow;
+	var vanne1 = myObj.vanne1;
+	var vanne2 = myObj.vanne2;
+	var status = myObj.status;
+	var error = myObj.error;
+	var time = myObj.time;
+	var rpm2 = myObj.rpm;
+	var ticks = myObj.ticks;
+	//Gauges
+	gaugeRC.value = ppm_gaz;
+	gaugeRC_aux.value = ppm_aux;
+	gaugeEGT.value = egt;
+	gaugeRPM.value = rpm;
+	//Chart
+	if(rpm2 > max_rpm)
+	{
+		max_rpm = rpm2 ;
+		//console.log("chart y update");
+		chart2.config.options.scales.y.max = max_rpm + 1000 ;
+	}
+	if(ticks > maxtime)
+	{
+		chart2.config.options.scales.x.min = ticks - 990 ;
+		chart2.config.options.scales.x.max = ticks + 10  ;
+		//console.log("chart X update");
+	}
+	
+	chart2.data.labels.push(ticks) ;
+	chart2.data.datasets.forEach((dataset) => {
+			dataset.data.push(rpm2);
+	});
+	//console.log("chart update");
+	chart2.update();
+
+	if(ticks > maxtime)
+		{
+			chart3.config.options.scales.x.min = ticks - 990 ;
+			chart3.config.options.scales.x.max = ticks + 10  ;
+			//console.log("chart3 X update");
+		}
+		
+		chart3.data.labels.push(ticks) ;
+		chart3.data.datasets.forEach((dataset) => {
+				dataset.data.push(egt);
+		});
+		//console.log("chart3 update");
+	chart3.update();
+	//Text
+	document.getElementById('pump1').innerHTML = pump1.toFixed(1);
+	document.getElementById('pump2').innerHTML = pump2.toFixed(1);
+	document.getElementById('vanne1').innerHTML = vanne1;
+	document.getElementById('vanne2').innerHTML = vanne2;
+	document.getElementById('glow').innerHTML = glow;
+	document.getElementById('rpmtxt').innerHTML = rpmtxt;
+	document.getElementById('status').innerHTML = status;
+	document.getElementById('error').innerHTML = error;
+	document.getElementById('time').innerHTML = time;
+}
+
+
+

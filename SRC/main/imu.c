@@ -18,6 +18,7 @@
 */
 
 #include <stdio.h>
+#include <string.h>
 #include "unity.h"
 #include "driver/i2c.h"
 #include "mpu6050.h"
@@ -26,8 +27,9 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/queue.h"
-
+#include "freertos/message_buffer.h"
 #include "imu.h"
+#include "cJSON.h"
 
 
 #define I2C_MASTER_SCL_IO 22      /*!< gpio number for I2C master clock */
@@ -37,6 +39,7 @@
 
 TaskHandle_t xIMUHandle ;
 QueueHandle_t xQueueIMU = NULL;
+MessageBufferHandle_t xMessageBufferToClient;
 
 static const char *TAG = "mpu6050";
 
@@ -102,10 +105,30 @@ void task_imu(void *pvParameter)
   while(1)
   {
     mpu6050_get_acce(mpu6050, &acce);
-    ESP_LOGI(TAG,"Accel x : %f - Accel y : %f - Accel z : %f",acce.acce_x,acce.acce_y,acce.acce_z) ;
+    ESP_LOGD(TAG,"Accel x : %f - Accel y : %f - Accel z : %f",acce.acce_x,acce.acce_y,acce.acce_z) ;
     if (xQueueSend(xQueueIMU, &acce, 100) != pdPASS ) {
-				ESP_LOGE(TAG, "xQueueSend fail");
+				//ESP_LOGE(TAG, "xQueueSend fail");
 			}
+
+    
     vTaskDelay(5 / portTICK_PERIOD_MS); //200 hz
+    
+    /* Creation du message pour le websocket*/
+    /*cJSON *request;
+		request = cJSON_CreateObject();
+    cJSON_AddStringToObject(request, "id", "data-request");
+    cJSON_AddNumberToObject(request, "roll", acce.acce_x);
+    cJSON_AddNumberToObject(request, "pitch", acce.acce_y);
+    cJSON_AddNumberToObject(request, "yaw", 0.0);
+    char *my_json_string = cJSON_Print(request);
+    ESP_LOGD(TAG, "my_json_string\n%s",my_json_string);
+    size_t xBytesSent = xMessageBufferSend(xMessageBufferToClient, my_json_string, strlen(my_json_string), 100);
+    if (xBytesSent != strlen(my_json_string)) {
+      ESP_LOGE(TAG, "xMessageBufferSend fail");
+    }
+    cJSON_Delete(request);
+    cJSON_free(my_json_string);
+
+    vTaskDelay(1);*/
   }
 }
