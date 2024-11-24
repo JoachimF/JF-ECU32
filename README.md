@@ -1,5 +1,8 @@
 # JF-ECU32
 RC Jet Engine ECU
+## Environement
+- VsCode
+- IDF 5.0.7
 
 ## Démarrage du projet d'ECU opensource pour réacteurs
 
