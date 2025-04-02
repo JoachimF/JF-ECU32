@@ -29,9 +29,11 @@
 #include "driver/rmt_rx.h"
 #include "freertos/semphr.h"
 #include "jf-ecu32.h"
+#include "esp_adc/adc_oneshot.h"
+#include "esp_adc/adc_cali.h"
+#include "esp_adc/adc_cali_scheme.h"
 
-#define ECU_ONEWIRE_BUS_GPIO    4
-#define ECU_ONEWIRE_MAX_DS18B20 1
+
 
 #define RPM_PIN 34//21
 #define RMT_RX_GPIO_NUM  26     /*!< GPIO number for Throttle */
@@ -43,10 +45,10 @@
 #define CS_GPIO_NUM 5       /*!< GPIO number for CS */
 
 // I2C capteur courant bougie
-#define I2C_PORT 0
+#define I2C_PORT I2C_NUM_0
 #define I2C_ADDR INA219_ADDR_GND_GND
-#define SDA_GPIO 22 //34
-#define SCL_GPIO 21 //35
+#define SDA_GPIO 21
+#define SCL_GPIO 22
 
 
 #if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(4, 0, 0)
@@ -55,7 +57,18 @@
 #define HOST    SPI2_HOST
 #endif
 
+
 /*    ds18b20          */
+#ifdef DS18B20
+#define ECU_ONEWIRE_BUS_GPIO    4
+#define ECU_ONEWIRE_MAX_DS18B20 1
+#endif
+
+/* ADC */
+#define ADC_ATTEN     ADC_ATTEN_DB_12
+#define ADC1_CHAN0    ADC_CHANNEL_0
+
+
 typedef struct {
     int timer_group;
     int timer_idx;
@@ -94,9 +107,15 @@ uint32_t get_aux(_engine_t * engine) ;
 uint32_t get_RPM(_engine_t * engine) ;
 uint32_t get_EGT(_engine_t * engine) ;
 float get_GLOW_CURRENT(_engine_t * engine) ;
+#ifdef DS18B20
 void init_ds18b20(void) ;
+#endif
 
 void task_glow_current(void *pvParameter) ;
 void task_egt(void *pvParameter) ;
+
+/* Tension batterie */
+static bool adc_calibration_init(adc_unit_t unit, adc_atten_t atten, adc_cali_handle_t *out_handle);
+static void adc_calibration_deinit(adc_cali_handle_t handle);
 
 #endif

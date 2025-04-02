@@ -47,7 +47,9 @@
 #include "error.h"
 #include "calibration.h"
 #include "html.h"
+#ifdef IMU
 #include "imu.h"
+#endif
 #include "websocket.h"
 
 extern TimerHandle_t xTimer60s ;
@@ -1065,7 +1067,7 @@ static esp_err_t configmoteur(httpd_req_t *req)
 		
 	// Send HTML header
 	send_head(req) ;
-	httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Paramètres du moteur&nbsp;</b></legend><form method=\"GET\" action=\"configmoteur\"><p>") ;
+	httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Paramètres du moteur&nbsp;</b></legend><form method=\"GET\" action=\"c_moteur\"><p>") ;
 	WSInputBox(req,I_NAME,0,turbine_config.name,TEXT,true) ;
 	WSInputBox(req,I_GLOWPOWER,turbine_config.glow_power,NULL,NUMBER,true) ;
 	WSInputBox(req,I_RPMMAX,turbine_config.jet_full_power_rpm,NULL,NUMBER,true) ;
@@ -1323,7 +1325,9 @@ static esp_err_t readings_get_handler(httpd_req_t *req){
 	static cJSON *myjson;
 	char status[50] ;
 	char errors[200] ;
+	#ifdef IMU
 	mpu6050_acce_value_t acce;	
+	#endif
 
 	uint8_t heures,minutes,secondes ;
 	//ESP_LOGI(TAG, "readings_get_handler req->uri=[%s]", req->uri);
@@ -1363,7 +1367,7 @@ static esp_err_t readings_get_handler(httpd_req_t *req){
 		cJSON_AddStringToObject(myjson, "time", status);
 
 		cJSON_AddNumberToObject(myjson, "ticks",xTaskGetTickCount() - Ticks);
-
+		#ifdef IMU
 		if(xQueueReceive(xQueueIMU, &acce, portMAX_DELAY)) {
 			cJSON_AddNumberToObject(myjson, "accx", acce.acce_x);
 			cJSON_AddNumberToObject(myjson, "accy", acce.acce_y);
@@ -1372,6 +1376,7 @@ static esp_err_t readings_get_handler(httpd_req_t *req){
 		}else {
 				ESP_LOGE(TAG, "xQueueReceive fail");
 		}
+		#endif
 	
 //	}xSemaphoreGive(xTimeMutex) ;
 	//ESP_LOGI(TAG, "Send http");
@@ -1419,7 +1424,7 @@ static esp_err_t configs(httpd_req_t *req)
     char filepath[20];
 	esp_err_t err ;
 	//static int i=0 ;
-    //ESP_LOGI(TAG, "URI : %s", req->uri);
+    //ESP_LOGI(TAG, "configs - URI : %s", req->uri);
 	xTimerStop( xTimer60s,0) ;
     const char *filename = get_path_from_uri(filepath, req->uri, sizeof(filepath));
 
@@ -1476,9 +1481,11 @@ static esp_err_t configs(httpd_req_t *req)
 			i = 0 ;
 		}*/
 	}
-	else if(strcmp(filename, "/readings") == 0) 
+	else if(strcmp(filename, "/c_readings") == 0) 
 	{
-		vTaskResume(xIMUHandle) ;
+		#ifdef IMU
+			vTaskResume(xIMUHandle) ;
+		#endif
 		readings_get_handler(req) ;
 	}
 	else if(strcmp(filename, "/c_g_params") == 0) 
@@ -1502,7 +1509,7 @@ static esp_err_t frontpage(httpd_req_t *req)
 	//ESP_LOGI(TAG, "root_get_handler req->uri=[%s]", req->uri);
     char filepath[20];
 	//static int i=0 ;
-    //ESP_LOGI(TAG, "URI : %s", req->uri);
+    //ESP_LOGI(TAG, "frontapge - URI : %s", req->uri);
 	xTimerStop( xTimer60s,0) ;
     const char *filename = get_path_from_uri(filepath, req->uri, sizeof(filepath));
 	
@@ -1590,7 +1597,9 @@ static esp_err_t frontpage(httpd_req_t *req)
 	else if(strcmp(filename, "/") == 0 ) 
 	{*/
 		// Frontpage
-	vTaskSuspend(xIMUHandle);
+	#ifdef IMU
+		vTaskSuspend(xIMUHandle);
+	#endif
 	send_head(req) ;
 	
 	WSContentButton(req,BT_PARAMECU, true) ;
@@ -1671,7 +1680,7 @@ esp_err_t start_server(const char *base_path, int port)
 	httpd_register_uri_handler(server, &_root_post_handler);
 
 	//setup_websocket_server(server) ;
-
+	ESP_LOGI(TAG, "HTTP Server Started");
 	return ESP_OK;
 }
 
@@ -1694,25 +1703,6 @@ void http_server_task(void *pvParameters)
 	//URL_t urlBuf;
 	while(1) {
 		vTaskDelay(10 / portTICK_PERIOD_MS);
-		// Waiting for submit
-		/*
-		if (xQueueReceive(xQueueHttp, &urlBuf, portMAX_DELAY) == pdTRUE) {
-			ESP_LOGI(TAG, "url=%s", urlBuf.url);
-			ESP_LOGI(TAG, "parameter=%s", urlBuf.parameter);
-
-			
-			// save key & value to NVS
-			esp_err_t err = save_key_value(urlBuf.url, urlBuf.parameter);
-			if (err != ESP_OK) {
-				ESP_LOGE(TAG, "Error (%s) saving to NVS", esp_err_to_name(err));
-			}
-
-			// load key & value from NVS
-			err = load_key_value(urlBuf.url, urlBuf.parameter, sizeof(urlBuf.parameter));
-			if (err != ESP_OK) {
-				ESP_LOGE(TAG, "Error (%s) loading to NVS", esp_err_to_name(err));
-			}
-		}*/
 	}
 
 	// Never reach here

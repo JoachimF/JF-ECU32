@@ -212,6 +212,34 @@ uint8_t get_glow_power(_GLOW_t *glow)
     return glow->value ;
 }
 
+/*Renvoie le courant dans la bougie */
+float get_glow_current(_GLOW_t *glow)
+{
+    //ESP_LOGI(TAG, "Get Glow current : %0.3fA", glow->current) ;
+    return glow->current ;
+}
+
+/*Met a jour le courrant de la bougie 0.0f*/
+void set_glow_current(_GLOW_t *glow, float current)
+{
+    //ESP_LOGI(TAG, "Set Glow current : %0.3fA", current) ;
+    glow->current = current ;
+}
+
+
+/*Renvoie la tension de la batterie 0.0f*/
+float get_vbatt(_engine_t *turbine)
+{
+    return turbine->Vbatt ;
+}
+
+/*Met a jour la tension de la batterie 0.0f*/
+void set_vbatt(_engine_t *turbine, float tension)
+{
+    turbine->Vbatt = tension ;
+}
+
+
 /*Renvoie la valeur d'une vanne de la puissance demandé en cours de 0-1024*/
 uint8_t get_vanne_power(_VALVE_t *vanne)
 {
@@ -756,7 +784,7 @@ void ecu_task(void * pvParameters )
                         for(int i=0;i<10;i++) //Attendre 1 seconde
                         {
 
-                                avg_current += turbine.GLOW_CURRENT ;
+                                avg_current += get_glow_current(&turbine.glow) ;
                                 count_curr_sample++ ;
  
                             if(turbine.position_gaz != PLEINGAZ)

@@ -23,7 +23,6 @@
 #include <esp_ota_ops.h>
 #include <esp_chip_info.h>
 
-
 #include "jf-ecu32.h"
 #include "http_server.h"
 #include "wifi.h"
@@ -323,53 +322,63 @@ void app_main()
 	ESP_LOGI(TAG, "Initializing Task Log");
 	xTaskCreate(log_task, "LOG", 1024*6, NULL, 2, &xlogHandle);
 	configASSERT( xlogHandle );
-	//vTaskSuspend( xlogHandle ); 
+	vTaskSuspend( xlogHandle ); 
 	
 	ESP_LOGI(TAG, "Initializing Task ECU");
 	xTaskCreatePinnedToCore(ecu_task, "ECU", 4096, NULL, (configMAX_PRIORITIES -2 )	|( 1UL | portPRIVILEGE_BIT ), &xecuHandle,1);
 	configASSERT( xecuHandle );
 	//vTaskSuspend( xecuHandle ); 
 	
-	ESP_LOGI(TAG, "Initializing Task Inputs");
+	ESP_LOGI(TAG, "Initializing Task PPM Inputs");
 	xTaskCreatePinnedToCore(inputs_task, "INPUTS", 4096, NULL, (configMAX_PRIORITIES -1 )|( 1UL | portPRIVILEGE_BIT ), &xinputsHandle,1);
 	configASSERT( xinputsHandle );
+	//vTaskSuspend( xinputsHandle ); 
 
 	/* Htop */
-	ESP_LOGI(TAG, "Initializing Task Htop");
+	/*ESP_LOGI(TAG, "Initializing Task Htop");
 	sync_spin_task = xSemaphoreCreateCounting(NUM_OF_SPIN_TASKS, 0);
     sync_stats_task = xSemaphoreCreateBinary();
-	xTaskCreatePinnedToCore(stats_task, "stats", 4096, NULL, STATS_TASK_PRIO, NULL, tskNO_AFFINITY);
+	xTaskCreatePinnedToCore(stats_task, "stats", 4096, NULL, STATS_TASK_PRIO, NULL, tskNO_AFFINITY);*/
 
 
 	ESP_LOGI(TAG, "Initializing MAX31855 Task\n"); //EGT
     SEM_EGT = xSemaphoreCreateMutex();
     xTaskCreatePinnedToCore(task_egt, "EGT", configMINIMAL_STACK_SIZE * 8, NULL,(configMAX_PRIORITIES -1 )|( 1UL | portPRIVILEGE_BIT ), &task_egt_h,1);
-    
+	configASSERT( task_egt_h );
+    //vTaskSuspend(task_egt_h);
+
+	#ifdef IMU
+	ESP_LOGI(TAG, "Initializing IMU Task\n");  // Glow current
+    xTaskCreatePinnedToCore(task_imu, "IMU", configMINIMAL_STACK_SIZE * 8, NULL, (configMAX_PRIORITIES -1 )|( 1UL | portPRIVILEGE_BIT ), &xIMUHandle,1);
+    vTaskSuspend(xIMUHandle);
+	#endif
+	
+	ESP_LOGI(TAG, "Initializing WebSocket Task\n");  // Glow current
+	xTaskCreatePinnedToCore(ws_task, "WS_TASK", configMINIMAL_STACK_SIZE * 8, NULL, (configMAX_PRIORITIES -1 )|( 1UL | portPRIVILEGE_BIT ), &xWSHandle,1);
+	vTaskSuspend(xWSHandle);
+
     ESP_LOGI(TAG, "Initializing INA219 Task\n");  // Glow current
     SEM_glow_current = xSemaphoreCreateMutex();
     xTaskCreatePinnedToCore(task_glow_current, "GLOW Current", configMINIMAL_STACK_SIZE * 8, NULL, (configMAX_PRIORITIES -1 )|( 1UL | portPRIVILEGE_BIT ), &task_glow_current_h,1);
     vTaskSuspend(task_glow_current_h);
 
-	ESP_LOGI(TAG, "Initializing IMU Task\n");  // Glow current
-    xTaskCreatePinnedToCore(task_imu, "IMU", configMINIMAL_STACK_SIZE * 8, NULL, (configMAX_PRIORITIES -1 )|( 1UL | portPRIVILEGE_BIT ), &xIMUHandle,1);
-    vTaskSuspend(xIMUHandle);
-
-	xTaskCreatePinnedToCore(ws_task, "WS_TASK", configMINIMAL_STACK_SIZE * 8, NULL, (configMAX_PRIORITIES -1 )|( 1UL | portPRIVILEGE_BIT ), &xWSHandle,1);
-	vTaskSuspend(xWSHandle);
-
-    //xSemaphoreGive(sync_stats_task);
+	//xSemaphoreGive(sync_stats_task);
 	/* Htop */
 
 	/* Demarrage des taches*/
 	//xSemaphoreGive(ecu_task_start) ;
-	xSemaphoreGive(http_task_start) ;	
+	xSemaphoreGive(http_task_start) ;
+	vTaskResume(task_glow_current_h);	
 	//xSemaphoreGive(log_task_start) ;
 	
 	vTaskDelay(2000 / portTICK_PERIOD_MS);
+	
+	
+	
 	//turbine.EGT = 1000 ;
 	//turbine.GAZ = 1000 ;
-
-	start_simulator() ;
+		
+	//start_simulator() ;
 	#if 1
 	while(1)
 	{

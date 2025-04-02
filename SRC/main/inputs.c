@@ -18,8 +18,9 @@
 */
 
 
+
 #include "inputs.h"
-#include "jf-ecu32.h"
+//#include "jf-ecu32.h"
 #include "error.h"
 #include <stdio.h>
 #include "freertos/FreeRTOS.h"
@@ -34,16 +35,30 @@
 #include "esp_err.h"
 #include "freertos/semphr.h"
 #include <ina219.h>
-#include "ds18b20.h"
+#include "esp_adc/adc_oneshot.h"
+#include "esp_adc/adc_cali.h"
+#include "esp_adc/adc_cali_scheme.h"
 
-#define IMU 1
+
+#ifdef DS18B20
+    #include "ds18b20.h"
+    #include "onewire_bus_impl_rmt.h"
+#endif
+
 
 #ifdef IMU
     #include "imu.h"
 #endif
 
-#include "onewire_bus_impl_rmt.h"
+/* Capteur EGT */
 #include <max31855.h>
+
+/* Tension batterie */
+adc_oneshot_unit_handle_t adc1_handle;
+adc_oneshot_unit_init_cfg_t init_config1 ;
+bool do_calibration1 ;
+adc_cali_handle_t adc1_cali_handle = NULL;
+
 
 static const char *TAG = "INPUTS";
 
@@ -71,11 +86,11 @@ rmt_channel_handle_t rx_ppm_aux_chan = NULL;
 
 TaskHandle_t task_egt_h ;
 TaskHandle_t task_glow_current_h ;
-//Courant bougie
-ina219_t dev;
 
 
 
+#ifdef DS18B20
+// Sonde de temperature externe
 void init_ds18b20(void)
 {
     // install 1-wire bus
@@ -109,6 +124,7 @@ void init_ds18b20(void)
 
     // Now you have the DS18B20 sensor handle, you can use it to read the temperature
 }
+#endif
 
 /*********** ISR pour les RPM ******************/
 static void IRAM_ATTR gpio_isr_handler(void* arg)
@@ -165,55 +181,84 @@ static bool IRAM_ATTR ppm_rmt_aux_done_callback(rmt_channel_handle_t channel, co
 /*********** Tache pour lecture du courant de la bougie période 100ms ******************/
 void task_glow_current(void *pvParameter)
 {
+    static int adc_raw[2][10];
+    static int voltage[2][10];
+    //Courant bougie
+    ESP_LOGI(TAG, "Task glow_current start");
+    ina219_t dev;
+    static float volt ;
+    static float bus_voltage, shunt_voltage, current, power;
     memset(&dev, 0, sizeof(ina219_t));
-
+        
     ESP_ERROR_CHECK(ina219_init_desc(&dev, I2C_ADDR, I2C_PORT, SDA_GPIO, SCL_GPIO));
     ESP_LOGI(TAG, "Initializing INA219");
     ESP_ERROR_CHECK(ina219_init(&dev));
 
     ESP_LOGI(TAG, "Configuring INA219");
-    ESP_ERROR_CHECK(ina219_configure(&dev, INA219_BUS_RANGE_16V, INA219_GAIN_0_125,
-            INA219_RES_12BIT_1S, INA219_RES_12BIT_1S, INA219_MODE_CONT_SHUNT_BUS));
+    ESP_ERROR_CHECK(ina219_configure(&dev, INA219_BUS_RANGE_16V, INA219_GAIN_0_25,
+        INA219_RES_12BIT_128S, INA219_RES_12BIT_128S, INA219_MODE_CONT_SHUNT_BUS));
 
     ESP_LOGI(TAG, "Calibrating INA219");
 
     ESP_ERROR_CHECK(ina219_calibrate(&dev, (float)10 / 1000.0f)); // Résistance de shunt 10mOhm
+    ESP_LOGI(TAG, "INA219 initialized\n");
+    
+    
+
     while(1)
     {
-        ESP_ERROR_CHECK(ina219_get_current(&dev, &turbine.GLOW_CURRENT)) ;
+        /* Glow current */
+        //ESP_ERROR_CHECK(ina219_get_current(&dev, &turbine.glow.current)) ;
+        //ESP_ERROR_CHECK(ina219_get_bus_voltage(&dev, &bus_voltage));
+        //ESP_ERROR_CHECK(ina219_get_shunt_voltage(&dev, &shunt_voltage));
+        //ESP_ERROR_CHECK(ina219_get_power(&dev, &power));
+        ESP_ERROR_CHECK(ina219_get_current(&dev, &current)) ;
+        //ESP_LOGI(TAG, "Glow current : %0.3fA",current) ;
+        set_glow_current(&turbine.glow,current) ;
+
+        //printf("%fV %0.3fA %fW %fV\n",bus_voltage/1000.0,current,power,shunt_voltage);
         xSemaphoreGive(SEM_glow_current) ;
-        vTaskDelay(100 / portTICK_PERIOD_MS) ;
+        //ESP_LOGI(TAG, "Func Glow current : %0.3fA", get_glow_current(&turbine.glow)) ;
+        /* Battery voltage */
+        ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, ADC1_CHAN0, &adc_raw[0][0]));
+        //ESP_LOGI(TAG, "ADC%d Channel[%d] Raw Data: %d", ADC_UNIT_1 + 1, ADC1_CHAN0, adc_raw[0][0]);
+        if (do_calibration1) {
+            ESP_ERROR_CHECK(adc_cali_raw_to_voltage(adc1_cali_handle, adc_raw[0][0], &voltage[0][0]));
+            voltage[0][0] = voltage[0][0]*4.71 ;
+            //ESP_LOGI(TAG, "ADC%d Channel[%d] Cali Voltage: %d mV", ADC_UNIT_1 + 1, ADC1_CHAN0, voltage[0][0]);
+            volt = (get_vbatt(&turbine) * 3 + (float)(voltage[0][0])/1000) / 4 ;
+            set_vbatt(&turbine, volt) ;
+            //ESP_LOGI(TAG, "Output Voltage: %f mV",get_vbatt(&turbine));
+        }
+        vTaskDelay(200 / portTICK_PERIOD_MS) ;
     }
 }
 
 void scan_i2c(void)
 {
-    i2c_dev_t dev = { 0 };
-    dev.cfg.sda_io_num = SDA_GPIO ;
-    dev.cfg.scl_io_num = SCL_GPIO ;
-    dev.cfg.master.clk_speed = 100000; // 100kHz
-
-    while (1)
+    i2c_dev_t devT = { 0 };
+    ESP_ERROR_CHECK(i2cdev_init());
+    devT.cfg.sda_io_num = SDA_GPIO ;
+    devT.cfg.scl_io_num = SCL_GPIO ;
+    devT.cfg.master.clk_speed = 100000; // 100kHz
+    
+    esp_err_t res;
+    printf("     0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f\n");
+    printf("00:         ");
+    for (uint8_t addr = 3; addr < 0x78; addr++)
     {
-        esp_err_t res;
-        printf("     0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f\n");
-        printf("00:         ");
-        for (uint8_t addr = 3; addr < 0x78; addr++)
-        {
-            if (addr % 16 == 0)
-                printf("\n%.2x:", addr);
+        if (addr % 16 == 0)
+            printf("\n%.2x:", addr);
 
-            dev.addr = addr;
-            res = i2c_dev_probe(&dev, I2C_DEV_WRITE);
+        devT.addr = addr;
+        res = i2c_dev_probe(&devT, I2C_DEV_WRITE);
 
-            if (res == 0)
-                printf(" %.2x", addr);
-            else
-                printf(" --");
-        }
-        printf("\n\n");
-        vTaskDelay(pdMS_TO_TICKS(1000));
+        if (res == 0)
+            printf(" %.2x", addr);
+        else
+            printf(" --");
     }
+    printf("\n\n");
 }
 
 /*********** Tache de lecture des EGT et DS18B20 période 200ms ******************/
@@ -249,14 +294,16 @@ void task_egt(void *pvParameter)
             if (oc) ESP_LOGW(TAG, "No connection to thermocouple!");
             if (scv) add_error_msg(E_K,"K shorted to VCC!");
             if (scg) add_error_msg(E_K,"K shorted to GND!");
-            if (oc) add_error_msg(E_K,"K not connected");
+            if (oc) add_error_msg(E_K,"K not connected");*/
             //ESP_LOGI(TAG, "Temperature: %.2f°C, cold junction temperature: %.4f°C", tc_t, cj_t);
             //ESP_LOGI("wifi", "free Heap:%d,%d", esp_get_free_heap_size(), heap_caps_get_free_size(MALLOC_CAP_8BIT));*/
             turbine.EGT = (turbine.EGT + tc_t)/2 ;
             xSemaphoreGive(SEM_EGT) ;
         }
+        #ifdef DS18B20
         if(turbine.ds18b20_device_num > 0)
             ds18b20_get_temperature(turbine.ds18b20s[0],&turbine.DS18B20_temp) ;
+        #endif
         vTaskDelay(pdMS_TO_TICKS(200));
     }
 }
@@ -278,7 +325,8 @@ void init_inputs(void)
     gpio_set_direction(RPM_PIN, GPIO_MODE_INPUT);
     gpio_pullup_dis(RPM_PIN);
     gpio_pulldown_dis(RPM_PIN);
-    //gpio_pullup_en(RPM_PIN);
+    //gpio_pullup_en(SDA_GPIO);
+    //gpio_pullup_en(SCL_GPIO);
     //gpio_pulldown_en(RPM_PIN);
     gpio_set_intr_type(RPM_PIN, GPIO_INTR_POSEDGE);    
     gpio_install_isr_service(ESP_INTR_FLAG_LEVEL3|ESP_INTR_FLAG_IRAM);
@@ -323,11 +371,11 @@ void init_inputs(void)
     ESP_ERROR_CHECK(rmt_rx_register_event_callbacks(rx_ppm_aux_chan, &cbs_aux, receive_queue_aux));
     ESP_LOGI(TAG, "RMT AUX initialized\n");
 
-    // the following timing requirement is based on NEC protocol
+     /* PPMs */
     receive_config.signal_range_min_ns = 0; //100 * 1000;    // 700ms
     receive_config.signal_range_max_ns = 3000 * 1000; //10000000UL; // 3000ms
     
-    // ready to receive
+   
     ESP_ERROR_CHECK(rmt_enable(rx_ppm_chan)) ;
     ESP_ERROR_CHECK(rmt_receive(rx_ppm_chan, raw_symbols, sizeof(raw_symbols), &receive_config));
     ESP_LOGI(TAG, "Receive RX ranges initialized\n");
@@ -336,9 +384,34 @@ void init_inputs(void)
     ESP_LOGI(TAG, "Receive AUX ranges initialized\n");
 
     ESP_LOGI("PPM","Initialized");
+
+    /* INA219 */
+    /* Initalistion du port I2C */
+    ESP_ERROR_CHECK(i2cdev_init());
+    ESP_LOGI(TAG, "I2C initialized\n");
+    //scan_i2c() ;
     
-    //init_ds18b20() ;
+
+    /* ADC tension batterie */
+    init_config1.unit_id = ADC_UNIT_1;
+    init_config1.ulp_mode = ADC_ULP_MODE_DISABLE;
+    
+    ESP_ERROR_CHECK(adc_oneshot_new_unit(&init_config1, &adc1_handle));
+    
+    adc_oneshot_chan_cfg_t config = {
+        .bitwidth = ADC_BITWIDTH_DEFAULT,
+        .atten = ADC_ATTEN_DB_12,
+    };
+    ESP_ERROR_CHECK(adc_oneshot_config_channel(adc1_handle,ADC1_CHAN0, &config));
+    //-------------ADC1 Calibration Init---------------//
+    do_calibration1 = adc_calibration_init(ADC_UNIT_1, ADC_ATTEN, &adc1_cali_handle);
+
+
+    #ifdef DS18B20
+    /* DS18B20 */
+    init_ds18b20() ;
     ESP_LOGI(TAG, "DS18B20 initialized\n");
+    #endif
 
     #ifdef IMU
     //init MPU6050
@@ -409,8 +482,66 @@ uint32_t get_EGT(struct _engine_ * engine)
     return engine->EGT ;
 }
 
-/* Renvoie la valeur du courant dans la bougie */
-float get_GLOW_CURRENT(struct _engine_ * engine)
+
+/*---------------------------------------------------------------
+        ADC Calibration
+---------------------------------------------------------------*/
+static bool adc_calibration_init(adc_unit_t unit, adc_atten_t atten, adc_cali_handle_t *out_handle)
 {
-    return engine->GLOW_CURRENT ;
+    adc_cali_handle_t handle = NULL;
+    esp_err_t ret = ESP_FAIL;
+    bool calibrated = false;
+
+#if ADC_CALI_SCHEME_CURVE_FITTING_SUPPORTED
+    if (!calibrated) {
+        ESP_LOGI(TAG, "calibration scheme version is %s", "Curve Fitting");
+        adc_cali_curve_fitting_config_t cali_config = {
+            .unit_id = unit,
+            .atten = atten,
+            .bitwidth = ADC_BITWIDTH_DEFAULT,
+        };
+        ret = adc_cali_create_scheme_curve_fitting(&cali_config, &handle);
+        if (ret == ESP_OK) {
+            calibrated = true;
+        }
+    }
+#endif
+
+#if ADC_CALI_SCHEME_LINE_FITTING_SUPPORTED
+    if (!calibrated) {
+        ESP_LOGI(TAG, "calibration scheme version is %s", "Line Fitting");
+        adc_cali_line_fitting_config_t cali_config = {
+            .unit_id = unit,
+            .atten = atten,
+            .bitwidth = ADC_BITWIDTH_DEFAULT,
+        };
+        ret = adc_cali_create_scheme_line_fitting(&cali_config, &handle);
+        if (ret == ESP_OK) {
+            calibrated = true;
+        }
+    }
+#endif
+
+    *out_handle = handle;
+    if (ret == ESP_OK) {
+        ESP_LOGI(TAG, "Calibration Success");
+    } else if (ret == ESP_ERR_NOT_SUPPORTED || !calibrated) {
+        ESP_LOGW(TAG, "eFuse not burnt, skip software calibration");
+    } else {
+        ESP_LOGE(TAG, "Invalid arg or no memory");
+    }
+
+    return calibrated;
+}
+
+static void adc_calibration_deinit(adc_cali_handle_t handle)
+{
+#if ADC_CALI_SCHEME_CURVE_FITTING_SUPPORTED
+    ESP_LOGI(TAG, "deregister %s calibration scheme", "Curve Fitting");
+    ESP_ERROR_CHECK(adc_cali_delete_scheme_curve_fitting(handle));
+
+#elif ADC_CALI_SCHEME_LINE_FITTING_SUPPORTED
+    ESP_LOGI(TAG, "deregister %s calibration scheme", "Line Fitting");
+    ESP_ERROR_CHECK(adc_cali_delete_scheme_line_fitting(handle));
+#endif
 }

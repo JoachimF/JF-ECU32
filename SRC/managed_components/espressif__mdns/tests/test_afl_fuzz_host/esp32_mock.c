@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2022 Espressif Systems (Shanghai) CO LTD
+ * SPDX-FileCopyrightText: 2022-2025 Espressif Systems (Shanghai) CO LTD
  *
  * SPDX-License-Identifier: Unlicense OR CC0-1.0
  */
@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include "esp32_mock.h"
+#include "esp_log.h"
 
 void     *g_queue;
 int       g_queue_send_shall_fail = 0;
@@ -58,7 +59,7 @@ uint32_t xTaskGetTickCount(void)
 }
 
 /// Queue mock
-QueueHandle_t xQueueCreate( uint32_t uxQueueLength, uint32_t uxItemSize )
+QueueHandle_t xQueueCreate(uint32_t uxQueueLength, uint32_t uxItemSize)
 {
     g_size = uxItemSize;
     g_queue = malloc((uxQueueLength) * (uxItemSize));
@@ -66,7 +67,7 @@ QueueHandle_t xQueueCreate( uint32_t uxQueueLength, uint32_t uxItemSize )
 }
 
 
-void vQueueDelete( QueueHandle_t xQueue )
+void vQueueDelete(QueueHandle_t xQueue)
 {
     free(xQueue);
 }
@@ -110,4 +111,52 @@ void xTaskNotifyGive(TaskHandle_t task)
 BaseType_t xTaskNotifyWait(uint32_t bits_entry_clear, uint32_t bits_exit_clear, uint32_t *value, TickType_t wait_time)
 {
     return pdTRUE;
+}
+
+void esp_log_write(esp_log_level_t level, const char *tag, const char *format, ...)
+{
+}
+
+void esp_log(esp_log_config_t config, const char *tag, const char *format, ...)
+{
+}
+
+uint32_t esp_log_timestamp(void)
+{
+    return 0;
+}
+
+void *mdns_mem_malloc(size_t size)
+{
+    return malloc(size);
+}
+
+void *mdns_mem_calloc(size_t num, size_t size)
+{
+    return calloc(num, size);
+}
+
+void mdns_mem_free(void *ptr)
+{
+    free(ptr);
+}
+
+char *mdns_mem_strdup(const char *s)
+{
+    return strdup(s);
+}
+
+char *mdns_mem_strndup(const char *s, size_t n)
+{
+    return strndup(s, n);
+}
+
+void *mdns_mem_task_malloc(size_t size)
+{
+    return malloc(size);
+}
+
+void mdns_mem_task_free(void *ptr)
+{
+    free(ptr);
 }

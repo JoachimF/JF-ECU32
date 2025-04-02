@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2015-2023 Espressif Systems (Shanghai) CO LTD
+ * SPDX-FileCopyrightText: 2015-2025 Espressif Systems (Shanghai) CO LTD
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -103,12 +103,6 @@
 #define MDNS_PACKET_QUEUE_LEN       16                      // Maximum packets that can be queued for parsing
 #define MDNS_ACTION_QUEUE_LEN       CONFIG_MDNS_ACTION_QUEUE_LEN  // Maximum actions pending to the server
 #define MDNS_TXT_MAX_LEN            1024                    // Maximum string length of text data in TXT record
-#if defined(CONFIG_LWIP_IPV6) && defined(CONFIG_MDNS_RESPOND_REVERSE_QUERIES)
-#define MDNS_NAME_MAX_LEN           (64+4)                  // Need to account for IPv6 reverse queries (64 char address  + ".ip6" )
-#else
-#define MDNS_NAME_MAX_LEN           64                      // Maximum string length of hostname, instance, service and proto
-#endif
-#define MDNS_NAME_BUF_LEN           (MDNS_NAME_MAX_LEN+1)   // Maximum char buffer size to hold hostname, instance, service or proto
 #define MDNS_MAX_PACKET_SIZE        1460                    // Maximum size of mDNS  outgoing packet
 
 #define MDNS_HEAD_LEN               12
@@ -187,15 +181,6 @@ typedef enum {
     ACTION_SYSTEM_EVENT,
     ACTION_HOSTNAME_SET,
     ACTION_INSTANCE_SET,
-    ACTION_SERVICE_ADD,
-    ACTION_SERVICE_DEL,
-    ACTION_SERVICE_INSTANCE_SET,
-    ACTION_SERVICE_PORT_SET,
-    ACTION_SERVICE_TXT_REPLACE,
-    ACTION_SERVICE_TXT_SET,
-    ACTION_SERVICE_TXT_DEL,
-    ACTION_SERVICE_SUBTYPE_ADD,
-    ACTION_SERVICES_CLEAR,
     ACTION_SEARCH_ADD,
     ACTION_SEARCH_SEND,
     ACTION_SEARCH_END,
@@ -446,41 +431,6 @@ typedef struct {
             mdns_if_t interface;
             mdns_event_actions_t event_action;
         } sys_event;
-        struct {
-            mdns_srv_item_t *service;
-        } srv_add;
-        struct {
-            char *instance;
-            char *service;
-            char *proto;
-            char *hostname;
-        } srv_del;
-        struct {
-            mdns_srv_item_t *service;
-            char *instance;
-        } srv_instance;
-        struct {
-            mdns_srv_item_t *service;
-            uint16_t port;
-        } srv_port;
-        struct {
-            mdns_srv_item_t *service;
-            mdns_txt_linked_item_t *txt;
-        } srv_txt_replace;
-        struct {
-            mdns_srv_item_t *service;
-            char *key;
-            char *value;
-            uint8_t value_len;
-        } srv_txt_set;
-        struct {
-            mdns_srv_item_t *service;
-            char *key;
-        } srv_txt_del;
-        struct {
-            mdns_srv_item_t *service;
-            char *subtype;
-        } srv_subtype_add;
         struct {
             mdns_search_once_t *search;
         } search_add;

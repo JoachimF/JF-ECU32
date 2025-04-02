@@ -1,5 +1,154 @@
 # Changelog
 
+## [1.8.2](https://github.com/espressif/esp-protocols/commits/mdns-v1.8.2)
+
+### Bug Fixes
+
+- Fix parsing incorrect txt records ([8fd2c99f](https://github.com/espressif/esp-protocols/commit/8fd2c99f))
+
+## [1.8.1](https://github.com/espressif/esp-protocols/commits/mdns-v1.8.1)
+
+### Bug Fixes
+
+- Fix potential task delete race ([8ca45f34](https://github.com/espressif/esp-protocols/commit/8ca45f34))
+
+## [1.8.0](https://github.com/espressif/esp-protocols/commits/mdns-v1.8.0)
+
+### Features
+
+- Add version keys ([e01e67e7](https://github.com/espressif/esp-protocols/commit/e01e67e7))
+
+### Bug Fixes
+
+- Reformat mdns sources per indent-cont=120 ([c7663cde](https://github.com/espressif/esp-protocols/commit/c7663cde))
+
+## [1.7.0](https://github.com/espressif/esp-protocols/commits/mdns-v1.7.0)
+
+### Features
+
+- Support user defined allocators ([88162d1f](https://github.com/espressif/esp-protocols/commit/88162d1f))
+- Allow allocate memory with configured caps ([7d29b476](https://github.com/espressif/esp-protocols/commit/7d29b476))
+
+### Bug Fixes
+
+- Adjust some formatting per indent-cont=120 ([5b2077e3](https://github.com/espressif/esp-protocols/commit/5b2077e3))
+
+## [1.6.0](https://github.com/espressif/esp-protocols/commits/mdns-v1.6.0)
+
+### Features
+
+- support allocating mDNS task from SPIRAM ([8fcad10c](https://github.com/espressif/esp-protocols/commit/8fcad10c))
+
+### Bug Fixes
+
+- Use correct task delete function ([eb4ab524](https://github.com/espressif/esp-protocols/commit/eb4ab524))
+
+### Updated
+
+- ci(mdns): Fix mdns host test layers with static task creation ([0690eba3](https://github.com/espressif/esp-protocols/commit/0690eba3))
+
+## [1.5.3](https://github.com/espressif/esp-protocols/commits/mdns-v1.5.3)
+
+### Bug Fixes
+
+- Fix responder to ignore only invalid queries ([cd07228f](https://github.com/espressif/esp-protocols/commit/cd07228f), [#754](https://github.com/espressif/esp-protocols/issues/754))
+
+## [1.5.2](https://github.com/espressif/esp-protocols/commits/mdns-v1.5.2)
+
+### Bug Fixes
+
+- Fix potential NULL deref when sending sub-buy ([e7273c46](https://github.com/espressif/esp-protocols/commit/e7273c46))
+- Fix _mdns_append_fqdn excessive stack usage ([bd23c233](https://github.com/espressif/esp-protocols/commit/bd23c233))
+
+## [1.5.1](https://github.com/espressif/esp-protocols/commits/mdns-v1.5.1)
+
+### Bug Fixes
+
+- Fix incorrect memory free for mdns browse ([4451a8c5](https://github.com/espressif/esp-protocols/commit/4451a8c5))
+
+## [1.5.0](https://github.com/espressif/esp-protocols/commits/mdns-v1.5.0)
+
+### Features
+
+- supported removal of subtype when updating service ([4ad88e29](https://github.com/espressif/esp-protocols/commit/4ad88e29))
+
+### Bug Fixes
+
+- Fix zero-sized VLA clang-tidy warnings ([196198ec](https://github.com/espressif/esp-protocols/commit/196198ec))
+- Remove dead store to arg variable shared ([e838bf03](https://github.com/espressif/esp-protocols/commit/e838bf03))
+- Fix name mangling not to use strcpy() ([99b54ac3](https://github.com/espressif/esp-protocols/commit/99b54ac3))
+- Fix potential null derefernce in _mdns_execute_action() ([f5be2f41](https://github.com/espressif/esp-protocols/commit/f5be2f41))
+- Fix AFL test mock per espressif/esp-idf@a5bc08fb55c ([3d8835cf](https://github.com/espressif/esp-protocols/commit/3d8835cf))
+- Fixed potential out-of-bound interface error ([24f55ce9](https://github.com/espressif/esp-protocols/commit/24f55ce9))
+- Fixed incorrect error conversion ([8f8516cc](https://github.com/espressif/esp-protocols/commit/8f8516cc))
+- Fixed potential overflow when allocating txt data ([75a8e864](https://github.com/espressif/esp-protocols/commit/75a8e864))
+- Move MDNS_NAME_BUF_LEN to public headers ([907087c0](https://github.com/espressif/esp-protocols/commit/907087c0), [#724](https://github.com/espressif/esp-protocols/issues/724))
+- Cleanup includes in mdns.c ([68a9e148](https://github.com/espressif/esp-protocols/commit/68a9e148), [#725](https://github.com/espressif/esp-protocols/issues/725))
+- Allow advertizing service with port==0 ([827ea65f](https://github.com/espressif/esp-protocols/commit/827ea65f))
+- Fixed complier warning if MDNS_MAX_SERVICES==0 ([95377216](https://github.com/espressif/esp-protocols/commit/95377216), [#611](https://github.com/espressif/esp-protocols/issues/611))
+
+## [1.4.3](https://github.com/espressif/esp-protocols/commits/mdns-v1.4.3)
+
+### Features
+
+- support zero item when update subtype ([5bd82c01](https://github.com/espressif/esp-protocols/commit/5bd82c01))
+
+## [1.4.2](https://github.com/espressif/esp-protocols/commits/mdns-v1.4.2)
+
+### Features
+
+- support update subtype ([062b8dca](https://github.com/espressif/esp-protocols/commit/062b8dca))
+
+### Updated
+
+- chore(mdns): Add more info to idf_component.yml ([4a1cb65c](https://github.com/espressif/esp-protocols/commit/4a1cb65c))
+
+## [1.4.1](https://github.com/espressif/esp-protocols/commits/mdns-v1.4.1)
+
+### Features
+
+- Send PTR query for mdns browse when interface is ready ([010a404a](https://github.com/espressif/esp-protocols/commit/010a404a))
+
+### Bug Fixes
+
+- Prevent deadlock when deleting a browse request ([3f48f9ea](https://github.com/espressif/esp-protocols/commit/3f48f9ea))
+- Fix use after free reported by coverity ([25b3d5fd](https://github.com/espressif/esp-protocols/commit/25b3d5fd))
+- Fixed dead-code reported by coverity ([11846c7d](https://github.com/espressif/esp-protocols/commit/11846c7d))
+
+## [1.4.0](https://github.com/espressif/esp-protocols/commits/mdns-v1.4.0)
+
+### Major changes
+
+- Fixed mdns API issues when add/remove/update records from multiple threads ([Fix services API races to directly add/remove services](https://github.com/espressif/esp-protocols/commit/8a690503))
+
+### Features
+
+- Unit tests for add/remove/update deleg/selfhosted services ([0660ece1](https://github.com/espressif/esp-protocols/commit/0660ece1))
+- Add console command for mdns browsing ([1e8ede33](https://github.com/espressif/esp-protocols/commit/1e8ede33))
+- Console test: set instance for service ([f107dcd1](https://github.com/espressif/esp-protocols/commit/f107dcd1))
+- Console test: add subtype for service ([ee00e97b](https://github.com/espressif/esp-protocols/commit/ee00e97b))
+- Console test: set port for (delegated) srvs ([07b79abf](https://github.com/espressif/esp-protocols/commit/07b79abf))
+- Console test: add/remove TXT recs for delegated srvs ([c9a58d73](https://github.com/espressif/esp-protocols/commit/c9a58d73))
+- Console test for changing TXT records ([6b9a6ce6](https://github.com/espressif/esp-protocols/commit/6b9a6ce6))
+- Console test for add/remove delegated service APIs ([43de7e5c](https://github.com/espressif/esp-protocols/commit/43de7e5c))
+- Console test for add/remove delegated host APIs ([ce7f326a](https://github.com/espressif/esp-protocols/commit/ce7f326a))
+- Console test for lookup service APIs ([a91ead8e](https://github.com/espressif/esp-protocols/commit/a91ead8e))
+- Add linux console functional tests ([50d059af](https://github.com/espressif/esp-protocols/commit/50d059af))
+- check if the txt items is changed when browsing ([e2f0477a](https://github.com/espressif/esp-protocols/commit/e2f0477a))
+
+### Bug Fixes
+
+- Fix mdns_delegate_hostname_add() to block until done ([2c1b1661](https://github.com/espressif/esp-protocols/commit/2c1b1661))
+- Fix API races when removing all services ([169405b5](https://github.com/espressif/esp-protocols/commit/169405b5))
+- Fix API races setting instance name for services ([643dc6d4](https://github.com/espressif/esp-protocols/commit/643dc6d4))
+- Fix API races while adding subtypes for services ([f9f234c4](https://github.com/espressif/esp-protocols/commit/f9f234c4))
+- Fix API races removing txt item for services ([3f97a822](https://github.com/espressif/esp-protocols/commit/3f97a822))
+- Fix API races adding txt item for services ([c62b920b](https://github.com/espressif/esp-protocols/commit/c62b920b))
+- Fix API races while setting txt for services ([a927bf3a](https://github.com/espressif/esp-protocols/commit/a927bf3a))
+- Fix API races while setting port for services ([99d5fb27](https://github.com/espressif/esp-protocols/commit/99d5fb27))
+- Fix services API races to directly add/remove services ([8a690503](https://github.com/espressif/esp-protocols/commit/8a690503))
+- Fix mdns mdns_lookup_service() to handle empty TXT ([d4da9cb0](https://github.com/espressif/esp-protocols/commit/d4da9cb0))
+
 ## [1.3.2](https://github.com/espressif/esp-protocols/commits/mdns-v1.3.2)
 
 ### Features

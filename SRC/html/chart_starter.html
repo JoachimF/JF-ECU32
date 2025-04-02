@@ -27,6 +27,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.0.1/dist/chart.umd.min.js"></script>
 <script>
+
     //window.addEventListener("load", getData);
     var maxtime = 1000 ;
 	const chart1 = new Chart(document.getElementById("rpmpump"), {
@@ -81,6 +82,9 @@
 	});
 
     var max_rpm = 0 ;
+
+
+
     function getData() {
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function () {
@@ -131,7 +135,7 @@
                 chart2.update();
             }
         };
-        xhr.open("GET", "/chart_starter_cal", true);
+        xhr.open("GET", "/c_chart_starter_cal", true);
         xhr.send();
     }
 

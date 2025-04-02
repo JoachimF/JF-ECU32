@@ -394,6 +394,9 @@ websocket.onmessage = function(evt) {
 	var pump1 = myObj.pump1;
 	var pump2 = myObj.pump2;
 	var glow = myObj.glow;
+	var glowcurrent = myObj.glowcurrent;
+	var vbatt = myObj.vbatt;	
+	var starter = myObj.starter ;
 	var vanne1 = myObj.vanne1;
 	var vanne2 = myObj.vanne2;
 	var status = myObj.status;
@@ -441,12 +444,15 @@ websocket.onmessage = function(evt) {
 		//console.log("chart3 update");
 	chart3.update();
 	//Text
-	document.getElementById('pump1').innerHTML = pump1.toFixed(1);
-	document.getElementById('pump2').innerHTML = pump2.toFixed(1);
+	document.getElementById('pump1').innerHTML = pump1;
+	document.getElementById('pump2').innerHTML = pump2;
 	document.getElementById('vanne1').innerHTML = vanne1;
 	document.getElementById('vanne2').innerHTML = vanne2;
 	document.getElementById('glow').innerHTML = glow;
 	document.getElementById('rpmtxt').innerHTML = rpmtxt;
+	document.getElementById('glowcurrent').innerHTML = glowcurrent;
+	document.getElementById('vbatt').innerHTML = vbatt;
+	document.getElementById('starter').innerHTML = starter;
 	document.getElementById('status').innerHTML = status;
 	document.getElementById('error').innerHTML = error;
 	document.getElementById('time').innerHTML = time;

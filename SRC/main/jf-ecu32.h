@@ -27,9 +27,13 @@
 #include "freertos/event_groups.h"
 #include "freertos/semphr.h"
 #include "freertos/timers.h"
+#include "config.h"
 #include <ina219.h>
+
+#ifdef DS18B20
 #include "ds18b20.h"
 #include "onewire_bus_impl_rmt.h"
+#endif
 
 typedef struct _pump_table{  
   uint32_t pump[50] ; //Table RPM/PWM
@@ -174,6 +178,7 @@ typedef struct _GLOW_{
   uint32_t (*get_power)(struct _GLOW_ * glow);
   void (*on)(_pwm_config *config);
   void (*off)(_pwm_config *config);
+  float current ;
 } _GLOW_t ;
 
 typedef struct _PUMP_{
@@ -214,8 +219,6 @@ typedef struct _engine_ {
   uint32_t EGT ;
   uint32_t EGTs[10] ;
   uint32_t EGT_delta ; //Degrées secondes
-  float GLOW_CURRENT ;
-  float DS18B20_temp ;
   _PUMP_t pump1 ;
   _PUMP_t pump2 ;
   _PUMP_t starter ;
@@ -224,15 +227,18 @@ typedef struct _engine_ {
   _VALVE_t vanne2 ; //Vanne KERO
   uint8_t phase_fonctionnement ;
   uint8_t position_gaz ;
+  float Vbatt ;
   char error_message[50] ;
+  #ifdef DS18B20
+  float DS18B20_temp ;
   onewire_bus_handle_t bus ;
   onewire_bus_config_t bus_config;
   onewire_bus_rmt_config_t rmt_config ;
   ds18b20_device_handle_t ds18b20s[1]; //1 seul capteur
   onewire_device_iter_handle_t iter ;
   onewire_device_t next_onewire_device ;
- 
   int ds18b20_device_num ;
+  #endif
 } _engine_t;
 
 //Taches
@@ -286,9 +292,13 @@ float get_starter_power(_PUMP_t *config) ;
 
 uint32_t get_pump_power_int(_PUMP_t *config) ;
 uint8_t get_glow_power(_GLOW_t *config) ;
+float get_glow_current(_GLOW_t *glow) ;
+void set_glow_current(_GLOW_t *glow, float current) ;
 uint8_t get_vanne_power(_VALVE_t *config) ;
 float get_starter_power(_PUMP_t *config) ;
 float get_power(_PUMP_t *starter) ;
+float get_vbatt(_engine_t *turbine) ;
+void  set_vbatt(_engine_t *turbine,float tension) ;
 
 /***Gestion du temps  */
 void get_time_total(_engine_t *engine, uint8_t *sec, uint8_t *min, uint8_t *heure) ;
