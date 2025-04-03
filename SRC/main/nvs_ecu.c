@@ -189,13 +189,16 @@ static void set_defaut_turbine(void)
     turbine_config.max_pump2 = 512 ;
     turbine_config.min_pump2 = 0 ;
     //Vannes
-    turbine_config.max_vanne1 = 1024 ;
-    turbine_config.max_vanne2 = 1024 ;
+    turbine_config.max_vanne1 = 255 ;
+    turbine_config.max_vanne2 = 255 ;
     // Starter    
     turbine_config.starter_rpm_start = 0 ;
     turbine_config.starter_pwm_perc_start = 0 ;
     turbine_config.starter_pwm_perc_min = 0 ;
     turbine_config.starter_max_rpm = 0 ;
+    //Batterie
+    turbine_config.lipo_elements = 0 ;
+    turbine_config.Vmin_decollage = 8.0 ;
 
     init_power_table() ;
     init_random_pump() ;
@@ -346,6 +349,9 @@ void read_nvs(void)
                 ESP_LOGI(TAG,"starter_pwm_perc_start= %f", turbine_config.starter_pwm_perc_start);
                 ESP_LOGI(TAG,"starter_pwm_perc_min = %f", turbine_config.starter_pwm_perc_min);
                 ESP_LOGI(TAG,"starter_max_rpm= %ld", turbine_config.starter_max_rpm);
+                //Batterie
+                ESP_LOGI(TAG,"Nb lipos= %ld", turbine_config.lipo_elements);
+                ESP_LOGI(TAG,"Vmin décollage= %ld", turbine_config.Vmin_decollage);
 
                 /*for(int i=0;i<50;i++)
                 {

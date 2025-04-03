@@ -59,14 +59,14 @@ const char htmlBoutonFrontpage[]  =
   B_INFORMATION "|" B_LOG "|" B_WIFI "|" B_SLIDER "|" B_JAUGES "|"
   B_CALIBRATION "|" B_STARTCALIBRATION "|" B_STOPCALIBRATION "|" B_SAVE "|"
   B_CHART "|"
-  B_START_ENGINE "|" B_STOP_ENGINE"|" B_MAJ "|" B_CUT_WIFI ;
+  B_START_ENGINE "|" B_STOP_ENGINE"|" B_FILES "|" B_MAJ "|" B_CUT_WIFI ;
 
 
 const char BoutonFrontpageAction[]  =
   "c_ecu|c_moteur|"
   "c_info|c_logs|c_wifi|c_slider|c_gauges|c_cals|c_st_cal|c_stop_st_cal|c_save_st_cal|"
   "c_chart|"
-  "c_start|c_stop|c_upgrade|c_stopwifi";
+  "c_start|c_stop|html/|c_upgrade|c_stopwifi";
 
 const char htmlInputParamEng[] =
   IN_NAME "|" IN_GLOWPOWER "|" 
@@ -75,23 +75,25 @@ const char htmlInputParamEng[] =
   IN_DELAYACC "|" IN_DELAYDEC "|" IN_DELAYSTAB "|" 
   IN_PUMP1MAX "|" IN_PUMP1MIN "|" IN_PUMP2MAX "|" IN_PUMP2MIN "|" 
   IN_VANNE1MAX "|" IN_VANNE2MAX "|" 
-  IN_RPMSTARTER "|" IN_MAXSTARTERRPM ;
+  IN_RPMSTARTER "|" IN_MAXSTARTERRPM "|" IN_LIPO_ELEMENTS "|" IN_VMIN_START;
 
-const uint32_t htmlParamEngMinMax[2][17] =
+const uint32_t htmlParamEngMinMax[2][20] =
  {{MIN_NAME,MIN_GLOWPOWER,
   MIN_RPMMAX,MIN_RPMIDLE,MIN_RPMMIN,
   MIN_TEMPSTART,MIN_TEMPMAX,
   MIN_DELAYACC,MIN_DELAYDEC,MIN_DELAYSTAB,
   MIN_PUMP1MAX,MIN_PUMP1MIN,MIN_PUMP2MAX,MIN_PUMP2MIN,
   MIN_VANNE1MAX,MIN_VANNE2MAX,
-  MIN_RPMSTARTER},
+  MIN_RPMSTARTER,MIN_RPMMAXSTARTER,
+  MIN_LIPO_ELEMENTS,MIN_VMIN_START},
   {MAX_NAME,MAX_GLOWPOWER,
   MAX_RPMMAX,MAX_RPMIDLE,MAX_RPMMIN,
   MAX_TEMPSTART,MAX_TEMPMAX,
   MAX_DELAYACC,MAX_DELAYDEC,MAX_DELAYSTAB,
   MAX_PUMP1MAX,MAX_PUMP1MIN,MAX_PUMP2MAX,MAX_PUMP2MIN,
   MAX_VANNE1MAX,MAX_VANNE2MAX,
-  MAX_RPMSTARTER}} ;
+  MAX_RPMSTARTER,MAX_RPMMAXSTARTER,
+  MAX_LIPO_ELEMENTS,MAX_VMIN_START}} ;
 
 enum BoutonParmEcuEnum {
   BT_SAVE, BT_RETOUR  };

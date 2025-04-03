@@ -187,7 +187,7 @@ void task_glow_current(void *pvParameter)
     ESP_LOGI(TAG, "Task glow_current start");
     ina219_t dev;
     static float volt ;
-    static float bus_voltage, shunt_voltage, current, power;
+    float current ;
     memset(&dev, 0, sizeof(ina219_t));
         
     ESP_ERROR_CHECK(ina219_init_desc(&dev, I2C_ADDR, I2C_PORT, SDA_GPIO, SCL_GPIO));
@@ -486,7 +486,7 @@ uint32_t get_EGT(struct _engine_ * engine)
 /*---------------------------------------------------------------
         ADC Calibration
 ---------------------------------------------------------------*/
-static bool adc_calibration_init(adc_unit_t unit, adc_atten_t atten, adc_cali_handle_t *out_handle)
+bool adc_calibration_init(adc_unit_t unit, adc_atten_t atten, adc_cali_handle_t *out_handle)
 {
     adc_cali_handle_t handle = NULL;
     esp_err_t ret = ESP_FAIL;
@@ -534,7 +534,7 @@ static bool adc_calibration_init(adc_unit_t unit, adc_atten_t atten, adc_cali_ha
     return calibrated;
 }
 
-static void adc_calibration_deinit(adc_cali_handle_t handle)
+/*static void adc_calibration_deinit(adc_cali_handle_t handle)
 {
 #if ADC_CALI_SCHEME_CURVE_FITTING_SUPPORTED
     ESP_LOGI(TAG, "deregister %s calibration scheme", "Curve Fitting");
@@ -544,4 +544,69 @@ static void adc_calibration_deinit(adc_cali_handle_t handle)
     ESP_LOGI(TAG, "deregister %s calibration scheme", "Line Fitting");
     ESP_ERROR_CHECK(adc_cali_delete_scheme_line_fitting(handle));
 #endif
+}*/
+
+uint8_t get_lipo_elements(void)
+{
+    float volt = get_vbatt(&turbine) ;
+    //ESP_LOGI(TAG,"Vbatt : %0.2f",volt) ;
+
+    if(volt < 4.3 )
+    {
+        return 1;
+    }
+    if(volt > 6.6 && volt < 8.5)
+    {
+        return 2;
+    }
+    if(volt > 9.9 && volt < 12.7)
+    {
+        return 3;
+    }
+    if(volt > 13.2 && volt < 17)
+    {
+        return 4;
+    }
+    return 0 ;
 }
+
+
+bool battery_check(void)
+{
+    uint8_t nb_lipo_conf,nb_lipo ;
+    float volt, vmin ;
+
+    nb_lipo_conf = get_conf_lipo_elements() ;
+    //ESP_LOGI(TAG,"Batterie configurée %d éléments",nb_lipo_conf) ;
+    nb_lipo = get_lipo_elements() ;
+    //ESP_LOGI(TAG,"Batterie branché %d éléments",nb_lipo) ;
+    volt = get_vbatt(&turbine) ;
+    vmin = get_Vmin_decollage() ;
+
+    if(nb_lipo_conf != nb_lipo)
+    {
+        set_batOk(0) ;
+        add_error_msg(E_BATTCONF,"Batterie mal configurée");
+        ESP_LOGI(TAG,"Batterie mal configurée") ;		
+    }
+	
+    if(nb_lipo > 3 || nb_lipo < 2)
+    {
+        set_batOk(0) ;
+        add_error_msg(E_BATTWRONG,"Batterie non compatible");
+        ESP_LOGI(TAG,"Batterie non compatible") ;		
+    }
+    
+    if(volt < vmin)
+    {
+        set_batOk(0) ;
+        add_error_msg(E_BATTLOW,"Batterie trop faible");
+        ESP_LOGI(TAG,"Batterie trop faible") ;		
+    }
+    if(isBatOk())
+        return 1 ;
+    else
+        return 0 ;
+}
+
+

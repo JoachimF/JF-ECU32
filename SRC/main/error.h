@@ -26,7 +26,7 @@
 #include "driver/gptimer.h"
 
 typedef enum _error_sources_ {
-    E_K,E_RPM,E_RC_SIGNAL,E_AUX_SIGNAL,E_EGT,E_GLOW
+    E_K,E_RPM,E_RC_SIGNAL,E_AUX_SIGNAL,E_EGT,E_GLOW,E_BATTLOW,E_BATTWRONG,E_BATTCONF
 }_error_sources_t ;
 
 typedef struct _error_
@@ -38,7 +38,7 @@ typedef struct _error_
 
 typedef struct _errors_
 {
-    _error_t *error[5] ;
+    _error_t *error[10] ;
     int nb_error ;
 }_errors_t;
 

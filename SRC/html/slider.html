@@ -35,7 +35,7 @@
 			document.getElementById("textSliderValue6").innerHTML = pwmSliderValue6;
 			console.log(pwmSliderValue1);	
 			var httpRequest = new XMLHttpRequest();
-			httpRequest.open('POST','/post', true);
+			httpRequest.open('POST','/p_post', true);
 			httpRequest.setRequestHeader("Accept", "application/txt");
 			httpRequest.setRequestHeader("Content-Type", "application/txt");
 			httpRequest.onreadystatechange = function () {

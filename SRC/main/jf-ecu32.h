@@ -148,6 +148,9 @@ typedef struct _configEngine_{
   float starter_pwm_perc_start ; // PWM à laquelle le démarreur commence a tourner
   float starter_pwm_perc_min ; // PWM à laquelle le démarreur cale
   uint32_t starter_max_rpm ; // RPM max du démarreur
+  // Paremètre batterie
+  uint8_t lipo_elements ;
+  float Vmin_decollage ;
 
   _pump_table_t power_table;
   uint32_t checksum ;
@@ -227,6 +230,7 @@ typedef struct _engine_ {
   _VALVE_t vanne2 ; //Vanne KERO
   uint8_t phase_fonctionnement ;
   uint8_t position_gaz ;
+  bool batOk ;
   float Vbatt ;
   char error_message[50] ;
   #ifdef DS18B20
@@ -297,8 +301,16 @@ void set_glow_current(_GLOW_t *glow, float current) ;
 uint8_t get_vanne_power(_VALVE_t *config) ;
 float get_starter_power(_PUMP_t *config) ;
 float get_power(_PUMP_t *starter) ;
+
+/* Batterie */
 float get_vbatt(_engine_t *turbine) ;
 void  set_vbatt(_engine_t *turbine,float tension) ;
+uint8_t get_conf_lipo_elements(void) ;
+void set_conf_lipo_elements(uint8_t) ;
+bool isBatOk(void) ;
+void set_batOk(bool set) ;
+float get_Vmin_decollage(void) ;
+
 
 /***Gestion du temps  */
 void get_time_total(_engine_t *engine, uint8_t *sec, uint8_t *min, uint8_t *heure) ;

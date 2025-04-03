@@ -51,7 +51,7 @@ void add_error_msg(_error_sources_t id,const char *msg)
     {
         if(!search_id(id))
         {
-            if(errors_struct.nb_error < 5)
+            if(errors_struct.nb_error < 10)
             {
                 len = strlen(msg) ;
                 errors_struct.error[errors_struct.nb_error] = malloc(sizeof(_error_t)) ;

@@ -115,7 +115,8 @@ void task_glow_current(void *pvParameter) ;
 void task_egt(void *pvParameter) ;
 
 /* Tension batterie */
-static bool adc_calibration_init(adc_unit_t unit, adc_atten_t atten, adc_cali_handle_t *out_handle);
-static void adc_calibration_deinit(adc_cali_handle_t handle);
-
+bool adc_calibration_init(adc_unit_t unit, adc_atten_t atten, adc_cali_handle_t *out_handle);
+//static void adc_calibration_deinit(adc_cali_handle_t handle);
+uint8_t get_lipo_elements(void) ;
+bool battery_check(void) ;
 #endif

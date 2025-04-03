@@ -357,7 +357,7 @@ void app_main()
 	xTaskCreatePinnedToCore(ws_task, "WS_TASK", configMINIMAL_STACK_SIZE * 8, NULL, (configMAX_PRIORITIES -1 )|( 1UL | portPRIVILEGE_BIT ), &xWSHandle,1);
 	vTaskSuspend(xWSHandle);
 
-    ESP_LOGI(TAG, "Initializing INA219 Task\n");  // Glow current
+    ESP_LOGI(TAG, "Initializing INA219 + ADC Task\n");  // Glow current
     SEM_glow_current = xSemaphoreCreateMutex();
     xTaskCreatePinnedToCore(task_glow_current, "GLOW Current", configMINIMAL_STACK_SIZE * 8, NULL, (configMAX_PRIORITIES -1 )|( 1UL | portPRIVILEGE_BIT ), &task_glow_current_h,1);
     vTaskSuspend(task_glow_current_h);
@@ -372,7 +372,11 @@ void app_main()
 	//xSemaphoreGive(log_task_start) ;
 	
 	vTaskDelay(2000 / portTICK_PERIOD_MS);
-	
+	if(get_conf_lipo_elements() == 0 ) {
+		set_conf_lipo_elements(get_lipo_elements()) ;
+			write_nvs_turbine() ;
+	}
+	battery_check() ;
 	
 	
 	//turbine.EGT = 1000 ;

@@ -259,6 +259,31 @@ void set_power_glow(_VALVE_t *vanne, uint32_t value)
     set_power_vanne(vanne, value) ;
 }
 
+uint8_t get_conf_lipo_elements(void)
+{
+    return turbine_config.lipo_elements ;
+}
+
+void set_conf_lipo_elements(uint8_t elem)
+{
+    turbine_config.lipo_elements = elem ;
+}
+
+void set_batOk(bool set)
+{
+    turbine.batOk = set ; 
+}
+
+bool isBatOk(void)
+{
+    return turbine.batOk ;
+}
+
+float get_Vmin_decollage(void)
+{
+    return turbine_config.Vmin_decollage ;
+}
+
 /*Configure la valeur de puissance de 0-255*/
 void set_power_ledc(_ledc_config *config, uint32_t value)
 {
@@ -634,6 +659,7 @@ void vTimer1sCallback( TimerHandle_t pxTimer ) //toutes les secondes
     else
         turbine.WDT_RPM = 0 ;
     
+    battery_check() ;
     check_errors() ;
 
     //ESP_LOGI(TAG,"RPM_sec : %ld",turbine.RPM_sec) ;
@@ -760,14 +786,16 @@ void ecu_task(void * pvParameters )
                     }
                     break;
                 case START :
-                    if(turbine.position_gaz == COUPE)
-                        turbine.phase_fonctionnement = WAIT ;
-                    else if(turbine.position_gaz == PLEINGAZ) {
-                        // Ventilation
-                        turbine.starter.set_power(&turbine.starter.config,turbine_config.starter_rpm_start) ;
-                        turbine.phase_fonctionnement = GLOW ;
+                    if(battery_check()) {
+                        if(turbine.position_gaz == COUPE)
+                            turbine.phase_fonctionnement = WAIT ;
+                        else if(turbine.position_gaz == PLEINGAZ) {
+                            // Ventilation
+                            turbine.starter.set_power(&turbine.starter.config,turbine_config.starter_rpm_start) ;
+                            turbine.phase_fonctionnement = GLOW ;
+                        }
+                        break;
                     }
-                    break;
                 case GLOW :
                     float avg_current = 0 ;
                     int count_curr_sample = 0 ;

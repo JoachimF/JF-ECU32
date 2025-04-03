@@ -33,6 +33,7 @@
   #define B_START_ENGINE "Démarreur le moteur"
   #define B_STOP_ENGINE "Arrêter le moteur"
   #define B_MAJ "Mise à jour"
+  #define B_FILES "Fichiers"
   #define B_CUT_WIFI "Couper le WIFI"
 
   #define B_SAVE "Sauvegarder"
@@ -88,6 +89,8 @@
   #define IN_VANNE2MAX "PWM Max vanne 2 (0-255)"
   #define IN_RPMSTARTER "RPM Allumage (0-10000RPM)"
   #define IN_MAXSTARTERRPM "RPM Max du démarreur"
+  #define IN_LIPO_ELEMENTS "Nombre d'éléments LIPO"
+  #define IN_VMIN_START "Voltage minimum pour démarrer"
 
   #define SURE "Etes vous sur de vouloir"
   #define B_CONFIRM_SAVE "Confirmer la sauvegarde"
