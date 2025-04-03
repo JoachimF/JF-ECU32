@@ -2,20 +2,20 @@
 RC Jet Engine ECU
 ## Environement
 - VsCode
-- IDF 5.0.7
+- IDF 5.0.8
 
 ## Démarrage du projet d'ECU opensource pour réacteurs
 
 ### Fonctionnalitées :
 
 - Démarrage GAZ/KERO
-- Fonctionnement du réacteur
-- Apprentissage du moteur
+- Fonctionnement du réacteur*
+- Apprentissage du moteur*
 - Surveillance des paramètres
-- Redémarrage en vol
+- Redémarrage en vol*
 - Log
 - Interface WEB
-- Ecran sans fil
+- Ecran sans fil*
 
 
 ### Composants :
@@ -28,6 +28,7 @@ RC Jet Engine ECU
 - Entrée PPM - AUX
 - Entrée compte tours IR ou HALL
 - Entrée sonde K (module MAX31865)
+- INA219 courant de la bougie
 
 ### Sorties :
 - Sortie PWM/PPM 10A pour le moteur de démarrage
@@ -35,4 +36,6 @@ RC Jet Engine ECU
 - Sortie PWM/PPM 10A pour ESC de pompe numéro 2 (fumigène ou redondance, comme sur les grandeurs)
 - Sorties PWM pour 2 électrovannes (KERO/GAZ - KERO/KERO) 1A
 - Sortie PWM pour une bougies Glow ou Kero 10A
-- Sortie FPORT FRSky (télémétrie)
+- Sortie FPORT FRSky (télémétrie)*
+
+*en cours de fabrication
