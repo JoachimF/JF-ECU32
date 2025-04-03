@@ -218,7 +218,7 @@ void WSCheckBox(httpd_req_t *req,uint32_t title_index,uint8_t param, bool show)
   httpd_resp_sendstr_chunk(req,buffer) ;
 }
 
-void WSInputBox(httpd_req_t *req,uint32_t title_index,uint32_t intparam,char *charparam, int type, bool show)
+void WSInputBox(httpd_req_t *req,uint32_t title_index,uint32_t intparam,char *charparam,float floatparam, int type, bool show)
 {
   char title[100];
   char buffer[500] ;
@@ -230,6 +230,9 @@ void WSInputBox(httpd_req_t *req,uint32_t title_index,uint32_t intparam,char *ch
       break ;
     case TEXT :
       sprintf(buffer+strlen(buffer),"<input id=\"input_%ld\" placeholder=\"\" value=\"%s\" name=\"input_%ld\" minlength=\"%ld\" maxlength=\"%ld\"></p><p>",title_index,charparam,title_index,htmlParamEngMinMax[0][title_index],htmlParamEngMinMax[1][title_index]);
+      break ;
+    case FLOAT : 
+      sprintf(buffer+strlen(buffer),"<input id=\"input_%ld\" placeholder=\"\" value=\"%0.2f\" name=\"input_%ld\" type=\"number\" step=\"0.01\" min=\"%0.2f\" max=\"%0.2f\"></p><p>",title_index,floatparam,title_index,(float)(htmlParamEngMinMax[0][title_index]),(float)(htmlParamEngMinMax[1][title_index]));
       break ;
   }
   httpd_resp_sendstr_chunk(req,buffer) ;

@@ -289,12 +289,12 @@ void task_egt(void *pvParameter)
             ESP_LOGE(TAG, "Failed to measure: %d (%s)", res, esp_err_to_name(res));
         else
         {
-            /*if (scv) ESP_LOGW(TAG, "Thermocouple shorted to VCC!");
+            if (scv) ESP_LOGW(TAG, "Thermocouple shorted to VCC!");
             if (scg) ESP_LOGW(TAG, "Thermocouple shorted to GND!");
             if (oc) ESP_LOGW(TAG, "No connection to thermocouple!");
             if (scv) add_error_msg(E_K,"K shorted to VCC!");
             if (scg) add_error_msg(E_K,"K shorted to GND!");
-            if (oc) add_error_msg(E_K,"K not connected");*/
+            if (oc) add_error_msg(E_K,"K not connected");
             //ESP_LOGI(TAG, "Temperature: %.2f°C, cold junction temperature: %.4f°C", tc_t, cj_t);
             //ESP_LOGI("wifi", "free Heap:%d,%d", esp_get_free_heap_size(), heap_caps_get_free_size(MALLOC_CAP_8BIT));*/
             turbine.EGT = (turbine.EGT + tc_t)/2 ;

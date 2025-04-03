@@ -834,6 +834,82 @@ int find_param_input(int param,char *buf,char *output)
 	return len ;
 }
 
+char* str_replace(char* search, char* replace, char* subject) {
+	int i, j, k;
+	
+	int searchSize = strlen(search);
+	int replaceSize = strlen(replace);
+	int size = strlen(subject);
+
+	char* ret;
+
+	if (!searchSize) {
+		ret = malloc(size + 1);
+		for (i = 0; i <= size; i++) {
+			ret[i] = subject[i];
+		}
+		return ret;
+	}
+	
+	int retAllocSize = (strlen(subject) + 1) * 2; // Allocation size of the return string.
+    // let the allocation size be twice as that of the subject initially
+	ret = malloc(retAllocSize);
+
+	int bufferSize = 0; // Found characters buffer counter
+	char* foundBuffer = malloc(searchSize); // Found character bugger
+	
+	for (i = 0, j = 0; i <= size; i++) {
+		/**
+         * Double the size of the allocated space if it's possible for us to surpass it
+		 **/
+		if (retAllocSize <= j + replaceSize) {
+			retAllocSize *= 2;
+			ret = (char*) realloc(ret, retAllocSize);
+		}
+		/**
+         * If there is a hit in characters of the substring, let's add it to the
+         * character buffer
+		 **/
+		else if (subject[i] == search[bufferSize]) {
+			foundBuffer[bufferSize] = subject[i];
+			bufferSize++;
+
+			/**
+             * If the found character's bugger's counter has reached the searched substring's
+             * length, then there's a hit. Let's copy the replace substring's characters
+             * onto the return string.
+			 **/
+			if (bufferSize == searchSize) {
+				bufferSize = 0;
+				for (k = 0; k < replaceSize; k++) {
+					ret[j++] = replace[k];
+				}
+			}
+		}
+		/**
+         * If the character is a miss, let's put everything back from the buffer
+         * to the return string, and set the found character buffer counter to 0.
+		 **/
+		else {
+			for (k = 0; k < bufferSize; k++) {
+				ret[j++] = foundBuffer[k];
+			}
+			bufferSize = 0;
+			/**
+             * Add the current character in the subject string to the return string.
+			 **/
+			ret[j++] = subject[i];
+		}
+	}
+
+	/**
+	 * Free memory
+	 **/
+	free(foundBuffer);
+	
+	return ret;
+}
+
 void save_configturbine(httpd_req_t *req)
 {
 	char *buf = malloc(strlen(req->uri)+1) ;
@@ -845,7 +921,7 @@ void save_configturbine(httpd_req_t *req)
 	/*Nom*/
 	len = find_param_input(I_NAME,buf,param) ;
 	if(len>0) {
-		strcpy(turbine_config.name,param) ;
+		strcpy(turbine_config.name,str_replace("+"," ",str_replace("%%20"," ",param))) ;
 	}
 	/*Puissance bougie*/
 	len = find_param_input(I_GLOWPOWER,buf,param) ;
@@ -925,12 +1001,10 @@ void save_configturbine(httpd_req_t *req)
 
 	len = find_param_input(I_LIPO_ELEMENTS,buf,param) ;
 	if(len>0) {
-		ESP_LOGI(TAG, "ELEMENT %s",param);
 		turbine_config.lipo_elements = atoi(param) ;		
 	}
 	len = find_param_input(I_VMIN_START,buf,param) ;
 	if(len>0) {
-		ESP_LOGI(TAG, "Vmin %s",param);
 		turbine_config.Vmin_decollage = atof(param) ;		
 	}
 	write_nvs_turbine() ;
@@ -1081,26 +1155,26 @@ static esp_err_t configmoteur(httpd_req_t *req)
 	// Send HTML header
 	send_head(req) ;
 	httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Paramètres du moteur&nbsp;</b></legend><form method=\"GET\" action=\"c_moteur\"><p>") ;
-	WSInputBox(req,I_NAME,0,turbine_config.name,TEXT,true) ;
-	WSInputBox(req,I_GLOWPOWER,turbine_config.glow_power,NULL,NUMBER,true) ;
-	WSInputBox(req,I_RPMMAX,turbine_config.jet_full_power_rpm,NULL,NUMBER,true) ;
-	WSInputBox(req,I_RPMIDLE,turbine_config.jet_idle_rpm,NULL,NUMBER,true) ;
-	WSInputBox(req,I_RPMMIN,turbine_config.jet_min_rpm,NULL,NUMBER,true) ;
-	WSInputBox(req,I_TEMPSTART,turbine_config.start_temp,NULL,NUMBER,true) ;
-	WSInputBox(req,I_TEMPMAX,turbine_config.max_temp,NULL,NUMBER,true) ;
-	WSInputBox(req,I_DELAYACC,turbine_config.acceleration_delay,NULL,NUMBER,false) ;
-	WSInputBox(req,I_DELAYDEC,turbine_config.deceleration_delay,NULL,NUMBER,false) ;
-	WSInputBox(req,I_DELAYSTAB,turbine_config.stability_delay,NULL,NUMBER,true) ;
-	WSInputBox(req,I_PUMP1MAX,turbine_config.max_pump1,NULL,NUMBER,true) ;
-	WSInputBox(req,I_PUMP1MIN,turbine_config.min_pump1,NULL,NUMBER,true) ;
-	WSInputBox(req,I_PUMP2MAX,turbine_config.max_pump2,NULL,NUMBER,true) ;
-	WSInputBox(req,I_PUMP2MIN,turbine_config.min_pump2,NULL,NUMBER,true) ;
-	WSInputBox(req,I_VANNE1MAX,turbine_config.max_vanne1,NULL,NUMBER,true) ;
-	WSInputBox(req,I_VANNE2MAX,turbine_config.max_vanne2,NULL,NUMBER,true) ;
-	WSInputBox(req,I_RPMSTARTER,turbine_config.starter_rpm_start,NULL,NUMBER,true) ;
-	WSInputBox(req,I_MAXSTARTERRPM,turbine_config.starter_max_rpm,NULL,NUMBER,true) ;
-	WSInputBox(req,I_LIPO_ELEMENTS,turbine_config.lipo_elements,NULL,NUMBER,true) ;
-	WSInputBox(req,I_VMIN_START,turbine_config.Vmin_decollage,NULL,NUMBER,true) ;
+	WSInputBox(req,I_NAME,0,turbine_config.name,0,TEXT,true) ;
+	WSInputBox(req,I_GLOWPOWER,turbine_config.glow_power,NULL,0,NUMBER,true) ;
+	WSInputBox(req,I_RPMMAX,turbine_config.jet_full_power_rpm,NULL,0,NUMBER,true) ;
+	WSInputBox(req,I_RPMIDLE,turbine_config.jet_idle_rpm,NULL,0,NUMBER,true) ;
+	WSInputBox(req,I_RPMMIN,turbine_config.jet_min_rpm,NULL,0,NUMBER,true) ;
+	WSInputBox(req,I_TEMPSTART,turbine_config.start_temp,NULL,0,NUMBER,true) ;
+	WSInputBox(req,I_TEMPMAX,turbine_config.max_temp,NULL,0,NUMBER,true) ;
+	WSInputBox(req,I_DELAYACC,turbine_config.acceleration_delay,NULL,0,NUMBER,false) ;
+	WSInputBox(req,I_DELAYDEC,turbine_config.deceleration_delay,NULL,0,NUMBER,false) ;
+	WSInputBox(req,I_DELAYSTAB,turbine_config.stability_delay,NULL,0,NUMBER,true) ;
+	WSInputBox(req,I_PUMP1MAX,turbine_config.max_pump1,NULL,0,NUMBER,true) ;
+	WSInputBox(req,I_PUMP1MIN,turbine_config.min_pump1,NULL,0,NUMBER,true) ;
+	WSInputBox(req,I_PUMP2MAX,turbine_config.max_pump2,NULL,0,NUMBER,true) ;
+	WSInputBox(req,I_PUMP2MIN,turbine_config.min_pump2,NULL,0,NUMBER,true) ;
+	WSInputBox(req,I_VANNE1MAX,turbine_config.max_vanne1,NULL,0,NUMBER,true) ;
+	WSInputBox(req,I_VANNE2MAX,turbine_config.max_vanne2,NULL,0,NUMBER,true) ;
+	WSInputBox(req,I_RPMSTARTER,turbine_config.starter_rpm_start,NULL,0,NUMBER,true) ;
+	WSInputBox(req,I_MAXSTARTERRPM,turbine_config.starter_max_rpm,NULL,0,NUMBER,true) ;
+	WSInputBox(req,I_LIPO_ELEMENTS,turbine_config.lipo_elements,NULL,0,NUMBER,true) ;
+	WSInputBox(req,I_VMIN_START,0,NULL,turbine_config.Vmin_decollage,FLOAT,true) ;
 	
 	WSSaveBouton(req) ;
 	/*httpd_resp_sendstr_chunk(req, "<button name=\"save\" type=\"submit\" class=\"button bgrn\">Sauvegarde</button>") ;
@@ -1529,13 +1603,6 @@ static esp_err_t frontpage(httpd_req_t *req)
 	xTimerStop( xTimer60s,0) ;
     const char *filename = get_path_from_uri(filepath, req->uri, sizeof(filepath));
 	
-	/*if (req->method != HTTP_GET)
-    {
-		ESP_LOGI(TAG, "Non HTTP_GET request method : %d",req->method);
-		//ESP_LOGI(TAG, "frontpage req->uri=[%s]", req->uri);
-		handle_ws_req(req);
-	}*/
-
     if (!filename) 
     {
         ESP_LOGE(TAG, "Filename is too long");
@@ -1543,81 +1610,14 @@ static esp_err_t frontpage(httpd_req_t *req)
         httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Filename too long");
         return ESP_FAIL;
     }
-	//ESP_LOGI(TAG, "File : %s", filename);
-
-	/*if(strcmp(filename, "/configecu") == 0) 
-		configecu(req) ;
-	else if(strcmp(filename, "/configmoteur") == 0) 
-		configmoteur(req) ;
-	else if(strcmp(filename, "/calibrations") == 0) 
-		calibrations(req) ;
-	else if(strcmp(filename, "/starter_calibration") == 0) 
-		starter_calibration_page(req) ;
-	else if(strcmp(filename, "/stop_starter_calibration") == 0) 
-		stop_starter_calibration(req) ;
-	else if(strcmp(filename, "/save_st_calibration") == 0) 
-		write_nvs_turbine() ;
-		
-	else if(strcmp(filename, "/logs") == 0) 
-		logs(req) ;
-	else if(strcmp(filename, "/slider") == 0) 
-		slider(req) ;
-	else if(strcmp(filename, "/start") == 0) 
-		turbine.phase_fonctionnement = START ;
-	else if(strcmp(filename, "/stop") == 0) 
-		turbine.phase_fonctionnement = STOP ;
-	else if(strcmp(filename, "/curves.txt") == 0) 
-		curves_get_handler(req) ;
-	else if(strcmp(filename, "/logs.txt") == 0) 
-		logs_get_handler(req) ;
-	else if(strcmp(filename, "/favicon.ico") == 0) 
-		favicon_get_handler(req) ;
-	else if(strcmp(filename, "/wifi") == 0) 
-		wifi_get_handler(req) ;
-	else if(strcmp(filename, "/stopwifi") == 0) {
-		ESP_ERROR_CHECK(esp_wifi_stop() );
-		vTaskDelete( xWebHandle ); }
-	else if(strcmp(filename, "/gauges") == 0) 
-	{
-//		ESP_ERROR_CHECK( heap_trace_start(HEAP_TRACE_LEAKS) );
-		gauges_get_handler(req) ;
-		//i++ ;
-		//if(i>10)
-		//{
-		//	ESP_ERROR_CHECK( heap_trace_stop() );
-		//	heap_trace_dump();
-		//	i = 0 ;
-		//}
-	}
-	else if(strcmp(filename, "/readings") == 0) 
-	{
-		vTaskResume(xIMUHandle) ;
-		readings_get_handler(req) ;
-	}
-	else if(strcmp(filename, "/g_params") == 0) 
-		g_params_get_handler(req) ;
-	//else if(strcmp(filename, "/events") == 0) 
-	//	events_get_handler(req) ;
-	else if(strcmp(filename, "/upgrade") == 0) 
-		upgrade_get_handler(req) ;
-	else if(strcmp(filename, "/chart") == 0) 
-		chart_get_handler(req) ;
-	else if(strcmp(filename, "/chartdata") == 0) 
-		g_chartdata_get_handler(req) ;
-	// Courbe calibration du démarreur
-	else if(strcmp(filename, "/chart_starter_cal") == 0) 
-		g_chartstarter_get_handler(req) ;
-	// Websocket 
-	//else if(strcmp(filename, "/ws") == 0) 
-	//	handle_ws_req(req) ;
-	else if(strcmp(filename, "/") == 0 ) 
-	{*/
+	
 		// Frontpage
 	#ifdef IMU
 		vTaskSuspend(xIMUHandle);
 	#endif
 	send_head(req) ;
-	
+	httpd_resp_sendstr_chunk(req,"<div><h1 id=\"status\">Status</h1><h2 id=\"error\" style=\"color:#FF0000\";>Erreur</h2><p id=\"time\"></p></div>") ;
+	httpd_resp_sendstr_chunk(req,"<div style=width:450px;display:inline-block;>") ;
 	WSContentButton(req,BT_PARAMECU, true) ;
 	WSContentButton(req,BT_PARAM_MOTEUR, true) ;
 	WSContentButton(req,BT_INFORMATION, true) ;
@@ -1631,9 +1631,11 @@ static esp_err_t frontpage(httpd_req_t *req)
 	WSContentButton(req,BT_CUT_WIFI, true) ;
 	WSContentButton(req,BT_START_ENGINE, true) ;
 	WSContentButton(req,BT_STOP_ENGINE, true) ;
-	
-
+	httpd_resp_sendstr_chunk(req,"</div>") ;
 	Text2Html(req, "/html/footer.html");
+	httpd_resp_sendstr_chunk(req, "<script>") ;
+	Text2Html(req, "/html/script_status.js");
+	httpd_resp_sendstr_chunk(req, "</script>") ;
 	httpd_resp_sendstr_chunk(req, NULL); //fin de la page
 	//}
 
@@ -1959,9 +1961,6 @@ static esp_err_t download_get_handler(httpd_req_t *req)
                                              req->uri, sizeof(filepath));
 	
 	update_curve_file() ;
-	//ESP_LOGI(TAG,"filename : %s",filename) ;
-	//filename[strlen(filename)-3] = '\0' ;
-	//filepath[strlen(filepath)-3] = '\0' ;
     //ESP_LOGI(TAG,"filename : %s",filename) ;
 	if (!filename) {
         ESP_LOGE(TAG, "Filename is too long");

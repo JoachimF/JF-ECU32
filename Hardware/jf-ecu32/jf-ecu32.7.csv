@@ -1,45 +1,48 @@
-"Id";"Référence";"Empreinte";"Quantité";"Désignation";"Fournisseur et réf";
-1;"TDI1,GND1,TMS1,TCK1,TDO1";"PinHeader_1x01_P2.00mm_Vertical";5;"Conn_01x01_Male";;;
-2;"Q5,Q6,Q4,Q2";"TO-252-2";4;"QM6006D";;;
-3;"R4";"R_0603_1608Metric";1;"2.7K";;;
-4;"BOOT1";"C_0603_1608Metric";1;"BOOT";;;
-5;"C7,C1,C13";"C_0603_1608Metric";3;"1µF";;;
-6;"J16,J3,J13";"PinHeader_1x03_P2.54mm_Vertical";3;"PPM/PWM";;;
-7;"R3,R15,R13,R5,R16,R14";"R_0603_1608Metric";6;"10K";;;
-8;"R11,R7,R12,R10,R8,R9";"R_0603_1608Metric";6;"R";;;
-9;"J18";"PinHeader_1x03_P2.54mm_Vertical";1;"PUMP2";;;
-10;"J7";"PinHeader_1x03_P2.54mm_Vertical";1;"VANNE KERO";;;
-11;"J21";"JST_PH_B7B-PH-K_1x07_P2.00mm_Vertical";1;"Conn_01x07";;;
-12;"J4";"PinHeader_1x03_P2.54mm_Vertical";1;"STARTER";;;
-13;"J15";"PinHeader_1x03_P2.54mm_Vertical";1;"PUMP1";;;
-14;"J10";"PinHeader_1x02_P2.54mm_Vertical";1;"k";;;
-15;"J19";"PinHeader_1x02_P2.54mm_Vertical";1;"EN";;;
-16;"J9";"AMASS_XT30U-F_1x02_P5.0mm_Vertical";1;"STARTER";;;
-17;"R2,R1";"R_2512_6332Metric";2;"R020";;;
-18;"J6";"PinHeader_1x03_P2.54mm_Vertical";1;"VANNE KEROSTART";;;
-19;"D18";"D_MiniMELF";1;"BZV55C3V3";;;
-20;"J8";"AMASS_XT30U-M_1x02_P5.0mm_Vertical";1;"BATTERY 2S/3S";;;
-21;"U1";"ESP32-WROOM-32";1;"ESP32-WROOM-32D";;;
-22;"Q1,Q3,Q7,Q8";"SOT-23";4;"AO3400A";;;
-23;"U4";"SOT-223-3_TabPin2";1;"AMS1117-3.3";;;
-24;"J1";"PinHeader_1x03_P2.54mm_Vertical";1;"GAZ";;;
-25;"J17";"AMASS_XT30U-F_1x02_P5.0mm_Vertical";1;"PUMP2";;;
-26;"J5";"AMASS_XT30U-F_1x02_P5.0mm_Vertical";1;"GLOW";;;
-27;"J12";"PinHeader_1x03_P2.54mm_Vertical";1;"S.PORT";;;
-28;"C8,C3";"CP_Elec_5x3";2;"22µF";;;
-29;"J2";"PinHeader_1x03_P2.54mm_Vertical";1;"AUX";;;
-30;"J11";"PinHeader_1x03_P2.54mm_Vertical";1;"RPM";;;
-31;"C9,C2,C5,C6,C10,C4,C12,C11";"C_0603_1608Metric";8;"0.1µF";;;
-32;"J14";"AMASS_XT30U-F_1x02_P5.0mm_Vertical";1;"PUMP1";;;
-33;"R23,R6";"R_0603_1608Metric";2;"1K";;;
-34;"D9,D10,D15,D13,D7,D3";"D_SMA";6;"D_Schottky";;;
-35;"D1";"D_SMF";1;"SMF5V0A";;;
-36;"U7";"SOT-23-5";1;"OPA340NA";;;
-37;"U8";"SOT-23";1;"LM4040DBZ-2.5";;;
-38;"U3";"SOIC-8_3.9x4.9mm_P1.27mm";1;"MAX31855KASA";;;
-39;"R17,R20,R21,R18,R19";"R_0603_1608Metric";5;"20K";;;
-40;"R22";"R_0603_1608Metric";1;"500";;;
-41;"R24";"R_0603_1608Metric";1;"100K";;;
-42;"U2,U5";"SOP-16_4.4x10.4mm_P1.27mm";2;"4050";;;
-43;"U6";"SOT-223-3_TabPin2";1;"AMS1117-5.0";;;
-44;"U9";"SOT-23-8";1;"INA219AxDCN";;;
+Id;Référence;Empreinte;Quantité;Désignation;Fournisseur et réf
+4;BOOT1;C_0603_1608Metric;1;BOOT;
+5;C7,C1,C13;C_0603_1608Metric;3;1µF;
+28;C8,C3;CP_Elec_5x3;2;22µF;
+31;C9,C2,C5,C6,C10,C4,C12,C11;C_0603_1608Metric;8;0.1µF;
+35;D1;D_SMF;1;SMF5V0A;
+19;D18;D_MiniMELF;1;BZV55C3V3;
+34;D9,D10,D15,D13,D7,D3;D_SMA;6;D_Schottky;
+24;J1;PinHeader_1x03_P2.54mm_Vertical;1;GAZ;
+14;J10;PinHeader_1x02_P2.54mm_Vertical;1;k;
+30;J11;PinHeader_1x03_P2.54mm_Vertical;1;RPM;
+27;J12;PinHeader_1x03_P2.54mm_Vertical;1;S.PORT;
+32;J14;AMASS_XT30U-F_1x02_P5.0mm_Vertical;1;PUMP1;
+13;J15;PinHeader_1x03_P2.54mm_Vertical;1;PUMP1;
+6;J16,J3,J13;PinHeader_1x03_P2.54mm_Vertical;3;PPM/PWM;
+25;J17;AMASS_XT30U-F_1x02_P5.0mm_Vertical;1;PUMP2;
+9;J18;PinHeader_1x03_P2.54mm_Vertical;1;PUMP2;
+15;J19;PinHeader_1x02_P2.54mm_Vertical;1;EN;
+29;J2;PinHeader_1x03_P2.54mm_Vertical;1;AUX;
+11;J21;JST_PH_B7B-PH-K_1x07_P2.00mm_Vertical;1;Conn_01x07;
+12;J4;PinHeader_1x03_P2.54mm_Vertical;1;STARTER;
+26;J5;AMASS_XT30U-F_1x02_P5.0mm_Vertical;1;GLOW;
+18;J6;PinHeader_1x03_P2.54mm_Vertical;1;VANNE KEROSTART;
+10;J7;PinHeader_1x03_P2.54mm_Vertical;1;VANNE KERO;
+20;J8;AMASS_XT30U-M_1x02_P5.0mm_Vertical;1;BATTERY 2S/3S;
+16;J9;AMASS_XT30U-F_1x02_P5.0mm_Vertical;1;STARTER;
+22;Q1,Q3,Q7,Q8;SOT-23;4;AO3400A;X
+2;Q5,Q6,Q4,Q2;TO-252-2;4;QM6006D;
+8;R11,R7,R12,R10,R8,R9;R_0603_1608Metric;6;R;
+39;R17,R20,R21,R18,R19;R_0603_1608Metric;5;20K;
+17;R2,R1;R_2512_6332Metric;2;R020;X
+40;R22;R_0603_1608Metric;1;500;
+33;R23,R6;R_0603_1608Metric;2;1K;
+41;R24;R_0603_1608Metric;1;100K;
+7;R3,R15,R13,R5,R16,R14;R_0603_1608Metric;6;10K;
+3;R4;R_0603_1608Metric;1;2.7K;
+1;TDI1,GND1,TMS1,TCK1,TDO1;PinHeader_1x01_P2.00mm_Vertical;5;Conn_01x01_Male;
+21;U1;ESP32-WROOM-32;1;ESP32-WROOM-32D;X
+42;U2,U5;SOP-16_4.4x10.4mm_P1.27mm;2;4050;X
+38;U3;SOIC-8_3.9x4.9mm_P1.27mm;1;MAX31855KASA;
+23;U4;SOT-223-3_TabPin2;1;AMS1117-3.3;X
+43;U6;SOT-223-3_TabPin2;1;AMS1117-5.0;X
+36;U7;SOT-23-5;1;OPA340NA;X
+37;U8;SOT-23;1;LM4040DBZ-2.5;X R2A
+44;U9;SOT-23-8;1;INA219AxDCN;
+;;;;;
+0;1;2;3;;
+;;;4;;

@@ -40,7 +40,7 @@
 #define MIN_RPMSTARTER 0
 #define MIN_RPMMAXSTARTER 0
 #define MIN_LIPO_ELEMENTS 2
-#define MIN_VMIN_START 7
+#define MIN_VMIN_START 7.0
 
 #define MAX_NAME 20
 #define MAX_GLOWPOWER 255
@@ -60,8 +60,8 @@
 #define MAX_VANNE2MAX 255
 #define MAX_RPMSTARTER 10000
 #define MAX_RPMMAXSTARTER 30000
-#define MAX_VMIN_START 13
-#define MAX_LIPO_ELEMENTS 3
+#define MAX_VMIN_START 13.0F
+#define MAX_LIPO_ELEMENTS 3.0
 
 #define NBFrontpageButton 11
 #define NBParamEcuRadio 7
@@ -98,13 +98,13 @@ enum InputParamEng {
 } ;
 
 enum InputParamTyp{
-    NUMBER,TEXT
+    NUMBER,TEXT,FLOAT
 };
 
 void WSContentButton(httpd_req_t *req,uint32_t title_index, bool show) ;
 void WSRadio(httpd_req_t *req,uint32_t title_index,uint8_t param, bool show) ;
 void WSCheckBox(httpd_req_t *req,uint32_t title_index,uint8_t param, bool show) ;
-void WSInputBox(httpd_req_t *req,uint32_t title_index,uint32_t intparam,char *charparam, int type, bool show);
+void WSInputBox(httpd_req_t *req,uint32_t title_index,uint32_t intparam,char *charparam,float floatparam, int type, bool show);
 void WSSaveBouton(httpd_req_t *req) ;
 void WSRetourBouton(httpd_req_t *req) ;
 char* GetTextIndexed(char* destination, size_t destination_size, uint32_t index, const char* haystack) ;
