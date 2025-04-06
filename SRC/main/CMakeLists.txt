@@ -2,7 +2,8 @@ set(COMPONENT_SRCS "websocket.c" "imu.c" "simulator.c" "removed.c" "html.c" "cal
                      )
 set(COMPONENT_ADD_INCLUDEDIRS "."
     EMBED_TXTFILES ota/index.html
-    EMBED_FILES "upload_script.html")
+    EMBED_FILES "upload_script.html"
+    EMBED_FILES "logs_script.html")
 
 
 register_component()

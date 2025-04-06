@@ -202,7 +202,10 @@ void task_glow_current(void *pvParameter)
 
     ESP_ERROR_CHECK(ina219_calibrate(&dev, (float)10 / 1000.0f)); // Résistance de shunt 10mOhm
     ESP_LOGI(TAG, "INA219 initialized\n");
-    
+    /* First read ADC */
+    ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, ADC1_CHAN0, &adc_raw[0][0]));
+    voltage[0][0] = voltage[0][0]*4.90 ;
+    vTaskDelay(200 / portTICK_PERIOD_MS) ;
     
 
     while(1)
@@ -219,14 +222,15 @@ void task_glow_current(void *pvParameter)
         //printf("%fV %0.3fA %fW %fV\n",bus_voltage/1000.0,current,power,shunt_voltage);
         xSemaphoreGive(SEM_glow_current) ;
         //ESP_LOGI(TAG, "Func Glow current : %0.3fA", get_glow_current(&turbine.glow)) ;
+
         /* Battery voltage */
         ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, ADC1_CHAN0, &adc_raw[0][0]));
         //ESP_LOGI(TAG, "ADC%d Channel[%d] Raw Data: %d", ADC_UNIT_1 + 1, ADC1_CHAN0, adc_raw[0][0]);
         if (do_calibration1) {
             ESP_ERROR_CHECK(adc_cali_raw_to_voltage(adc1_cali_handle, adc_raw[0][0], &voltage[0][0]));
-            voltage[0][0] = voltage[0][0]*4.71 ;
+            voltage[0][0] = voltage[0][0]*4.90 ;
             //ESP_LOGI(TAG, "ADC%d Channel[%d] Cali Voltage: %d mV", ADC_UNIT_1 + 1, ADC1_CHAN0, voltage[0][0]);
-            volt = (get_vbatt(&turbine) * 3 + (float)(voltage[0][0])/1000) / 4 ;
+            volt = (get_vbatt(&turbine) + (float)(voltage[0][0])/1000) / 2 ;
             set_vbatt(&turbine, volt) ;
             //ESP_LOGI(TAG, "Output Voltage: %f mV",get_vbatt(&turbine));
         }
@@ -582,7 +586,7 @@ bool battery_check(void)
     //ESP_LOGI(TAG,"Batterie branché %d éléments",nb_lipo) ;
     volt = get_vbatt(&turbine) ;
     vmin = get_Vmin_decollage() ;
-
+    set_batOk(1) ;
     if(nb_lipo_conf != nb_lipo)
     {
         set_batOk(0) ;

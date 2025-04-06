@@ -22,6 +22,7 @@
 #include "calibration.h"
 #include "jf-ecu32.h"
 #include "inputs.h"
+#include "nvs_ecu.h"
 #include "esp_log.h"
 #include "freertos/queue.h"
 
@@ -67,7 +68,7 @@ void starter_calibration()
     while(get_RPM(&turbine) == 0 && error == 0) // Trouver le minimum PWM pour démarrer le moteur
     {
         set_power(&turbine.starter,pwm_perc) ;
-        vTaskDelay(100 / portTICK_PERIOD_MS);
+        vTaskDelay(200 / portTICK_PERIOD_MS);
         c_datas.data = get_RPM(&turbine) ;
         c_datas.label = pwm_perc ;
         c_datas.rpmstart = pwm_perc ;
@@ -90,7 +91,7 @@ void starter_calibration()
 
         #endif
 
-        vTaskDelay(100 / portTICK_PERIOD_MS);
+        //vTaskDelay(100 / portTICK_PERIOD_MS);
     }
     if(error != 0)
     {
@@ -111,11 +112,11 @@ void starter_calibration()
     ESP_LOGI(TAG, "Recherche de la valeur minimale de rotation du démarreur");
     #endif
 
-    while(get_RPM(&turbine) > 0 && error == 0) //Descendre le PWM pour trouver a quel moment le moteur s'arrête
+    while(get_RPM(&turbine) > 0 && error == 0) //Descendre le PWM pour trouver à quel moment le moteur s'arrête
     {
-         set_power(&turbine.starter,pwm_perc) ;
+        set_power(&turbine.starter,pwm_perc) ;
         pwm_perc -= 0.1 ;
-        vTaskDelay(100 / portTICK_PERIOD_MS);
+        vTaskDelay(500 / portTICK_PERIOD_MS);
         c_datas.data = get_RPM(&turbine) ;
         c_datas.label = pwm_perc ;
         c_datas.powermin = pwm_perc ;
@@ -183,7 +184,10 @@ void starter_calibration()
     turbine_config.starter_pwm_perc_start = pwm_perc_start ; // PWM à laquelle le démarreur commence a tourner
     turbine_config.starter_pwm_perc_min = pwm_perc_min ; // PWM à laquelle le démarreur cale
     turbine_config.starter_max_rpm = max_rpm ; // RPM max du démarreur
+    
     ESP_LOGI(TAG, "Fin de la tache calibration du démarreur");
+    write_nvs_turbine() ;
+    ESP_LOGI(TAG, "Sauvegarde des paramètres");
     starter_calibration_h = NULL ;
     vTaskDelay(1000 / portTICK_PERIOD_MS);
     //vQueueDelete(Q_Calibration_Values) ;

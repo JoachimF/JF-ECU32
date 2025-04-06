@@ -146,6 +146,7 @@ int find_value(char * key, char * parameter, char * value)
 
 static esp_err_t Text2Html(httpd_req_t *req, char * filename) {
 	ESP_LOGI(TAG, "Reading %s", filename);
+	/* CHercher l'erreur ici SPI crash quand MCPWM starter activé*/
 	FILE* fhtml = fopen(filename, "r");
 	if (fhtml == NULL) {
 		ESP_LOGE(TAG, "fopen fail. [%s]", filename);
@@ -410,11 +411,6 @@ static esp_err_t root_post_handler(httpd_req_t *req)
 		len = find_value("pwmSliderValue1=",content,param) ;
 		if(len > 0)
 		{
-			/*turbine.pump1.value = atoi(param) ;
-			if(turbine.pump1.config.ppm_pwm == PPM)
-				set_power_func_us(&turbine.pump1,atoi(param)) ;
-			else
-				set_power_func(&turbine.pump1,atof(param)/20) ;*/
 			set_power(&turbine.pump1,atof(param)) ;
 		}
 
@@ -422,28 +418,17 @@ static esp_err_t root_post_handler(httpd_req_t *req)
 		if(len > 0)
 		{
 			set_power(&turbine.pump2,atof(param)) ;
-			/*turbine.pump2.value = atoi(param) ;
-			if(turbine.pump2.config.ppm_pwm == PPM)
-				set_power_func_us(&turbine.pump2,atoi(param)) ;
-			else
-				set_power_func(&turbine.pump2,atof(param)/20) ;*/
 		}
 
 		len = find_value("pwmSliderValue3=",content,param) ;
 		if(len > 0)
 		{
 			set_power(&turbine.starter,atof(param)) ;
-			/*turbine.starter.value = atoi(param) ;
-			if(turbine.starter.config.ppm_pwm == PPM)
-				set_power_func_us(&turbine.starter,atoi(param)) ;
-			else
-				set_power_func(&turbine.starter,atof(param)/20) ;*/
 		}
 		//Vanne 1
 		len = find_value("pwmSliderValue4=",content,param) ;
 		if(len > 0)
 		{
-			//turbine.vanne1.value = atoi(param) ;
 			param_int32 = atoi(param) ;
 			if(param_int32 > turbine_config.max_vanne1)
 				param_int32 = turbine_config.max_vanne1 ;
@@ -457,8 +442,6 @@ static esp_err_t root_post_handler(httpd_req_t *req)
 			if(param_int32 > turbine_config.max_vanne2)
 				param_int32 = turbine_config.max_vanne2 ;
 			set_power_vanne(&turbine.vanne2,param_int32) ;
-			/*turbine.vanne2.value = atoi(param) ;
-			turbine.vanne2.set_power(&turbine.vanne2.config,atoi(param)) ;*/
 		}
 		// GLOW
 		len = find_value("pwmSliderValue6=",content,param) ;
@@ -468,8 +451,6 @@ static esp_err_t root_post_handler(httpd_req_t *req)
 			if(param_int32 > turbine_config.glow_power)
 				param_int32 = turbine_config.glow_power ;
 			set_power_glow(&turbine.glow,param_int32) ;
-			//turbine.glow.value = param_int32 ;	
-			//turbine.glow.set_power(&turbine.glow.config,param_int32) ;
 		}
 		//ESP_LOGI(TAG,"%s",content) ;
 		/* Send a simple response */
@@ -692,18 +673,18 @@ void save_configecu(httpd_req_t *req)
 	len = find_param_radio(R_PUMP1_TYP,buf,param) ;
 	if(len==1) {
 		if(*param == '0'){
-			config_ECU.output_pump1 = PPM ;
-		}else{
 			config_ECU.output_pump1 = PWM ;
+		}else{
+			config_ECU.output_pump1 = PPM ;
 		}
 	}
 	//len = find_value("output_starter=",buf,param) ; 
 	len = find_param_radio(R_STARTER_TYP,buf,param) ;
 	if(len==1) {
 		if(*param == '0'){
-			config_ECU.output_starter = PPM ;
-		}else{
 			config_ECU.output_starter = PWM ;
+		}else{
+			config_ECU.output_starter = PPM ;
 		}
 	}
 	//len = find_value("telem=",buf,param) ;
@@ -711,13 +692,16 @@ void save_configecu(httpd_req_t *req)
 	if(len==1) {
 		switch(*param){
 			case '0' : 
-			config_ECU.use_telem = FUTABA ;
+			config_ECU.use_telem = NONE ;
 			break ;
 			case '1' :
 			config_ECU.use_telem = FRSKY ;
 			break ;
 			case '2' :
-			config_ECU.use_telem = NONE ;
+			config_ECU.use_telem = FUTABA ;
+			break ;
+			case '3' : 
+			config_ECU.use_telem = HOTT ;
 			break ;
 		}
 	}
@@ -726,10 +710,10 @@ void save_configecu(httpd_req_t *req)
 	if(len==1) {
 		switch(*param){
 			case '0' :
-			config_ECU.output_pump2 = PPM ;
+			config_ECU.output_pump2 = PWM ;
 			break;
 			case '1' :
-			config_ECU.output_pump2 = PWM ;
+			config_ECU.output_pump2 = PPM ;
 			break;
 			case '2' :
 			config_ECU.output_pump2 = NONE ;
@@ -796,7 +780,7 @@ static esp_err_t configecu(httpd_req_t *req)
 	
 	
 	
-	httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Paramètre de l'ECU&nbsp;</b></legend><form method=\"GET\" action=\"configecu\"><p>") ;
+	httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Paramètre de l'ECU&nbsp;</b></legend><form method=\"GET\" action=\"c_ecu\"><p>") ;
 	/*Voie des gaz*/
 	WSRadio(req,R_THROTTLE_TYP,config_ECU.input_type,true);
 	WSRadio(req,R_GLOW_TYP,config_ECU.glow_type,true);
@@ -1193,6 +1177,7 @@ static esp_err_t slider(httpd_req_t *req)
 {
 	//ESP_LOGI(TAG, "slider_get_handler req->uri=[%s]", req->uri);
 	Text2Html(req, "/html/slider.html");
+	Text2Html(req, "/html/footer.html");
 	httpd_resp_sendstr_chunk(req, NULL); //fin de la page
 	return ESP_OK;
 }
@@ -1415,6 +1400,7 @@ static esp_err_t readings_get_handler(httpd_req_t *req){
 	static cJSON *myjson;
 	char status[50] ;
 	char errors[200] ;
+	char tmp[20] ;
 	#ifdef IMU
 	mpu6050_acce_value_t acce;	
 	#endif
@@ -1448,6 +1434,8 @@ static esp_err_t readings_get_handler(httpd_req_t *req){
 		cJSON_AddNumberToObject(myjson, "glow", get_glow_power(&turbine.glow));
 		//ESP_LOGI(TAG, "statut : %s", status);
 		cJSON_AddStringToObject(myjson, "status", status);
+		sprintf(tmp,"Batterie %0.2fV",get_vbatt(&turbine));
+		cJSON_AddStringToObject(myjson, "vbatt", tmp);
 		//ESP_LOGI(TAG, "get_errors");
 		get_errors(errors); 
 		cJSON_AddStringToObject(myjson, "error", errors);
@@ -1538,16 +1526,28 @@ static esp_err_t configs(httpd_req_t *req)
 		err = starter_calibration_page(req) ;
 	else if(strcmp(filename, "/c_stop_st_cal") == 0) 
 		err = stop_starter_calibration(req) ;
-	else if(strcmp(filename, "/c_save_st_cal") == 0) 
+	else if(strcmp(filename, "/c_save_st_cal") == 0) {
+		httpd_resp_set_status(req, "303 See Other");
+		httpd_resp_set_hdr(req, "Location", "/c_cals");
+		httpd_resp_sendstr_chunk(req, NULL); //fin de la page	
 		write_nvs_turbine() ;
-	else if(strcmp(filename, "/c_start") == 0) 
+	}
+	else if(strcmp(filename, "/c_start") == 0){
+		httpd_resp_set_status(req, "303 See Other");
+		httpd_resp_set_hdr(req, "Location", "/");
+		httpd_resp_sendstr_chunk(req, NULL); //fin de la page	
 		turbine.phase_fonctionnement = START ;
-	else if(strcmp(filename, "/c_stop") == 0) 
+	}
+	else if(strcmp(filename, "/c_stop") == 0) {
+		httpd_resp_set_status(req, "303 See Other");
+		httpd_resp_set_hdr(req, "Location", "/");
+		httpd_resp_sendstr_chunk(req, NULL); //fin de la page
 		turbine.phase_fonctionnement = STOP ;
+	}
 	else if(strcmp(filename, "/c_slider") == 0) 
 		slider(req) ;
-	else if(strcmp(filename, "/c_logs") == 0) 
-		logs(req) ;
+	//else if(strcmp(filename, "/c_logs") == 0) //ancien logs et curve
+	//	logs(req) ;
 	else if(strcmp(filename, "/c_slider") == 0) 
 		slider(req) ;
 	else if(strcmp(filename, "/c_curves.txt") == 0) 
@@ -1616,7 +1616,7 @@ static esp_err_t frontpage(httpd_req_t *req)
 		vTaskSuspend(xIMUHandle);
 	#endif
 	send_head(req) ;
-	httpd_resp_sendstr_chunk(req,"<div><h1 id=\"status\">Status</h1><h2 id=\"error\" style=\"color:#FF0000\";>Erreur</h2><p id=\"time\"></p></div>") ;
+	httpd_resp_sendstr_chunk(req,"<div><h1 id=\"status\">Status</h1><h2 id=\"error\" style=\"color:#FF0000\";>Erreur</h2></p></div>") ;
 	httpd_resp_sendstr_chunk(req,"<div style=width:450px;display:inline-block;>") ;
 	WSContentButton(req,BT_PARAMECU, true) ;
 	WSContentButton(req,BT_PARAM_MOTEUR, true) ;
@@ -1647,6 +1647,8 @@ esp_err_t start_server(const char *base_path, int port)
 {
 	
 	httpd_config_t config = HTTPD_DEFAULT_CONFIG();
+	config.max_open_sockets = 3 ;
+	config.core_id = 0 ;
 	config.stack_size = 16392 ; // Default 4K -> 20K
 	config.server_port = port;
 
@@ -1697,8 +1699,18 @@ esp_err_t start_server(const char *base_path, int port)
 		//.user_ctx  = server_data	// Pass server data as context
 	};
 	httpd_register_uri_handler(server, &_root_post_handler);
+	
 
 	/******** File server ********************/
+	/* URI handler for getting uploaded files */
+	httpd_uri_t logs_download = {
+		.uri       = "/logs*",  // Match all URIs of type /path/to/file
+		.method    = HTTP_GET,
+		.handler   = download_get_handler,
+		.user_ctx  = server_data    // Pass server data as context
+	};
+	httpd_register_uri_handler(server, &logs_download);
+
 	/* URI handler for getting uploaded files */
 	httpd_uri_t file_download = {
 		.uri       = "/html*",  // Match all URIs of type /path/to/file
@@ -1761,8 +1773,8 @@ void http_server_task(void *pvParameters)
     strlcpy(server_data->base_path, base_path,
             sizeof(server_data->base_path));
 
-    httpd_handle_t server = NULL;
-    httpd_config_t config = HTTPD_DEFAULT_CONFIG();
+    //httpd_handle_t server = NULL;
+    //httpd_config_t config = HTTPD_DEFAULT_CONFIG();
 	/*                                     */
 
 	ESP_LOGI(TAG, "Starting server on %s", url);
@@ -1813,6 +1825,7 @@ static esp_err_t http_resp_dir_html(httpd_req_t *req, const char *dirpath)
     char entrypath[FILE_PATH_MAX];
     char entrysize[16];
 	char URL[255] ;
+	char startwith[10] ;
     const char *entrytype;
 
     struct dirent *entry;
@@ -1833,14 +1846,27 @@ static esp_err_t http_resp_dir_html(httpd_req_t *req, const char *dirpath)
 
     /* Send HTML file header */
     send_head(req) ;
+
     /* Get handle to embedded file upload script */
 	
-    extern const unsigned char upload_script_start[] asm("_binary_upload_script_html_start");
-    extern const unsigned char upload_script_end[]   asm("_binary_upload_script_html_end");
-    const size_t upload_script_size = (upload_script_end - upload_script_start);
-
-    /* Add file upload form and script which on execution sends a POST request to /upload */
-    httpd_resp_send_chunk(req, (const char *)upload_script_start, upload_script_size);
+	
+    	extern const unsigned char upload_script_start[] asm("_binary_upload_script_html_start");
+    	extern const unsigned char upload_script_end[]   asm("_binary_upload_script_html_end");
+	
+		extern const unsigned char logs_script_start[] asm("_binary_logs_script_html_start");
+    	extern const unsigned char logs_script_end[]   asm("_binary_logs_script_html_end");
+	ESP_LOGI(TAG, "dirpath : %s", dirpath);
+	strlcpy(startwith,dirpath,6) ;
+	ESP_LOGI(TAG, "startwith : %s", startwith);
+	if(strcmp(startwith, "/html") == 0) {
+		const size_t upload_script_size = (upload_script_end - upload_script_start);
+		/* Add file upload form and script which on execution sends a POST request to /upload */
+		httpd_resp_send_chunk(req, (const char *)upload_script_start, upload_script_size);
+	} else if(strcmp(startwith, "/logs") == 0) {
+		const size_t logs_script_size = (logs_script_end - logs_script_start);
+		/* Add file upload form and script which on execution sends a POST request to /upload */
+		httpd_resp_send_chunk(req, (const char *)logs_script_start, logs_script_size);
+	}
 
     /* Send file-list table definition and column labels */
     httpd_resp_sendstr_chunk(req,
@@ -1883,7 +1909,7 @@ static esp_err_t http_resp_dir_html(httpd_req_t *req, const char *dirpath)
         httpd_resp_sendstr_chunk(req, "<form method=\"post\" action=\"/delete");
         httpd_resp_sendstr_chunk(req, URL);
         httpd_resp_sendstr_chunk(req, entry->d_name);
-        httpd_resp_sendstr_chunk(req, "\"><button type=\"submit\">Delete</button></form>");
+        httpd_resp_sendstr_chunk(req, "\" onsubmit=\"return confirm('Delete?')\"><button type=\"submit\" >Delete</button></form>");
         httpd_resp_sendstr_chunk(req, "</td></tr>\n");
     }
     closedir(dir);
@@ -1983,6 +2009,8 @@ static esp_err_t download_get_handler(httpd_req_t *req)
             return favicon_get_handler(req);
         } else if (strcmp(filename, "/html/?") == 0) {
             return index_html_get_handler(req);
+        } else if (strcmp(filename, "/logs/?") == 0) {
+            return index_html_get_handler(req);
         }
         ESP_LOGE(TAG, "Failed to stat file : %s", filepath);
         /* Respond with 404 Not Found */
@@ -2043,6 +2071,7 @@ static esp_err_t upload_post_handler(httpd_req_t *req)
     char filepath[FILE_PATH_MAX];
     FILE *fd = NULL;
     struct stat file_stat;
+	char startwith[7] ;
 
     /* Skip leading "/upload" from URI to get filename */
     /* Note sizeof() counts NULL termination hence the -1 */
@@ -2050,6 +2079,7 @@ static esp_err_t upload_post_handler(httpd_req_t *req)
                                              req->uri + sizeof("/upload") - 1, sizeof(filepath));
 	
 	ESP_LOGI(TAG, "upload filename : %s", filename);
+	strlcpy(startwith,filename,6) ;
     if (!filename) {
         /* Respond with 500 Internal Server Error */
         httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Filename too long");
@@ -2145,7 +2175,13 @@ static esp_err_t upload_post_handler(httpd_req_t *req)
 
     /* Redirect onto root to see the updated file list */
     httpd_resp_set_status(req, "303 See Other");
-    httpd_resp_set_hdr(req, "Location", "/html/");
+	if(strcmp(startwith, "/html") == 0) {
+    	httpd_resp_set_hdr(req, "Location", "/html/");
+	}
+	else if(strcmp(startwith, "/logs") == 0) {
+		httpd_resp_set_hdr(req, "Location", "/logs/");
+	}
+
 #ifdef CONFIG_EXAMPLE_HTTPD_CONN_CLOSE_HEADER
     httpd_resp_set_hdr(req, "Connection", "close");
 #endif
@@ -2158,6 +2194,7 @@ static esp_err_t delete_post_handler(httpd_req_t *req)
 {
     char filepath[FILE_PATH_MAX];
     struct stat file_stat;
+	char startwith[7] ;
 
     /* Skip leading "/delete" from URI to get filename */
     /* Note sizeof() counts NULL termination hence the -1 */
@@ -2168,7 +2205,7 @@ static esp_err_t delete_post_handler(httpd_req_t *req)
         httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Filename too long");
         return ESP_FAIL;
     }
-
+	strlcpy(startwith,filename,6) ;
     /* Filename cannot have a trailing '/' */
     if (filename[strlen(filename) - 1] == '/') {
         ESP_LOGE(TAG, "Invalid filename : %s", filename);
@@ -2189,7 +2226,12 @@ static esp_err_t delete_post_handler(httpd_req_t *req)
 
     /* Redirect onto root to see the updated file list */
     httpd_resp_set_status(req, "303 See Other");
-    httpd_resp_set_hdr(req, "Location", "/html/");
+	if(strcmp(startwith, "/html") == 0) {
+    	httpd_resp_set_hdr(req, "Location", "/html/");
+	}
+	else if(strcmp(startwith, "/logs") == 0) {
+		httpd_resp_set_hdr(req, "Location", "/logs/");
+	}
 #ifdef CONFIG_EXAMPLE_HTTPD_CONN_CLOSE_HEADER
     httpd_resp_set_hdr(req, "Connection", "close");
 #endif

@@ -46,8 +46,8 @@ enum glow_types {
     GAS,KERO
 };
 
-#define   PPM     0
-#define   PWM     1
+#define   PPM     1
+#define   PWM     0
 #define   SBUS    1
 #define   NONE    2
 #define   HOTT    3
@@ -79,6 +79,10 @@ enum glow_types {
 #define PWM_TIMER MCPWM_TIMER_0
 #define PPM_TIMER MCPWM_TIMER_1
 
+#define TESTGLOW_TIMEOUT 2000 // X10 pour avoir des millis
+#define IGNITE_TIMEOUT 10000 //
+#define PREHEAT_TIMEOUT 20000 //
+
 enum yesno_type {
     NO,YES
 };
@@ -101,8 +105,12 @@ typedef struct _BITsconfigECU_{
 
 
 enum phases {
-    WAIT,START,GLOW,KEROSTART,PREHEAT,RAMP,IDLE,PURGE,COOL,STOP,RUN
+    WAIT,START,KEROSTART,IDLE,PURGE,COOL,STOP,RUN
  };
+
+enum startphases {
+    INIT,TESTGLOW,IGNITE,PREHEAT,RAMP
+};
 
 enum manche_de_gaz {
     COUPE,RALENTI,MIGAZ,PLEINGAZ
@@ -229,6 +237,8 @@ typedef struct _engine_ {
   _VALVE_t vanne1 ; //Vanne KEROSTART/GAZ
   _VALVE_t vanne2 ; //Vanne KERO
   uint8_t phase_fonctionnement ;
+  uint8_t phase_start ;
+  uint32_t phase_start_begin ;
   uint8_t position_gaz ;
   bool batOk ;
   float Vbatt ;
@@ -271,7 +281,7 @@ void linear_interpolation(uint32_t x0,uint32_t y0,uint32_t x1,uint32_t y1,uint32
 void set_kero_pump_target(uint32_t RPM) ;
 
 void update_curve_file(void) ;
-void head_logs_file(void) ;
+void head_logs_file(char *logname) ;
 
 void create_timers(void) ;
 void start_timers(void) ;
@@ -285,8 +295,8 @@ void ecu_task(void * pvParameters ) ;
 void inputs_task(void * pvParameters) ;
 
 void init_mcpwm(void) ;
-void set_power_func_us(_PUMP_t *config ,float value) ;
-void set_power_func(_PUMP_t *config ,float value) ;
+//void set_power_func_us(_PUMP_t *config ,float value) ;
+//void set_power_func(_PUMP_t *config ,float value) ;
 void set_power(_PUMP_t *starter ,float value) ;
 void set_power_vanne(_VALVE_t *vanne, uint32_t value) ;
 void set_power_glow(_VALVE_t *vanne, uint32_t value) ;

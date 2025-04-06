@@ -1,6 +1,36 @@
 <div style="text-align:right;font-size:11px;">
     <hr>
-    <a href="https://github.com/JoachimF/JF-ECU32" target="_blank" style="color:#aaa;">JF-ECU32 0.11 par Joachim Franken</a>
+    <table>
+        <colgroup>
+            <col width="50%">
+            <col width="50%">
+        </colgroup>
+        <tr>
+            <td><div id="Vbatt_foo">Vbatt</div>    <div id="time_foo">time</div></td>
+            <td><a href="https://github.com/JoachimF/JF-ECU32" target="_blank" style="color:#aaa;">JF-ECU32 0.11 par Joachim Franken</a></td>
+        </tr>
+    </table>
 </div>
 
 </div></body></html>
+<script>
+window.addEventListener("load", getBatt);
+
+function getBatt() {
+	var xhr = new XMLHttpRequest();
+	xhr.onreadystatechange = function () {
+		if (this.readyState == 4 && this.status == 200) 
+		{
+			var myObj = JSON.parse(this.responseText);
+			//console.log(myObj);
+			var vbatt = myObj.vbatt;
+            var time = myObj.time;
+			document.getElementById('Vbatt_foo').innerHTML = vbatt;
+			document.getElementById('time_foo').innerHTML = time;
+		}
+	};
+	xhr.open("GET", "/c_readings", true);
+	xhr.send();
+}
+setInterval(getBatt,1000) ;
+</script>

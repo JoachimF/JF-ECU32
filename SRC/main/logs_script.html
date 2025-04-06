@@ -1,7 +1,7 @@
 <table class="fixed" border="0">
     <col width="250px" /><col width="300px" />
     <tr><td>
-        <h2>JF-ECU32 File Server</h2>
+        <h2>JF-ECU32 File Logs</h2>
     </td><td>
         <table border="0">
             <tr>
@@ -29,7 +29,7 @@
 <script>
 function setpath() {
     var default_path = document.getElementById("newfile").files[0].name;
-    document.getElementById("filepath").value = "html/" + default_path;
+    document.getElementById("filepath").value = "logs/" + default_path;
 }
 function upload() {
     var filePath = document.getElementById("filepath").value;

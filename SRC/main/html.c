@@ -64,7 +64,7 @@ const char htmlBoutonFrontpage[]  =
 
 const char BoutonFrontpageAction[]  =
   "c_ecu|c_moteur|"
-  "c_info|c_logs|c_wifi|c_slider|c_gauges|c_cals|c_st_cal|c_stop_st_cal|c_save_st_cal|"
+  "c_info|logs/|c_wifi|c_slider|c_gauges|c_cals|c_st_cal|c_stop_st_cal|c_save_st_cal|"
   "c_chart|"
   "c_start|c_stop|html/|c_upgrade|c_stopwifi";
 

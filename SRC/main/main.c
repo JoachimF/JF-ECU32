@@ -22,6 +22,7 @@
 //#include "esp_heap_trace.h"
 #include <esp_ota_ops.h>
 #include <esp_chip_info.h>
+#include <dirent.h>
 
 #include "jf-ecu32.h"
 #include "http_server.h"
@@ -276,10 +277,15 @@ void app_main()
 
 	// Initialize SPIFFS
 	ESP_LOGI(TAG, "Initializing SPIFFS");
-	if (mountSPIFFS("/html", "storage", 6) != ESP_OK)
+	if (mountSPIFFS("/html", "storage", 5) != ESP_OK)
 	{
 		ESP_LOGE(TAG, "SPIFFS mount failed");
 		while(1) { vTaskDelay(1); }
+	}
+	if (mountSPIFFS("/logs", "logs", 5) != ESP_OK)
+	{
+		ESP_LOGE(TAG, "SPIFFS mount failed");
+		//while(1) { vTaskDelay(1); }
 	}
 
 	// Create Queue
@@ -317,12 +323,12 @@ void app_main()
 	xTaskCreate(http_server_task, "HTTP", 1024*6, (void *)cparam0, 2, &xWebHandle);
 	configASSERT( xWebHandle ) ;
 	
-	head_logs_file();
+	//head_logs_file();
 	
 	ESP_LOGI(TAG, "Initializing Task Log");
 	xTaskCreate(log_task, "LOG", 1024*6, NULL, 2, &xlogHandle);
 	configASSERT( xlogHandle );
-	vTaskSuspend( xlogHandle ); 
+	//vTaskSuspend( xlogHandle ); 
 	
 	ESP_LOGI(TAG, "Initializing Task ECU");
 	xTaskCreatePinnedToCore(ecu_task, "ECU", 4096, NULL, (configMAX_PRIORITIES -2 )	|( 1UL | portPRIVILEGE_BIT ), &xecuHandle,1);
@@ -354,10 +360,10 @@ void app_main()
 	#endif
 	
 	ESP_LOGI(TAG, "Initializing WebSocket Task\n");  // Glow current
-	xTaskCreatePinnedToCore(ws_task, "WS_TASK", configMINIMAL_STACK_SIZE * 8, NULL, (configMAX_PRIORITIES -1 )|( 1UL | portPRIVILEGE_BIT ), &xWSHandle,1);
+	xTaskCreatePinnedToCore(ws_task, "WS_TASK", configMINIMAL_STACK_SIZE * 8, NULL, (configMAX_PRIORITIES -1 )|( 1UL | portPRIVILEGE_BIT ), &xWSHandle,0);
 	vTaskSuspend(xWSHandle);
 
-    ESP_LOGI(TAG, "Initializing INA219 + ADC Task\n");  // Glow current
+    ESP_LOGI(TAG, "Initializing INA219 + ADC Task\n");  // Glow current + battery voltage
     SEM_glow_current = xSemaphoreCreateMutex();
     xTaskCreatePinnedToCore(task_glow_current, "GLOW Current", configMINIMAL_STACK_SIZE * 8, NULL, (configMAX_PRIORITIES -1 )|( 1UL | portPRIVILEGE_BIT ), &task_glow_current_h,1);
     vTaskSuspend(task_glow_current_h);
@@ -366,7 +372,7 @@ void app_main()
 	/* Htop */
 
 	/* Demarrage des taches*/
-	//xSemaphoreGive(ecu_task_start) ;
+	xSemaphoreGive(ecu_task_start) ;
 	xSemaphoreGive(http_task_start) ;
 	vTaskResume(task_glow_current_h);	
 	//xSemaphoreGive(log_task_start) ;
@@ -377,6 +383,7 @@ void app_main()
 			write_nvs_turbine() ;
 	}
 	battery_check() ;
+	set_power(&turbine.starter,0) ;
 	
 	
 	//turbine.EGT = 1000 ;

@@ -11,7 +11,7 @@ function getReadings() {
             var time = myObj.time;
 			document.getElementById('status').innerHTML = status;
 			document.getElementById('error').innerHTML = error;
-			document.getElementById('time').innerHTML = time;
+			//document.getElementById('time').innerHTML = time;
 		}
 	};
 	xhr.open("GET", "/c_readings", true);
