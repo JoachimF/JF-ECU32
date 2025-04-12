@@ -106,6 +106,14 @@ uint32_t get_gaz(_engine_t * engine) ;
 uint32_t get_aux(_engine_t * engine) ;
 uint32_t get_RPM(_engine_t * engine) ;
 uint32_t get_EGT(_engine_t * engine) ;
+
+/*Gestion des deltas*/
+void set_delta_RPM(_engine_t * engine,int32_t) ;
+int32_t get_delta_RPM(_engine_t * engine) ;
+void set_delta_EGT(_engine_t * engine,int32_t) ;
+int32_t get_delta_EGT(_engine_t * engine) ;
+
+uint8_t get_WDT_RPM(_engine_t * engine) ;
 float get_GLOW_CURRENT(_engine_t * engine) ;
 #ifdef DS18B20
 void init_ds18b20(void) ;

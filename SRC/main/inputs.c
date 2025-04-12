@@ -134,26 +134,31 @@ static void IRAM_ATTR gpio_isr_handler(void* arg)
     static uint32_t rpm_temp ;
     //static BaseType_t xHigherPriorityTaskWoken;
     gptimer_get_raw_count(gptimer, &period) ;
-    if(period > 200)
+    gptimer_set_raw_count(gptimer, 0) ;
+
+    period_tmp = (period + (3*turbine.RPM_period))/4 ; //filtre
+    turbine.RPM_period  = period_tmp ;
+
+    if(turbine.RPM_period > 200 && turbine.RPM_period < 200000)
     {
-            gptimer_set_raw_count(gptimer, 0) ;
             /*if(xSemaphoreTakeFromISR(xRPMmutex,&xHigherPriorityTaskWoken ) == pdTRUE)
             {*/
                 //turbine.RPM_period = period ; 
-            period_tmp = (period + (3*turbine.RPM_period))/4 ; //filtre
-            turbine.RPM_period  = period_tmp ;
+            //period_tmp = (period + (3*turbine.RPM_period))/4 ; //filtre
+            //turbine.RPM_period  = period_tmp ;
 
-            if(period > 0 )
+            //if(period > 0 )
                 rpm_temp = 60000000 / period ;
-            else
-                rpm_temp = 0 ;
+            //else
+            //    rpm_temp = 0 ;
             turbine.RPM = rpm_temp ;
                 //xSemaphoreGiveFromISR(xRPMmutex,&xHigherPriorityTaskWoken) ;
             /*}
             turbine.WDT_RPM = 1 ;*/
-            turbine.WDT_RPM = 1 ;
+            
     }
-    turbine.RPM_sec++ ;
+    turbine.WDT_RPM = 5 ;
+    turbine.RPM_Pulse++ ;
 }
 
 BaseType_t high_task_wakeup = pdTRUE;
@@ -301,14 +306,18 @@ void task_egt(void *pvParameter)
             if (oc) add_error_msg(E_K,"K not connected");
             //ESP_LOGI(TAG, "Temperature: %.2f°C, cold junction temperature: %.4f°C", tc_t, cj_t);
             //ESP_LOGI("wifi", "free Heap:%d,%d", esp_get_free_heap_size(), heap_caps_get_free_size(MALLOC_CAP_8BIT));*/
-            turbine.EGT = (turbine.EGT + tc_t)/2 ;
+            turbine.EGT = (turbine.EGT + tc_t)/2 ; //filtre
             xSemaphoreGive(SEM_EGT) ;
         }
         #ifdef DS18B20
         if(turbine.ds18b20_device_num > 0)
             ds18b20_get_temperature(turbine.ds18b20s[0],&turbine.DS18B20_temp) ;
         #endif
-        vTaskDelay(pdMS_TO_TICKS(200));
+        for(int i=9; i>0; i--)
+            turbine.EGTs[i] = turbine.EGTs[i-1] ;
+        turbine.EGTs[0] = get_EGT(&turbine) ;
+        set_delta_EGT(&turbine,((turbine.EGTs[0]-turbine.EGTs[9])+get_delta_EGT(&turbine))/2) ;
+        vTaskDelay(pdMS_TO_TICKS(100));
     }
 }
 
@@ -444,17 +453,23 @@ void init_inputs(void)
     return 0 ;
 }*/
 
+/* Get WDT_RPM */
+uint8_t get_WDT_RPM(struct _engine_ * engine)
+{
+    uint8_t WDT_tmp ;
+    gpio_intr_disable(RPM_PIN) ;
+    WDT_tmp = engine->WDT_RPM ;
+    gpio_intr_enable(RPM_PIN) ;
+    return WDT_tmp ;
+
+}
 /*Remet à 0 les RPM par manque d'impulsion */
 void Reset_RPM() 
 {
-    //ESP_LOGI(TAG,"Reset RPM") ;
-    /*if(xSemaphoreTake(xRPMmutex,( TickType_t ) 10) == pdTRUE )
-    {*/
-        turbine.RPM_period = 0 ;
-        turbine.RPM = 0 ;
-    /*    xSemaphoreGive(xRPMmutex) ;
-        //ESP_LOGI(TAG,"Reset RPM mutex") ;
-    }*/
+    gpio_intr_disable(RPM_PIN) ;
+    turbine.RPM_period = 0 ;
+    turbine.RPM = 0 ;
+    gpio_intr_enable(RPM_PIN) ;
 }
 
 /* Renvoie la valeur du manche de gaz */
@@ -477,7 +492,6 @@ uint32_t get_RPM(struct _engine_ * engine)
     rpm_tmp = engine->RPM ;
     gpio_intr_enable(RPM_PIN) ;
     return rpm_tmp ;
-
 }
 
 /* Renvoie la valeur des EGT */
@@ -486,6 +500,27 @@ uint32_t get_EGT(struct _engine_ * engine)
     return engine->EGT ;
 }
 
+
+/*Gestion des deltas*/
+void set_delta_RPM(_engine_t * engine,int32_t delta)
+{
+    engine->RPM_delta = delta ;
+}
+
+int32_t get_delta_RPM(_engine_t * engine) 
+{
+    return engine->RPM_delta ;
+}
+
+void set_delta_EGT(_engine_t * engine, int32_t delta) 
+{
+    engine->EGT_delta = delta ;
+}
+
+int32_t get_delta_EGT(_engine_t * engine)
+{
+    return engine->EGT_delta ;
+}
 
 /*---------------------------------------------------------------
         ADC Calibration

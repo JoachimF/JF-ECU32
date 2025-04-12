@@ -56,6 +56,7 @@ TaskHandle_t xecuHandle ;
 TaskHandle_t xinputsHandle ;
 
 //Timers
+TimerHandle_t xTimer10ms ;
 TimerHandle_t xTimer100ms ;
 TimerHandle_t xTimer1s ;
 TimerHandle_t xTimer60s ;
@@ -67,12 +68,15 @@ TimerHandle_t xTimer60s ;
 SemaphoreHandle_t log_task_start;
 SemaphoreHandle_t ecu_task_start;
 
+//Events
+EventGroupHandle_t xLogEventGroup;
+
 static const char *TAG = "ECU";
 
 bool isEngineRun(void)
 {
     uint8_t phase = turbine.phase_fonctionnement ;
-    if(phase ==  KEROSTART || phase == PREHEAT || phase == RAMP || phase == IDLE || phase == RUN)
+    if(phase ==  KEROSTART || phase == IDLE || phase == RUN || phase == START )
         return 1;
     else
         return 0 ;
@@ -571,105 +575,141 @@ void update_curve_file(void)
 }
 
 
-void head_logs_file(char *logname)
+void head_logs_file(FILE *fd)
 {
-    FILE *fd = NULL;
-	char FileName[FILE_PATH_MAX] ;
-    sprintf(FileName,"/logs/%s",logname) ;
-    fd = fopen(logname, "a");
 	if (!fd) {
-       ESP_LOGI("File", "Failed to read existing file : %s",logname);
+       ESP_LOGI("File", "Failed to open file");
     } else {
-        fprintf(fd,"Num;Time;RPM;RPMDelta;RPMPeriod;EGT;Pompe1;Cible Pompe1;Pompe2;Glow;Vanne1;Vanne2;Voie Gaz;Voie Aux;Vbatt;Glow current;Stater;ErrorMsg;PhaseF;PhaseS;PhaseSB\n");
-        fclose(fd);
+        fprintf(fd,"Time;RPM;RPMDelta;RPMPeriod;EGT;EGT_delta;Pompe1;Cible Pompe1;Pompe2;Glow;Vanne1;Vanne2;Voie Gaz;Voie Aux;Vbatt;Glow current;Stater;ErrorMsg;PhaseF;PhaseS\n");
     }
 }
 
-void update_logs_file(char *logname)
-{
-    FILE *fd = NULL;
-	char FileName[FILE_PATH_MAX] ;
-    sprintf(FileName,"/logs/%s",logname) ;
+void update_logs_file(FILE *fd)
+{   
     uint8_t minutes,secondes ;
+    char errors[100] ;
+
     get_time_up(&turbine,&secondes,&minutes,NULL) ;
 
-    fd = fopen(FileName, "a");
+/*    fd = fopen(logpath, "a");
     if (!fd) {
         ESP_LOGI("File", "Failed to read existing file : logs.txt");
-    } else {
-        fprintf(fd,"%d;%02d:%02d;%06ld;%03ld;%04ld;%04ld;%04ld;%03d;%03d;%03d;%04ld;%04ld\n", turbine_config.log_count,minutes,secondes,turbine.RPM,turbine.EGT,
-                                                                                            turbine.pump1.value,turbine.pump1.target,turbine.pump2.value,turbine.glow.value,
-                                                                                            turbine.vanne1.value,turbine.vanne2.value,turbine.GAZ,turbine.Aux);   
-
-        fclose(fd);                                                                                            
-    }
+    } else {*/
+            get_errors(errors) ;
+               /*Time;RPM;RPMDelta;RPMPeriod;EGT;EGT_Delta;Pompe1;Cible Pompe1;Pompe2;Glow;Vanne1;Vanne2;Voie Gaz;Voie Aux;Vbatt;Glow current;Stater;ErrorMsg;PhaseF;PhaseS;PhaseSB\n"*/
+            fprintf(fd,"%02u:%02u;%lu;%ld;%llu;%lu;%ld;%f;Cible Pompe1;%f;%u;%u;%u;%lu;%lu;%0.2f;%0.3f;%0.2f;%s;%d;%d\n",
+                    minutes,secondes,get_RPM(&turbine),get_delta_RPM(&turbine),turbine.RPM_period,get_EGT(&turbine),get_delta_EGT(&turbine),
+                    get_pump_power_float(&turbine.pump1),get_pump_power_float(&turbine.pump2),get_glow_power(&turbine.glow),get_vanne_power(&turbine.vanne1),get_vanne_power(&turbine.vanne2),
+                    get_gaz(&turbine),get_aux(&turbine),get_vbatt(&turbine),get_glow_current(&turbine.glow),get_starter_power(&turbine.starter),errors,turbine.phase_fonctionnement,
+                    turbine.phase_start
+            );
+/*        fclose(fd);                                                                                            
+    }*/
 }
 
 void log_task( void * pvParameters )
 {
+    
+    EventBits_t uxBits;
+    const TickType_t xTicksToWait = 100 / portTICK_PERIOD_MS;
+
     char entrypath[FILE_PATH_MAX];
     char entrysize[16];
     char filetmp[10] ;
     char *point;
     char *log_number ;
-    uint8_t number ;
+    uint8_t number = 0;
     uint8_t last_number = 0 ;
     uint8_t first_number = 255 ;
     char last_log[10] ;
     char first_log[10] ;
     char startwith[6] ;
-    char newLog[50] ;
+    char newLog[FILE_PATH_MAX] ;
+    
 
     struct dirent *entry;
     FILE *fd = NULL;
     const char *entrytype;
-
-    xSemaphoreTake(log_task_start, portMAX_DELAY);
+    
+    turbine.log_started = 0 ;
+    //xSemaphoreTake(log_task_start, portMAX_DELAY);
  	ESP_LOGI(TAG, "Start Logtask");
+
+     
+     // Was the event group created successfully?
+    if( xLogEventGroup == NULL )
+    {
+        ESP_LOGE(TAG, "Fail to create Log event");
+    }
 
     /*cherche le dernier log*/
     DIR *dir = opendir("/logs/");
     const size_t dirpath_len = strlen("/logs/");
-    while ((entry = readdir(dir)) != NULL) {
-        entrytype = (entry->d_type == DT_DIR ? "directory" : "file");
-        ESP_LOGI(TAG, "Found %s : %s (%s bytes)", entrytype, entry->d_name, entrysize);
-        if(entry->d_type != DT_DIR) //Fichier
+
+    while(1) {
+        /* Wait for start log*/
+        uxBits = xEventGroupGetBits(xLogEventGroup);
+
+        if( uxBits == 1 && turbine.log_started == 0 ) // Start logging ?
         {
-            strlcpy(startwith,entry->d_name,4) ;
-            if(strcmp(startwith, "log") == 0) {
-                strcpy(filetmp,entry->d_name);
-                point = strstr(entry->d_name,".txt") ;
-                *point = '\0' ;
-                log_number = filetmp + 3 ;
-                number = atoi(log_number) ;
-                if(number > last_number) {
-                    last_number = number ;
-                    strcpy(last_log,entry->d_name);
+            ESP_LOGI("LOG", "New Log");
+            turbine.log_started = 5 ;
+            while ((entry = readdir(dir)) != NULL) {
+                entrytype = (entry->d_type == DT_DIR ? "directory" : "file");
+                //ESP_LOGI(TAG, "Found %s : %s (%s bytes)", entrytype, entry->d_name, entrysize);
+                if(entry->d_type != DT_DIR) //Fichier
+                {
+                    strlcpy(startwith,entry->d_name,4) ;
+                    if(strcmp(startwith, "log") == 0) {
+                        strcpy(filetmp,entry->d_name);
+                        point = strstr(entry->d_name,".csv") ;
+                        if(point) { //Si la fin est trouvée
+                            *point = '\0' ;
+                            log_number = filetmp + 3 ;
+                            number = atoi(log_number) ;
+                            if(number > last_number) {
+                                last_number = number ;
+                                strcpy(last_log,entry->d_name);
+                            }
+                            if(number < first_number && number > 0) {
+                                first_number = number ;
+                                strcpy(first_log,entry->d_name);
+                            }
+                        }
+                        ESP_LOGI(TAG, "%s : number %d",entry->d_name, number);
+                    }
                 }
-                if(number < first_number && number > 0) {
-                    first_number = number ;
-                    strcpy(first_log,entry->d_name);
-                }
-                ESP_LOGI(TAG, "%s : number %d",entry->d_name, number);
+            }
+            ESP_LOGI(TAG,"Last LOG : %s - First LOG %s",last_log, first_log);
+            number = last_number+1 ;
+            sprintf(newLog,"/logs/log%d.csv",number) ;
+            fd = fopen(newLog, "w");
+            if (fd) {
+                head_logs_file(fd) ;
             }
         }
-    }
-    ESP_LOGI(TAG,"Last LOG : %s - First LOG %s",last_log, first_log);
-    number = last_number+1 ;
-    sprintf(newLog,"/logs/log%d.txt",number) ;
-    fd = fopen(newLog, "w");
-    if (!fd) {
-        ESP_LOGI("File", "Failed to open file : curves.txt");       
-    } else {
-        fclose(fd) ;
-        head_logs_file(newLog) ;
-    }
-    while(1) {
-        //ESP_LOGI("LOG", "New Log");
 
-        //update_logs_file("/logs/") ;
+        if( turbine.log_started >= 1 ) // Start logging
+        {
+            if(fd)
+                update_logs_file(fd) ;
+        }
         
-        vTaskDelay( 500 / portTICK_PERIOD_MS);
+        if( uxBits == 0 ) //Stop logging
+        {
+            if(turbine.log_started > 0 ) {
+                ESP_LOGI("LOG", "End Log");
+                turbine.log_started-- ;
+            } else {
+                if(fd){
+                    ESP_LOGI("LOG", "Close Log File");
+                    fclose(fd);
+                    fd = NULL ;
+                }
+                    
+            }
+        } 
+        vTaskDelay( pdMS_TO_TICKS(250));
     }
     //ESP_LOGI(TAG, "finish");
 	vTaskDelete(xlogHandle);
@@ -682,60 +722,86 @@ void start_timers(void)
     xTimerStart( xTimer100ms, 0 ) ;
     xTimerStart( xTimer1s, 0 ) ;
     xTimerStart( xTimer60s, 0 ) ;
+    xTimerStart( xTimer10ms, 0 ) ;
+}
+
+void vTimer10msCallback( TimerHandle_t pxTimer ) //toutes les 100 millisecondes
+{
 }
 
 void vTimer100msCallback( TimerHandle_t pxTimer ) //toutes les 100 millisecondes
 {
-    turbine.RPMs[0] = turbine.RPM ;
-    for(int i=1; i<9; i++)
-        turbine.RPMs[i] = turbine.RPMs[i+1] ;
-
-    turbine.EGTs[0] = turbine.EGT ;
-    for(int i=1; i<9; i++)
-        turbine.EGTs[i] = turbine.EGTs[i+1] ;
+    int32_t delta_raw ;
+    int32_t delta_filter ;
+    for(int i=9; i>0; i--)
+        turbine.RPMs[i] = turbine.RPMs[i-1] ;
+    turbine.RPMs[0] = get_RPM(&turbine) ;
+    delta_raw = turbine.RPMs[0] - turbine.RPMs[9] ;
+    delta_filter = (delta_raw + get_delta_RPM(&turbine)) / 2  ;
+    set_delta_RPM(&turbine,delta_filter) ;
+    
+    //printf("\ndelta_raw : %ld delta_filter : %ld get_delta %ld",delta_raw,delta_filter,get_delta_RPM(&turbine)) ;
+    /* zero rpm detection*/
+    if(get_WDT_RPM(&turbine) > 0)
+    {
+        gpio_intr_disable(RPM_PIN) ;
+        turbine.WDT_RPM--;
+        gpio_intr_enable(RPM_PIN) ;
+    }
+    else
+        Reset_RPM() ;
+    
+    //for(int i=0; i<8; i++)
+    //    turbine.EGTs[i] = turbine.EGTs[i+1] ;
+    //turbine.EGTs[0] = get_EGT(&turbine) ;
 }
 
 void vTimer1sCallback( TimerHandle_t pxTimer ) //toutes les secondes
 {
     // Mutex sur le temps d'allumage de l'ECU
-    static uint32_t rpm_prec = 0 ;
-    static uint32_t egt_prec = 0 ;
+    //static uint32_t rpm_prec = 0 ;
+    //static uint32_t egt_prec = 0 ;
     
-    /*if( xSemaphoreTake(xTimeMutex,( TickType_t ) 10) == pdTRUE ) {
-        turbine.secondes++ ;
-        if(turbine.secondes > 59) {
-            turbine.secondes = 0 ;
-            turbine.minutes++ ;
-        }
-        //ESP_LOGI(TAG,"%02d:%02d",turbine.minutes,turbine.secondes) ;
-    }
-    xSemaphoreGive(xTimeMutex) ;*/
     turbine.time++ ;
     if(isEngineRun())
         turbine.time_up++ ;
+    else
+        turbine.time_up = 0 ;
     //ESP_LOGI(TAG,"secondes : %ld",turbine.time) ;
-    set_delta_RPM(&turbine,get_RPM(&turbine)-rpm_prec) ;
-    set_delta_EGT(&turbine,get_EGT(&turbine)-egt_prec) ;
+    //set_delta_RPM(&turbine,get_RPM(&turbine)-rpm_prec) ;
+    //set_delta_EGT(&turbine,get_EGT(&turbine)-egt_prec) ;
     
-    rpm_prec = get_RPM(&turbine) ;
-    egt_prec = get_EGT(&turbine) ;
+    //rpm_prec = get_RPM(&turbine) ;
+    //egt_prec = get_EGT(&turbine) ;
    
+    /*
+    printf("\nEGTs : ") ;
+    for(int i = 0;i<10;i++)
+    {
+        printf("%ld - ",turbine.EGTs[i]) ;
+    }
+    printf(" ----- EGT Delta : %ld\n",get_delta_EGT(&turbine)) ;
 
+    printf("\nRPMs : ") ;
+    for(int i = 0;i<10;i++)
+    {
+        printf("%ld - ",turbine.RPMs[i]) ;
+    }
+    printf(" ----- RPM Delta : %ld\n",get_delta_RPM(&turbine)) ;
+    */
 
     //ESP_LOGI(TAG,"RPM_sec : %ld - %ld",turbine.RPM_sec,turbine.RPM_sec*60) ;
     //turbine.RPM_sec = 0 ;
     //ESP_LOGI(TAG,"WDT_RPM : %ld",turbine.WDT_RPM) ;
     
-    if(turbine.WDT_RPM == 0)
-        Reset_RPM() ;
-    else
-        turbine.WDT_RPM = 0 ;
-    
+   
     battery_check() ;
     check_errors() ;
 
-    //ESP_LOGI(TAG,"RPM_sec : %ld",turbine.RPM_sec) ;
-    turbine.RPM_sec = 0 ;
+    //ESP_LOGI(TAG,"RPM_Pulse : %ld",turbine.RPM_Pulse) ;
+    //ESP_LOGI(TAG,"RPM : %ld",turbine.RPM_Pulse*60) ;
+    
+    turbine.RPM_Pulse = 0 ;
     //heap_trace_dump();
     //long long int Timer1 = esp_timer_get_time();
     //printf("Timer: %lld μs\n", Timer1/1000);
@@ -778,11 +844,18 @@ void create_timers(void)
                             ( void * ) 2,  // Assign each timer a unique id equal to its array index.
                             vTimer60sCallback // Each timer calls the same callback when it expires.
                             );
+    xTimer10ms = xTimerCreate("Timer10ms",       // Just a text name, not used by the kernel.
+                            ( pdMS_TO_TICKS(10) ),   // The timer period in ticks.
+                            pdFALSE,        // The timers will auto-reload themselves when they expire.
+                            ( void * ) 2,  // Assign each timer a unique id equal to its array index.
+                            vTimer10msCallback // Each timer calls the same callback when it expires.
+                            );
 }
 
 void ecu_task(void * pvParameters ) 
 {
     float avg_current = 0 ;
+    float avg_cur = 0;
     float starter_power_perc ;
     uint8_t count_curr_sample = 0 ;
     xSemaphoreTake(ecu_task_start, portMAX_DELAY);
@@ -790,7 +863,7 @@ void ecu_task(void * pvParameters )
     starter_power_perc = turbine_config.starter_pwm_perc_start ;
     while(1)
     {
-        vTaskDelay(10 / portTICK_PERIOD_MS);
+        vTaskDelay(pdMS_TO_TICKS(10));
             switch(turbine.phase_fonctionnement)
             {
                 case STOP :
@@ -810,6 +883,7 @@ void ecu_task(void * pvParameters )
                         break ;
                 case WAIT :
                     //ESP_LOGI(TAG, "WAIT");
+                    xEventGroupClearBits(xLogEventGroup,BIT_0);
                     if(turbine.EGT > 100)
                         turbine.phase_fonctionnement = COOL ;
                     else if(turbine.position_gaz == COUPE) 
@@ -863,7 +937,8 @@ void ecu_task(void * pvParameters )
                     break;
                 case START :
                     ESP_LOGI(TAG, "START");
-                    xSemaphoreGive(log_task_start) ;
+                    //xSemaphoreGive(log_task_start) ;
+                    xEventGroupSetBits(xLogEventGroup,BIT_0 );// The bits being set.
                     if(battery_check()) {
                         if(0){//turbine.position_gaz == COUPE) {
                             turbine.phase_fonctionnement = WAIT ;
@@ -875,23 +950,27 @@ void ecu_task(void * pvParameters )
                             {
                                 case INIT : 
                                     ESP_LOGI(TAG, "START INIT");
-                                    turbine.phase_start_begin = xTaskGetTickCount() ;
                                     avg_current = 0 ;
                                     count_curr_sample = 0 ;
                                     turbine.phase_start = TESTGLOW ;
                                     starter_power_perc = turbine_config.starter_pwm_perc_start ;
+                                    avg_cur = 0 ;
+                                    vTaskDelay(pdMS_TO_TICKS(1000));
+                                    turbine.phase_start_begin = xTaskGetTickCount() ;
                                     break ;
 
                                 case TESTGLOW :
                                     ESP_LOGI(TAG, "START TESTGLOW");
-                                    if(((xTaskGetTickCount() - turbine.phase_start_begin) < TESTGLOW_TIMEOUT/ portTICK_PERIOD_MS)) //Ajouter abort)
-                                    {
-                                        if(count_curr_sample < 90)
+                                    //ESP_LOGI(TAG, "Tasktick %u Taskbegin %u", xTaskGetTickCount(),turbine.phase_start_begin);
+                                    if((xTaskGetTickCount() - turbine.phase_start_begin) < pdMS_TO_TICKS(TESTGLOW_TIMEOUT)) //Ajouter abort)
+                                    {   
+                                        if(count_curr_sample < 90 && avg_cur < 0.05 )
                                         {
                                             set_power_glow(&turbine.glow,5) ;
+                                            ESP_LOGI(TAG, "SP : %u Curr : %fmA ", count_curr_sample,avg_cur);
                                             avg_current += get_glow_current(&turbine.glow) ;
                                             count_curr_sample++ ;
-                                            //vTaskDelay(100 / portTICK_PERIOD_MS);
+                                            avg_cur = avg_current/ count_curr_sample ;
                                         } else {
                                             avg_current /= count_curr_sample ;
                                             if(avg_current > 0.05){
@@ -918,15 +997,15 @@ void ecu_task(void * pvParameters )
                                     break ;
                                 case IGNITE :                                    
                                     ESP_LOGI(TAG, "START IGNITE");
-                                    if(((xTaskGetTickCount() - turbine.phase_start_begin) < IGNITE_TIMEOUT/ portTICK_PERIOD_MS)) //Ajouter abort)
+                                    if((xTaskGetTickCount() - turbine.phase_start_begin) < pdMS_TO_TICKS(IGNITE_TIMEOUT)) //Ajouter abort)
                                     {
-                                        if(xTaskGetTickCount() - turbine.phase_start_begin < 500 / portTICK_PERIOD_MS) { /// Attendre 500ms
+                                        if(xTaskGetTickCount() - turbine.phase_start_begin < pdMS_TO_TICKS(500)) { /// Attendre 500ms
                                             // Ventilation
                                             ESP_LOGI(TAG, "IGNITE Set starter %d",turbine_config.starter_pwm_perc_start);
                                             set_power(&turbine.starter,turbine_config.starter_pwm_perc_start) ;
                                             set_power_glow(&turbine.glow,turbine_config.glow_power) ; 
                                         }  
-                                        else if(xTaskGetTickCount() - turbine.phase_start_begin > 2000 / portTICK_PERIOD_MS){
+                                        else if(xTaskGetTickCount() - turbine.phase_start_begin > pdMS_TO_TICKS(2000)){
                                             set_power(&turbine.starter,turbine_config.starter_pwm_perc_min) ;
                                             ESP_LOGI(TAG, "START Vanne Gas ON") ; 
                                             set_power_vanne(&turbine.vanne2,turbine_config.max_vanne2);
@@ -936,7 +1015,7 @@ void ecu_task(void * pvParameters )
                                                 ESP_LOGE(TAG, "IGNITE 150° atteint");
                                                 turbine.phase_start_begin = xTaskGetTickCount() ;
                                             }
-                                        } else if(xTaskGetTickCount() - turbine.phase_start_begin > IGNITE_TIMEOUT/ portTICK_PERIOD_MS) //10 seconde max
+                                        } else if(xTaskGetTickCount() - turbine.phase_start_begin > pdMS_TO_TICKS(IGNITE_TIMEOUT)) //10 seconde max
                                         { 
                                             ESP_LOGE(TAG, "IGNITE FAIL");
                                             set_power_glow(&turbine.glow,0) ;
@@ -959,9 +1038,9 @@ void ecu_task(void * pvParameters )
                                     break ;
                                 case PREHEAT :
                                     ESP_LOGI(TAG, "START PREHEAT");
-                                    if(((xTaskGetTickCount() - turbine.phase_start_begin) < PREHEAT_TIMEOUT/ portTICK_PERIOD_MS)) //Ajouter abort)
+                                    if((xTaskGetTickCount() - turbine.phase_start_begin) < pdMS_TO_TICKS(PREHEAT_TIMEOUT)) //Ajouter abort)
                                     {
-                                        if(xTaskGetTickCount() - turbine.phase_start_begin < 3000 / portTICK_PERIOD_MS) { /// Attendre 2000ms que les tubes chauffent
+                                        if(xTaskGetTickCount() - turbine.phase_start_begin < pdMS_TO_TICKS(3000)) { /// Attendre 2000ms que les tubes chauffent
                                             // Augementation de la température
                                             if(get_EGT(&turbine) > 200) {
                                                 ESP_LOGI(TAG, "PREHEAT Set starter %d",turbine_config.starter_pwm_perc_start);
@@ -1148,23 +1227,3 @@ void inputs_task(void * pvParameters)
     }
 }
 
-/*Gestion des deltas*/
-void set_delta_RPM(_engine_t * engine,uint32_t delta)
-{
-    engine->RPM_delta = delta ;
-}
-
-uint32_t get_delta_RPM(_engine_t * engine) 
-{
-    return engine->RPM_delta ;
-}
-
-void set_delta_EGT(_engine_t * engine, uint32_t delta) 
-{
-    engine->EGT_delta = delta ;
-}
-
-uint32_t get_delta_EGT(_engine_t * engine)
-{
-    return engine->EGT_delta ;
-}

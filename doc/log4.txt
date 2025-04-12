@@ -1,1 +1,4 @@
-Num;Time;RPM;EGT;Pompe1;Cible Pompe1;Pompe2;Glow;Vanne1;Vanne2;Voie Gaz;Voie aux
+Time;RPM;RPMDelta;RPMPeriod;EGT;Pompe1;Cible Pompe1;Pompe2;Glow;Vanne1;Vanne2;Voie Gaz;Voie Aux;Vbatt;Glow current;Stater;ErrorMsg;PhaseF;PhaseS;PhaseSB
+00:00;0;0;22;0;0.000000;Cible Pompe1;0.000000;5;0;0;0;0;7.599109;-0.003000;0.000000;Thr signal lost - Aux signal lost;1073415116;1073415117;1073415120
+00:00;0;0;22;0;0.000000;Cible Pompe1;0.000000;5;0;0;0;0;7.599027;-0.003000;0.000000;Thr signal lost - Aux signal lost;1073415116;1073415117;1073415120
+00:00;0;0;22;0;0.000000;Cible Pompe1;0.000000;0;0;0;0;0;7.627878;-0.003000;0.000000;Thr signal lost - Aux signal lost - NO GLOW DETECTED;1073415116;1073415117;1073415120

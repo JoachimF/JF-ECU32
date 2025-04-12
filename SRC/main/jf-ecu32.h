@@ -222,14 +222,14 @@ typedef struct _engine_ {
   uint32_t GAZ ;
   uint32_t Aux ;
   uint32_t RPM ;
-  uint32_t RPMs[10] ;
-  uint32_t RPM_delta ; //RPM secondes
-  uint64_t RPM_period ;
-  bool WDT_RPM ;
-  uint16_t RPM_sec ;
+  int32_t RPMs[10] ;
+  int32_t RPM_delta ; //RPM/secondes
+  uint64_t RPM_period ; 
+  uint8_t WDT_RPM ;
+  uint16_t RPM_Pulse ;
   uint32_t EGT ;
-  uint32_t EGTs[10] ;
-  uint32_t EGT_delta ; //Degrées secondes
+  int32_t EGTs[10] ;
+  int32_t EGT_delta ; //Degrées/secondes
   _PUMP_t pump1 ;
   _PUMP_t pump2 ;
   _PUMP_t starter ;
@@ -238,11 +238,12 @@ typedef struct _engine_ {
   _VALVE_t vanne2 ; //Vanne KERO
   uint8_t phase_fonctionnement ;
   uint8_t phase_start ;
-  uint32_t phase_start_begin ;
+  uint32_t phase_start_begin ; //tick
   uint8_t position_gaz ;
   bool batOk ;
   float Vbatt ;
   char error_message[50] ;
+  uint8_t log_started ;
   #ifdef DS18B20
   float DS18B20_temp ;
   onewire_bus_handle_t bus ;
@@ -272,6 +273,12 @@ extern SemaphoreHandle_t xGAZmutex;
 extern SemaphoreHandle_t log_task_start;
 extern SemaphoreHandle_t ecu_task_start;
 
+// Events
+#define BIT_0 ( 1 << 0 )
+#define BIT_4 ( 1 << 4 )
+extern EventGroupHandle_t xLogEventGroup;
+
+
 extern _engine_t turbine ;
 extern _configEngine_t turbine_config ;
 extern _BITsconfigECU_u config_ECU ;
@@ -281,7 +288,7 @@ void linear_interpolation(uint32_t x0,uint32_t y0,uint32_t x1,uint32_t y1,uint32
 void set_kero_pump_target(uint32_t RPM) ;
 
 void update_curve_file(void) ;
-void head_logs_file(char *logname) ;
+void head_logs_file(FILE *fd) ;
 
 void create_timers(void) ;
 void start_timers(void) ;
@@ -332,11 +339,7 @@ uint8_t get_heures_up(_engine_t * engine) ;
 uint8_t get_minutes_up(_engine_t * engine) ;
 uint8_t get_secondes_up(_engine_t * engine) ;
 
-/*Gestion des deltas*/
-void set_delta_RPM(_engine_t * engine,uint32_t) ;
-uint32_t get_delta_RPM(_engine_t * engine) ;
-void set_delta_EGT(_engine_t * engine,uint32_t) ;
-uint32_t get_delta_EGT(_engine_t * engine) ;
+
 bool isEngineRun(void) ;
 void init_ds18b20(void) ;
 

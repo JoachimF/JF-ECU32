@@ -277,7 +277,7 @@ void app_main()
 
 	// Initialize SPIFFS
 	ESP_LOGI(TAG, "Initializing SPIFFS");
-	if (mountSPIFFS("/html", "storage", 5) != ESP_OK)
+	if (mountSPIFFS("/html", "storage", 10) != ESP_OK)
 	{
 		ESP_LOGE(TAG, "SPIFFS mount failed");
 		while(1) { vTaskDelay(1); }
@@ -288,10 +288,8 @@ void app_main()
 		//while(1) { vTaskDelay(1); }
 	}
 
-	// Create Queue
-	/*
-	xQueueHttp = xQueueCreate( 10, sizeof(URL_t) );
-	configASSERT( xQueueHttp );*/
+	// Create EventGroup
+	xLogEventGroup = xEventGroupCreate();
 
 	/* Get the local IP address */
 	esp_netif_ip_info_t ip_info;
@@ -326,7 +324,7 @@ void app_main()
 	//head_logs_file();
 	
 	ESP_LOGI(TAG, "Initializing Task Log");
-	xTaskCreate(log_task, "LOG", 1024*6, NULL, 2, &xlogHandle);
+	xTaskCreate(log_task, "LOG", 1024*6, NULL,configMAX_PRIORITIES -10, &xlogHandle);
 	configASSERT( xlogHandle );
 	//vTaskSuspend( xlogHandle ); 
 	
@@ -349,7 +347,7 @@ void app_main()
 
 	ESP_LOGI(TAG, "Initializing MAX31855 Task\n"); //EGT
     SEM_EGT = xSemaphoreCreateMutex();
-    xTaskCreatePinnedToCore(task_egt, "EGT", configMINIMAL_STACK_SIZE * 8, NULL,(configMAX_PRIORITIES -1 )|( 1UL | portPRIVILEGE_BIT ), &task_egt_h,1);
+    xTaskCreatePinnedToCore(task_egt, "EGT", configMINIMAL_STACK_SIZE * 8, NULL,(configMAX_PRIORITIES -3 )|( 1UL | portPRIVILEGE_BIT ), &task_egt_h,1);
 	configASSERT( task_egt_h );
     //vTaskSuspend(task_egt_h);
 
@@ -360,12 +358,12 @@ void app_main()
 	#endif
 	
 	ESP_LOGI(TAG, "Initializing WebSocket Task\n");  // Glow current
-	xTaskCreatePinnedToCore(ws_task, "WS_TASK", configMINIMAL_STACK_SIZE * 8, NULL, (configMAX_PRIORITIES -1 )|( 1UL | portPRIVILEGE_BIT ), &xWSHandle,0);
+	xTaskCreatePinnedToCore(ws_task, "WS_TASK", configMINIMAL_STACK_SIZE * 8, NULL, (configMAX_PRIORITIES -10 ), &xWSHandle,0);
 	vTaskSuspend(xWSHandle);
 
     ESP_LOGI(TAG, "Initializing INA219 + ADC Task\n");  // Glow current + battery voltage
     SEM_glow_current = xSemaphoreCreateMutex();
-    xTaskCreatePinnedToCore(task_glow_current, "GLOW Current", configMINIMAL_STACK_SIZE * 8, NULL, (configMAX_PRIORITIES -1 )|( 1UL | portPRIVILEGE_BIT ), &task_glow_current_h,1);
+    xTaskCreatePinnedToCore(task_glow_current, "GLOW Current", configMINIMAL_STACK_SIZE * 8, NULL, (configMAX_PRIORITIES -5 ), &task_glow_current_h,1);
     vTaskSuspend(task_glow_current_h);
 
 	//xSemaphoreGive(sync_stats_task);
