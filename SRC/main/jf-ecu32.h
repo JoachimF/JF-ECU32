@@ -97,6 +97,7 @@ typedef struct _BITsconfigECU_{
     uint8_t use_telem ; // NON - FUTABA - FRSKY - HOT
     uint8_t use_led ; // OUI - NON
     uint8_t use_input2 ; // OUI - NON
+    bool INA219_Present ;
     uint32_t checksum ;
 }_BITsconfigECU_u;
 

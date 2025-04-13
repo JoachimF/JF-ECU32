@@ -360,11 +360,27 @@ void app_main()
 	ESP_LOGI(TAG, "Initializing WebSocket Task\n");  // Glow current
 	xTaskCreatePinnedToCore(ws_task, "WS_TASK", configMINIMAL_STACK_SIZE * 8, NULL, (configMAX_PRIORITIES -10 ), &xWSHandle,0);
 	vTaskSuspend(xWSHandle);
-
-    ESP_LOGI(TAG, "Initializing INA219 + ADC Task\n");  // Glow current + battery voltage
-    SEM_glow_current = xSemaphoreCreateMutex();
-    xTaskCreatePinnedToCore(task_glow_current, "GLOW Current", configMINIMAL_STACK_SIZE * 8, NULL, (configMAX_PRIORITIES -5 ), &task_glow_current_h,1);
-    vTaskSuspend(task_glow_current_h);
+	
+	/* Search I2C Peripherals*/
+	config_ECU.INA219_Present = 0;	
+	uint8_t *addresses,nb_periph ;
+	addresses = malloc(sizeof(uint8_t)) ;
+	nb_periph = scan_i2c(addresses) ;
+	for(int i = 0; i<nb_periph;i++)
+	{
+		if(addresses[i] == INA219_ADDR_GND_GND)
+		{
+			config_ECU.INA219_Present = 1;		
+		}
+	}
+	if(config_ECU.INA219_Present) 
+		ESP_LOGI(TAG, "INA219 found\n");  // Glow current + battery voltage
+	else
+		ESP_LOGI(TAG, "INA219 not found\n");  // Glow current + battery voltage
+	ESP_LOGI(TAG, "Initializing INA219 + ADC Task\n");  // Glow current + battery voltage
+	SEM_glow_current = xSemaphoreCreateMutex();
+	xTaskCreatePinnedToCore(task_glow_current, "GLOW Current", configMINIMAL_STACK_SIZE * 8, NULL, (configMAX_PRIORITIES -5 ), &task_glow_current_h,1);
+	vTaskSuspend(task_glow_current_h);
 
 	//xSemaphoreGive(sync_stats_task);
 	/* Htop */

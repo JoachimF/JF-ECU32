@@ -104,7 +104,7 @@
         "ESP_ROM_ELF_DIR": "C:\\Users\\Boby\\.espressif5\\tools\\esp-rom-elfs\\20220823/"
     },
     "idf.gitPathWin": "C:\\Users\\Boby\\.espressif5\\tools\\idf-git\\2.39.2\\cmd\\git.exe",
-    "idf.portWin": "COM6",
+    "idf.portWin": "COM4",
     "idf.flashType": "UART",
     "idf.pythonInstallPath": "N:\\Users\\Boby\\.espressif5\\tools\\idf-python\\3.11.2\\python.exe",
     "python.testing.unittestArgs": [

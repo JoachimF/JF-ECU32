@@ -112,6 +112,7 @@ void set_delta_RPM(_engine_t * engine,int32_t) ;
 int32_t get_delta_RPM(_engine_t * engine) ;
 void set_delta_EGT(_engine_t * engine,int32_t) ;
 int32_t get_delta_EGT(_engine_t * engine) ;
+uint8_t scan_i2c(int *addresses) ;
 
 uint8_t get_WDT_RPM(_engine_t * engine) ;
 float get_GLOW_CURRENT(_engine_t * engine) ;

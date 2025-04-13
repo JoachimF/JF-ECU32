@@ -20,6 +20,7 @@
 
 
 #include "inputs.h"
+#include "sdcard.h"
 //#include "jf-ecu32.h"
 #include "error.h"
 #include <stdio.h>
@@ -195,18 +196,20 @@ void task_glow_current(void *pvParameter)
     float current ;
     memset(&dev, 0, sizeof(ina219_t));
         
-    ESP_ERROR_CHECK(ina219_init_desc(&dev, I2C_ADDR, I2C_PORT, SDA_GPIO, SCL_GPIO));
-    ESP_LOGI(TAG, "Initializing INA219");
-    ESP_ERROR_CHECK(ina219_init(&dev));
+    if( config_ECU.INA219_Present == 1	) {
+        ESP_ERROR_CHECK(ina219_init_desc(&dev, I2C_ADDR, I2C_PORT, SDA_GPIO, SCL_GPIO));
+        ESP_LOGI(TAG, "Initializing INA219");
+        ESP_ERROR_CHECK(ina219_init(&dev));
 
-    ESP_LOGI(TAG, "Configuring INA219");
-    ESP_ERROR_CHECK(ina219_configure(&dev, INA219_BUS_RANGE_16V, INA219_GAIN_0_25,
-        INA219_RES_12BIT_128S, INA219_RES_12BIT_128S, INA219_MODE_CONT_SHUNT_BUS));
+        ESP_LOGI(TAG, "Configuring INA219");
+        ESP_ERROR_CHECK(ina219_configure(&dev, INA219_BUS_RANGE_16V, INA219_GAIN_0_25,
+            INA219_RES_12BIT_128S, INA219_RES_12BIT_128S, INA219_MODE_CONT_SHUNT_BUS));
 
-    ESP_LOGI(TAG, "Calibrating INA219");
+        ESP_LOGI(TAG, "Calibrating INA219");
 
-    ESP_ERROR_CHECK(ina219_calibrate(&dev, (float)10 / 1000.0f)); // Résistance de shunt 10mOhm
-    ESP_LOGI(TAG, "INA219 initialized\n");
+        ESP_ERROR_CHECK(ina219_calibrate(&dev, (float)10 / 1000.0f)); // Résistance de shunt 10mOhm
+        ESP_LOGI(TAG, "INA219 initialized\n");
+    }
     /* First read ADC */
     ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, ADC1_CHAN0, &adc_raw[0][0]));
     voltage[0][0] = voltage[0][0]*4.90 ;
@@ -220,14 +223,15 @@ void task_glow_current(void *pvParameter)
         //ESP_ERROR_CHECK(ina219_get_bus_voltage(&dev, &bus_voltage));
         //ESP_ERROR_CHECK(ina219_get_shunt_voltage(&dev, &shunt_voltage));
         //ESP_ERROR_CHECK(ina219_get_power(&dev, &power));
-        ESP_ERROR_CHECK(ina219_get_current(&dev, &current)) ;
-        //ESP_LOGI(TAG, "Glow current : %0.3fA",current) ;
-        set_glow_current(&turbine.glow,current) ;
+        if( config_ECU.INA219_Present == 1	) {
+            ESP_ERROR_CHECK(ina219_get_current(&dev, &current)) ;
+            //ESP_LOGI(TAG, "Glow current : %0.3fA",current) ;
+            set_glow_current(&turbine.glow,current) ;
 
-        //printf("%fV %0.3fA %fW %fV\n",bus_voltage/1000.0,current,power,shunt_voltage);
-        xSemaphoreGive(SEM_glow_current) ;
-        //ESP_LOGI(TAG, "Func Glow current : %0.3fA", get_glow_current(&turbine.glow)) ;
-
+            //printf("%fV %0.3fA %fW %fV\n",bus_voltage/1000.0,current,power,shunt_voltage);
+            xSemaphoreGive(SEM_glow_current) ;
+            //ESP_LOGI(TAG, "Func Glow current : %0.3fA", get_glow_current(&turbine.glow)) ;
+        }
         /* Battery voltage */
         ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, ADC1_CHAN0, &adc_raw[0][0]));
         //ESP_LOGI(TAG, "ADC%d Channel[%d] Raw Data: %d", ADC_UNIT_1 + 1, ADC1_CHAN0, adc_raw[0][0]);
@@ -243,8 +247,9 @@ void task_glow_current(void *pvParameter)
     }
 }
 
-void scan_i2c(void)
+uint8_t scan_i2c(int *addresses) 
 {
+    uint8_t nb_periph = 0 ;
     i2c_dev_t devT = { 0 };
     ESP_ERROR_CHECK(i2cdev_init());
     devT.cfg.sda_io_num = SDA_GPIO ;
@@ -262,20 +267,30 @@ void scan_i2c(void)
         devT.addr = addr;
         res = i2c_dev_probe(&devT, I2C_DEV_WRITE);
 
-        if (res == 0)
+        if (res == 0){
+            
             printf(" %.2x", addr);
+            nb_periph++ ;
+            addresses = realloc(addresses,sizeof(uint8_t)*nb_periph) ;
+            addresses[nb_periph] = addr ;
+        }
+
+            
         else
             printf(" --");
     }
     printf("\n\n");
+    return nb_periph ;
 }
 
 /*********** Tache de lecture des EGT et DS18B20 période 200ms ******************/
 void task_egt(void *pvParameter)
 {
     max31855_t dev = { 0 };
-    // Configure SPI bus
-    spi_bus_config_t cfg = {
+    // **********  Configure SPI bus
+    // Now initialized in init_inputs()
+
+    /*spi_bus_config_t cfg = {
        .mosi_io_num = -1,
        .miso_io_num = MISO_GPIO_NUM,
        .sclk_io_num = CLK_GPIO_NUM,
@@ -284,7 +299,7 @@ void task_egt(void *pvParameter)
        .max_transfer_sz = 0,
        .flags = 0
     };
-    ESP_ERROR_CHECK(spi_bus_initialize(HOST, &cfg, 1));
+    ESP_ERROR_CHECK(spi_bus_initialize(HOST, &cfg, 1));*/
 
     // Init device
     ESP_ERROR_CHECK(max31855_init_desc(&dev, HOST, MAX31855_MAX_CLOCK_SPEED_HZ, CS_GPIO_NUM));
@@ -333,6 +348,18 @@ void init_inputs(void)
 
     ESP_LOGI("RPM","Init RPM");
     //rpm_evt_queue = xQueueCreate(1, sizeof(unsigned long long));
+
+    /* SPI pins for SDcard and MAX31855*/
+    gpio_set_direction(PIN_NUM_MISO, GPIO_MODE_INPUT);
+    gpio_set_direction(PIN_NUM_MOSI, GPIO_MODE_OUTPUT);
+    gpio_set_direction(PIN_NUM_CS, GPIO_MODE_OUTPUT);
+    gpio_set_direction(PIN_NUM_CLK, GPIO_MODE_OUTPUT);
+    gpio_set_level(PIN_NUM_CS,1) ;
+    gpio_set_level(PIN_NUM_MOSI,1) ;
+    gpio_set_level(PIN_NUM_CLK,1) ;
+    sdmmc_card_t card ;
+    init_sdcard(&card) ;
+
 
     //** Interruption RPM
     gpio_set_direction(RPM_PIN, GPIO_MODE_INPUT);

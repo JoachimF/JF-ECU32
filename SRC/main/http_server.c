@@ -1044,7 +1044,7 @@ static esp_err_t wifi_get_handler(httpd_req_t *req)
 	httpd_resp_sendstr_chunk(req, turbine_config.name);
 	httpd_resp_sendstr_chunk(req, "</h2></div>");*/
 		
-	httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Paramètres Wifi&nbsp;</b></legend><form method=\"GET\" action=\"wifi\"><p>") ;
+	httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Paramètres Wifi&nbsp;</b></legend><form method=\"GET\" action=\"c_wifi\"><p>") ;
 	/*SSID*/
 	httpd_resp_sendstr_chunk(req, "<b>SSID</b><br>");
 	httpd_resp_sendstr_chunk(req, "<input id=\"ssid\" placeholder=\"\" value=\"");
