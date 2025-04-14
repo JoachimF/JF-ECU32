@@ -18,11 +18,11 @@
 */
 
 #include "driver/ledc.h"
+#include "sdcard.h"
 #include "driver/mcpwm.h" //IDF 4.3.4
 //#include "driver/mcpwm_prelude.h" // IDF 5.0
 #include <stdio.h>
 #include "esp_system.h"
-//#include "esp_system.h"
 #include "driver/gpio.h"
 #include "esp_wifi.h"
 #include <string.h>
@@ -487,8 +487,7 @@ void init(void)
     turbine.pump1.config.ppm_pwm = config_ECU.output_pump1 ;
     turbine.pump2.config.ppm_pwm = config_ECU.output_pump2 ;
     init_mcpwm() ;
-    // Entrées
-    init_inputs() ;
+
     init_errors() ;
     
     //Set les sortie pour test
@@ -561,7 +560,7 @@ void start_phase_to_str(char *status)
 void update_curve_file(void)
 {
     FILE *fd = NULL;
-	char FileName[] = "/logs/curves.txt" ;
+	char FileName[] = "/sdcard/logs/curves.txt" ;
     fd = fopen(FileName, "w");
 	if (!fd) {
        ESP_LOGI("File", "Failed to open file : curves.txt");       
@@ -626,6 +625,7 @@ void log_task( void * pvParameters )
     char startwith[6] ;
     char newLog[FILE_PATH_MAX] ;
     
+    
 
     struct dirent *entry;
     FILE *fd = NULL;
@@ -643,8 +643,9 @@ void log_task( void * pvParameters )
     }
 
     /*cherche le dernier log*/
-    DIR *dir = opendir("/logs/");
-    const size_t dirpath_len = strlen("/logs/");
+    const size_t dirpath_len = strlen(MOUNT_POINT"/logs/");
+    DIR *dir = opendir(MOUNT_POINT"/logs/");
+    
 
     while(1) {
         /* Wait for start log*/
@@ -660,9 +661,10 @@ void log_task( void * pvParameters )
                 if(entry->d_type != DT_DIR) //Fichier
                 {
                     strlcpy(startwith,entry->d_name,4) ;
-                    if(strcmp(startwith, "log") == 0) {
+                    ESP_LOGI(TAG,"startwith : %s",startwith) ;
+                    if(strcmp(startwith, "LOG") == 0) {
                         strcpy(filetmp,entry->d_name);
-                        point = strstr(entry->d_name,".csv") ;
+                        point = strstr(entry->d_name,".CSV") ;
                         if(point) { //Si la fin est trouvée
                             *point = '\0' ;
                             log_number = filetmp + 3 ;
@@ -682,7 +684,7 @@ void log_task( void * pvParameters )
             }
             ESP_LOGI(TAG,"Last LOG : %s - First LOG %s",last_log, first_log);
             number = last_number+1 ;
-            sprintf(newLog,"/logs/log%d.csv",number) ;
+            sprintf(newLog,MOUNT_POINT"/logs/log%d.CSV",number) ;
             fd = fopen(newLog, "w");
             if (fd) {
                 head_logs_file(fd) ;

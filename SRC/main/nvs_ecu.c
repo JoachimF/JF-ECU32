@@ -169,7 +169,7 @@ void init_power_table(void)
   test_checksum_table_pump(&turbine_config.power_table,&turbine_config.power_table.checksum) ;
 }
 
-static void set_defaut_turbine(void)
+void set_defaut_turbine(void)
 {
     strcpy(turbine_config.name,"Nom du moteur") ;
     turbine_config.log_count = 1 ;
@@ -198,7 +198,7 @@ static void set_defaut_turbine(void)
     turbine_config.starter_max_rpm = 0 ;
     //Batterie
     turbine_config.lipo_elements = 0 ;
-    turbine_config.Vmin_decollage = 8.0 ;
+    turbine_config.Vmin_decollage = 0.0 ;
 
     init_power_table() ;
     init_random_pump() ;

@@ -26,12 +26,14 @@
 #define PIN_NUM_MISO  19
 #define PIN_NUM_MOSI  23
 #define PIN_NUM_CLK   18
-#define PIN_NUM_CS    16
-#define PIN_NUM_DET   39 //VN_SENSOR
+#define PIN_NUM_CS    15 //16
+#define PIN_NUM_DET   -1 //39 //VN_SENSOR
 
 #define MOUNT_POINT "/sdcard"
 #define EXAMPLE_MAX_CHAR_SIZE    64
 
-void init_sdcard(sdmmc_card_t *card) ;
+#define LOGPATH MOUNT_POINT"/logs"
+
+void init_sdcard(sdmmc_card_t *card2) ;
 
 #endif

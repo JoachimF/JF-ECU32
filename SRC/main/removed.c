@@ -253,3 +253,96 @@ httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Voie des gaz</b></lege
 	/*httpd_resp_sendstr_chunk(req, "<p><input id=\"use_led\" type=\"checkbox\" " ) ;
 	httpd_resp_sendstr_chunk(req, (config_ECU.use_led == YES) ? "checked=\"\"" :" " ) ;
 	httpd_resp_sendstr_chunk(req, " name=\"use_led\"><b>Leds Activées</b>") ;*/
+/*
+	static esp_err_t logs(httpd_req_t *req)
+{
+	ESP_LOGI(TAG, "root_get_handler req->uri=[%s]", req->uri);
+
+	// Send HTML header
+	send_head(req) ;
+	httpd_resp_sendstr_chunk(req, "<!DOCTYPE html><html>");
+	Text2Html(req, "/html/head.html");
+
+	httpd_resp_sendstr_chunk(req, "<h2>");
+	httpd_resp_sendstr_chunk(req, turbine_config.name);
+	httpd_resp_sendstr_chunk(req, "</h2>");
+		
+	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"c_logs.txt\">");
+	httpd_resp_sendstr_chunk(req, "<button>Log 1</button></form>");
+	httpd_resp_sendstr_chunk(req, "</form>");
+	httpd_resp_sendstr_chunk(req, "<p></p>");
+	
+	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"c_curves.txt\">");
+	httpd_resp_sendstr_chunk(req, "<button>Courbe de gaz</button></form>");
+	httpd_resp_sendstr_chunk(req, "</form>");
+	httpd_resp_sendstr_chunk(req, "<p></p>");
+	
+	httpd_resp_sendstr_chunk(req, "<p></p><form action=\"/\" method=\"get\"><button name="">Retour</button></form>") ;
+
+	httpd_resp_sendstr_chunk(req, "<p></p>");
+
+	Text2Html(req, "/html/footer.html");
+	httpd_resp_sendstr_chunk(req, NULL); //fin de la page
+
+	return ESP_OK;
+}*/
+/*
+else if(strcmp(filename, "/c_curves.txt") == 0) 
+curves_get_handler(req) ;
+else if(strcmp(filename, "/c_logs.txt") == 0) 
+logs_get_handler(req) ;
+*/
+
+/*static esp_err_t logs_get_handler(httpd_req_t *req)
+{
+    FILE *fd = NULL;
+    struct stat st;
+	char FileName[] = "/sdcard/logs/logs.txt" ;
+    vTaskSuspend( xlogHandle );
+	if (stat(FileName, &st) != 0) {
+		ESP_LOGE(TAG, "[%s] not found", FileName);
+		return ESP_FAIL;
+	}
+	ESP_LOGI(TAG, "%s st.st_size=%ld", FileName, st.st_size);
+
+	char*	file_buffer = NULL;
+	size_t file_buffer_len = st.st_size;
+	if(file_buffer_len > 0)
+	{
+		file_buffer = malloc(file_buffer_len);
+		if (file_buffer == NULL) {
+			ESP_LOGE(TAG, "malloc fail. file_buffer_len %d", file_buffer_len);
+			return ESP_FAIL;
+		}
+
+		ESP_LOGI(TAG, "logs_get_handler req->uri=[%s]", req->uri);
+		fd = fopen(FileName, "r");
+		if (!fd) {
+		ESP_LOGE(TAG, "Failed to read existing file : logs.txt");
+			// Respond with 500 Internal Server Error 
+			httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to read existing file");
+			return ESP_FAIL;
+		}
+		for (int i=0;i<st.st_size;i++) {
+			fread(&file_buffer[i], sizeof(char), 1, fd);
+		}
+		fclose(fd);
+
+		ESP_LOGI(TAG, "Sending file : logs.txt...");
+		//ESP_LOGI(TAG, "%s",file_buffer);
+		httpd_resp_set_type(req, "application/octet-stream");
+		if (httpd_resp_send_chunk(req, file_buffer, st.st_size) != ESP_OK) {
+					fclose(fd);
+					ESP_LOGE(TAG, "File sending failed!");
+					// Abort sending file 
+					httpd_resp_sendstr_chunk(req, NULL);
+					// Respond with 500 Internal Server Error 
+					httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to send file");
+				return ESP_FAIL;
+		}
+		httpd_resp_sendstr_chunk(req, NULL);
+		ESP_LOGI(TAG, "File sending complete");
+	}
+    vTaskResume( xlogHandle );
+	return ESP_OK;
+}*/

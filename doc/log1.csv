@@ -1,50 +1,7 @@
 Time;RPM;RPMDelta;RPMPeriod;EGT;EGT_delta;Pompe1;Cible Pompe1;Pompe2;Glow;Vanne1;Vanne2;Voie Gaz;Voie Aux;Vbatt;Glow current;Stater;ErrorMsg;PhaseF;PhaseS
-00:01;0;0;0;28;0;0.000000;Cible Pompe1;0.000000;0;0;0;0;0;7.43;-0.002;0.00;Thr signal lost - Aux signal lost;1;1
-00:01;0;0;0;28;0;0.000000;Cible Pompe1;0.000000;0;0;0;0;0;7.44;-0.002;0.00;Thr signal lost - Aux signal lost;1;1
-00:01;0;0;0;28;0;0.000000;Cible Pompe1;0.000000;0;0;0;0;0;7.43;-0.002;0.00;Thr signal lost - Aux signal lost;1;1
-00:02;0;0;0;28;0;0.000000;Cible Pompe1;0.000000;0;0;0;0;0;7.43;-0.002;0.00;Thr signal lost - Aux signal lost;1;1
-00:02;0;0;0;28;0;0.000000;Cible Pompe1;0.000000;5;0;0;0;0;7.43;0.041;0.00;Thr signal lost - Aux signal lost;1;1
-00:02;0;0;77412361;28;0;0.000000;Cible Pompe1;0.000000;3;0;0;0;0;7.43;0.089;7.70;Thr signal lost - Aux signal lost;1;2
-00:02;0;0;77412361;28;0;0.000000;Cible Pompe1;0.000000;3;0;0;0;0;7.43;0.039;7.70;Thr signal lost - Aux signal lost;1;2
-00:03;0;0;0;28;0;0.000000;Cible Pompe1;0.000000;3;0;0;0;0;7.43;0.039;7.70;Thr signal lost - Aux signal lost;1;2
-00:03;0;0;0;28;0;0.000000;Cible Pompe1;0.000000;3;0;0;0;0;7.43;0.039;7.70;Thr signal lost - Aux signal lost;1;2
-00:03;0;0;0;28;0;0.000000;Cible Pompe1;0.000000;3;0;0;0;0;7.44;0.039;7.70;Thr signal lost - Aux signal lost;1;2
-00:03;0;0;0;28;0;0.000000;Cible Pompe1;0.000000;3;0;0;0;0;7.43;0.039;7.70;Thr signal lost - Aux signal lost;1;2
-00:04;0;0;0;28;0;0.000000;Cible Pompe1;0.000000;3;0;0;0;0;7.42;0.039;7.70;Thr signal lost - Aux signal lost;1;2
-00:04;0;0;0;28;0;0.000000;Cible Pompe1;0.000000;3;0;0;0;0;7.43;0.039;7.70;Thr signal lost - Aux signal lost;1;2
-00:04;0;0;0;28;0;0.000000;Cible Pompe1;0.000000;3;0;255;0;0;7.43;0.039;4.60;Thr signal lost - Aux signal lost;1;2
-00:04;0;0;0;28;0;0.000000;Cible Pompe1;0.000000;3;0;255;0;0;7.42;0.039;4.60;Thr signal lost - Aux signal lost;1;2
-00:05;0;0;0;28;0;0.000000;Cible Pompe1;0.000000;3;0;255;0;0;7.42;0.039;4.60;Thr signal lost - Aux signal lost;1;2
-00:05;0;0;0;28;0;0.000000;Cible Pompe1;0.000000;3;0;255;0;0;7.42;0.039;4.60;Thr signal lost - Aux signal lost;1;2
-00:05;0;0;0;28;0;0.000000;Cible Pompe1;0.000000;3;0;255;0;0;7.42;0.039;4.60;Thr signal lost - Aux signal lost;1;2
-00:05;0;0;0;28;0;0.000000;Cible Pompe1;0.000000;3;0;255;0;0;7.43;0.039;4.60;Thr signal lost - Aux signal lost;1;2
-00:06;0;0;0;28;0;0.000000;Cible Pompe1;0.000000;3;0;255;0;0;7.42;0.039;4.60;Thr signal lost - Aux signal lost;1;2
-00:06;0;0;0;28;0;0.000000;Cible Pompe1;0.000000;3;0;255;0;0;7.42;0.039;4.60;Thr signal lost - Aux signal lost;1;2
-00:06;0;0;0;28;0;0.000000;Cible Pompe1;0.000000;3;0;255;0;0;7.43;0.039;4.60;Thr signal lost - Aux signal lost;1;2
-00:06;0;0;0;28;0;0.000000;Cible Pompe1;0.000000;3;0;255;0;0;7.43;0.039;4.60;Thr signal lost - Aux signal lost;1;2
-00:07;0;0;0;28;0;0.000000;Cible Pompe1;0.000000;3;0;255;0;0;7.44;0.040;4.60;Thr signal lost - Aux signal lost;1;2
-00:07;0;0;0;28;0;0.000000;Cible Pompe1;0.000000;3;0;255;0;0;7.43;0.040;4.60;Thr signal lost - Aux signal lost;1;2
-00:07;0;0;0;28;0;0.000000;Cible Pompe1;0.000000;3;0;255;0;0;7.43;0.039;4.60;Thr signal lost - Aux signal lost;1;2
-00:07;0;0;1340986;28;0;0.000000;Cible Pompe1;0.000000;3;0;255;0;0;7.44;0.039;4.60;Thr signal lost - Aux signal lost;1;2
-00:08;0;0;1340986;28;0;0.000000;Cible Pompe1;0.000000;3;0;255;0;0;7.44;0.039;4.60;Thr signal lost - Aux signal lost;1;2
-00:08;0;0;0;28;0;0.000000;Cible Pompe1;0.000000;3;0;255;0;0;7.43;0.039;4.60;Thr signal lost - Aux signal lost;1;2
-00:08;1728;1496;49836;28;0;0.000000;Cible Pompe1;0.000000;3;0;255;0;0;7.44;0.039;4.60;Thr signal lost - Aux signal lost;1;2
-00:08;1749;1680;36471;28;0;0.000000;Cible Pompe1;0.000000;3;0;255;0;0;7.43;0.039;4.60;Thr signal lost - Aux signal lost;1;2
-00:09;1773;1749;34256;28;0;0.000000;Cible Pompe1;0.000000;3;0;255;0;0;7.42;0.040;4.60;Aux signal lost - Thr signal lost;1;2
-00:09;1765;918;33759;28;0;0.000000;Cible Pompe1;0.000000;3;0;255;0;0;7.43;0.039;4.60;Aux signal lost - Thr signal lost;1;2
-00:09;1791;165;33694;28;0;0.000000;Cible Pompe1;0.000000;3;0;255;0;0;7.43;0.039;4.60;Aux signal lost - Thr signal lost;1;2
-00:09;1791;71;33694;28;0;0.000000;Cible Pompe1;0.000000;3;0;255;0;0;7.43;0.039;4.60;Aux signal lost - Thr signal lost;1;2
-00:10;0;-1319;0;28;0;0.000000;Cible Pompe1;0.000000;3;0;255;0;0;7.43;0.039;4.60;Aux signal lost - Thr signal lost;1;2
-00:10;1791;-813;145974;28;0;0.000000;Cible Pompe1;0.000000;3;0;255;0;0;7.43;0.039;4.60;Aux signal lost - Thr signal lost;1;2
-00:10;1810;-183;48221;28;0;0.000000;Cible Pompe1;0.000000;3;0;255;0;0;7.44;0.039;4.60;Aux signal lost - Thr signal lost;1;2
-00:11;1809;-31;34680;28;0;0.000000;Cible Pompe1;0.000000;3;0;255;0;0;7.43;0.039;4.60;Aux signal lost - Thr signal lost;1;2
-00:11;1817;1584;33202;28;0;0.000000;Cible Pompe1;0.000000;3;0;255;0;0;7.43;0.039;4.60;Aux signal lost - Thr signal lost;1;2
-00:11;1808;420;33148;28;0;0.000000;Cible Pompe1;0.000000;3;0;255;0;0;7.42;0.039;4.60;Aux signal lost - Thr signal lost;1;2
-00:11;1818;109;33003;28;0;0.000000;Cible Pompe1;0.000000;3;0;255;0;0;7.43;0.039;4.60;Aux signal lost - Thr signal lost;1;2
-00:12;1791;-7;33126;28;0;0.000000;Cible Pompe1;0.000000;3;0;255;0;0;7.44;0.039;4.60;Aux signal lost - Thr signal lost;1;2
-00:12;1791;-21;33126;28;0;0.000000;Cible Pompe1;0.000000;3;0;255;0;0;7.44;0.039;4.60;Aux signal lost - Thr signal lost;1;2
-00:12;0;-1374;0;28;0;0.000000;Cible Pompe1;0.000000;0;0;0;0;0;7.43;0.040;0.00;Aux signal lost - Thr signal lost;0;0
-00:12;0;-1742;200159;28;0;0.000000;Cible Pompe1;0.000000;0;0;0;0;0;7.44;-0.003;0.00;Aux signal lost - Thr signal lost;0;0
-00:00;0;-1778;200159;28;0;0.000000;Cible Pompe1;0.000000;0;0;0;0;0;7.44;-0.002;0.00;Aux signal lost - Thr signal lost;0;0
-00:00;0;-893;0;28;0;0.000000;Cible Pompe1;0.000000;0;0;0;0;0;7.45;-0.002;0.00;Aux signal lost - Thr signal lost;0;0
-00:00;0;-111;0;28;0;0.000000;Cible Pompe1;0.000000;0;0;0;0;0;7.44;-0.002;0.00;Aux signal lost - Thr signal lost;0;0
+00:00;0;0;0;0;0;0.000000;Cible Pompe1;0.000000;0;0;0;0;0;7.77;0.000;0.00;K shorted to VCC! - Thr signal lost - Aux signal lost;0;0
+00:00;0;0;0;0;0;0.000000;Cible Pompe1;0.000000;0;0;0;0;0;7.77;0.000;0.00;K shorted to VCC! - Thr signal lost - Aux signal lost;0;0
+00:00;0;0;0;0;0;0.000000;Cible Pompe1;0.000000;0;0;0;0;0;7.77;0.000;0.00;K shorted to VCC! - Thr signal lost - Aux signal lost;0;0
+00:00;0;0;0;0;0;0.000000;Cible Pompe1;0.000000;0;0;0;0;0;7.77;0.000;0.00;K shorted to VCC! - Thr signal lost - Aux signal lost;0;0
+00:00;0;0;0;0;0;0.000000;Cible Pompe1;0.000000;0;0;0;0;0;7.77;0.000;0.00;K shorted to VCC! - Thr signal lost - Aux signal lost;0;0
+00:00;0;0;0;0;0;0.000000;Cible Pompe1;0.000000;0;0;0;0;0;7.77;0.000;0.00;K shorted to VCC! - Thr signal lost - Aux signal lost;0;0

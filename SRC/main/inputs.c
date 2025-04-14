@@ -215,6 +215,7 @@ void task_glow_current(void *pvParameter)
     voltage[0][0] = voltage[0][0]*4.90 ;
     vTaskDelay(200 / portTICK_PERIOD_MS) ;
     
+    
 
     while(1)
     {
@@ -240,6 +241,8 @@ void task_glow_current(void *pvParameter)
             voltage[0][0] = voltage[0][0]*4.90 ;
             //ESP_LOGI(TAG, "ADC%d Channel[%d] Cali Voltage: %d mV", ADC_UNIT_1 + 1, ADC1_CHAN0, voltage[0][0]);
             volt = (get_vbatt(&turbine) + (float)(voltage[0][0])/1000) / 2 ;
+            /* For debugging */
+            volt = 7.77f ;
             set_vbatt(&turbine, volt) ;
             //ESP_LOGI(TAG, "Output Voltage: %f mV",get_vbatt(&turbine));
         }
@@ -313,9 +316,9 @@ void task_egt(void *pvParameter)
             ESP_LOGE(TAG, "Failed to measure: %d (%s)", res, esp_err_to_name(res));
         else
         {
-            if (scv) ESP_LOGW(TAG, "Thermocouple shorted to VCC!");
-            if (scg) ESP_LOGW(TAG, "Thermocouple shorted to GND!");
-            if (oc) ESP_LOGW(TAG, "No connection to thermocouple!");
+            //if (scv) ESP_LOGW(TAG, "Thermocouple shorted to VCC!");
+            //if (scg) ESP_LOGW(TAG, "Thermocouple shorted to GND!");
+            //if (oc) ESP_LOGW(TAG, "No connection to thermocouple!");
             if (scv) add_error_msg(E_K,"K shorted to VCC!");
             if (scg) add_error_msg(E_K,"K shorted to GND!");
             if (oc) add_error_msg(E_K,"K not connected");
@@ -350,14 +353,24 @@ void init_inputs(void)
     //rpm_evt_queue = xQueueCreate(1, sizeof(unsigned long long));
 
     /* SPI pins for SDcard and MAX31855*/
-    gpio_set_direction(PIN_NUM_MISO, GPIO_MODE_INPUT);
+    ESP_LOGI("SPI","Set pins level for SDCARD");
+   /*gpio_set_direction(PIN_NUM_MISO, GPIO_MODE_INPUT);
     gpio_set_direction(PIN_NUM_MOSI, GPIO_MODE_OUTPUT);
+
     gpio_set_direction(PIN_NUM_CS, GPIO_MODE_OUTPUT);
     gpio_set_direction(PIN_NUM_CLK, GPIO_MODE_OUTPUT);
+    gpio_set_direction(PIN_NUM_CS, GPIO_MODE_OUTPUT);
+    
     gpio_set_level(PIN_NUM_CS,1) ;
     gpio_set_level(PIN_NUM_MOSI,1) ;
     gpio_set_level(PIN_NUM_CLK,1) ;
+    gpio_set_level(PIN_NUM_CS,1) ;
+    gpio_pullup_en(PIN_NUM_MOSI) ;
+    gpio_pullup_en(PIN_NUM_CS) ;
+    gpio_pullup_en(PIN_NUM_CLK) ;
+    gpio_pullup_en(PIN_NUM_CS) ;*/
     sdmmc_card_t card ;
+    ESP_LOGI("SDCARD","Init SDCARD");
     init_sdcard(&card) ;
 
 
@@ -660,14 +673,14 @@ bool battery_check(void)
     {
         set_batOk(0) ;
         add_error_msg(E_BATTWRONG,"Batterie non compatible");
-        ESP_LOGI(TAG,"Batterie non compatible") ;		
+        //ESP_LOGI(TAG,"Batterie non compatible") ;		
     }
     
     if(volt < vmin)
     {
         set_batOk(0) ;
         add_error_msg(E_BATTLOW,"Batterie trop faible");
-        ESP_LOGI(TAG,"Batterie trop faible") ;		
+        //ESP_LOGI(TAG,"Batterie trop faible") ;		
     }
     if(isBatOk())
         return 1 ;

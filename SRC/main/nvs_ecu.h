@@ -31,4 +31,7 @@ void init_power_table(void) ;
 void init_random_pump(void) ;
 
 void horametre_save(void) ;
+
+void set_defaut_turbine(void) ;
+
 #endif

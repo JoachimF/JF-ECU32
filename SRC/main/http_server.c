@@ -519,94 +519,6 @@ static esp_err_t curves_get_handler(httpd_req_t *req)
 	return ESP_OK;
 }
 
-static esp_err_t logs_get_handler(httpd_req_t *req)
-{
-    FILE *fd = NULL;
-    struct stat st;
-	char FileName[] = "/html/logs.txt" ;
-    vTaskSuspend( xlogHandle );
-	if (stat(FileName, &st) != 0) {
-		ESP_LOGE(TAG, "[%s] not found", FileName);
-		return ESP_FAIL;
-	}
-	ESP_LOGI(TAG, "%s st.st_size=%ld", FileName, st.st_size);
-
-	char*	file_buffer = NULL;
-	size_t file_buffer_len = st.st_size;
-	if(file_buffer_len > 0)
-	{
-		file_buffer = malloc(file_buffer_len);
-		if (file_buffer == NULL) {
-			ESP_LOGE(TAG, "malloc fail. file_buffer_len %d", file_buffer_len);
-			return ESP_FAIL;
-		}
-
-		ESP_LOGI(TAG, "logs_get_handler req->uri=[%s]", req->uri);
-		fd = fopen(FileName, "r");
-		if (!fd) {
-		ESP_LOGE(TAG, "Failed to read existing file : logs.txt");
-			/* Respond with 500 Internal Server Error */
-			httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to read existing file");
-			return ESP_FAIL;
-		}
-		for (int i=0;i<st.st_size;i++) {
-			fread(&file_buffer[i], sizeof(char), 1, fd);
-		}
-		fclose(fd);
-
-		ESP_LOGI(TAG, "Sending file : logs.txt...");
-		//ESP_LOGI(TAG, "%s",file_buffer);
-		httpd_resp_set_type(req, "application/octet-stream");
-		if (httpd_resp_send_chunk(req, file_buffer, st.st_size) != ESP_OK) {
-					fclose(fd);
-					ESP_LOGE(TAG, "File sending failed!");
-					/* Abort sending file */
-					httpd_resp_sendstr_chunk(req, NULL);
-					/* Respond with 500 Internal Server Error */
-					httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to send file");
-				return ESP_FAIL;
-		}
-		httpd_resp_sendstr_chunk(req, NULL);
-		ESP_LOGI(TAG, "File sending complete");
-	}
-    vTaskResume( xlogHandle );
-	return ESP_OK;
-}
-
-
-
-static esp_err_t logs(httpd_req_t *req)
-{
-	ESP_LOGI(TAG, "root_get_handler req->uri=[%s]", req->uri);
-
-	// Send HTML header
-	send_head(req) ;
-	/*httpd_resp_sendstr_chunk(req, "<!DOCTYPE html><html>");
-	Text2Html(req, "/html/head.html");
-
-	httpd_resp_sendstr_chunk(req, "<h2>");
-	httpd_resp_sendstr_chunk(req, turbine_config.name);
-	httpd_resp_sendstr_chunk(req, "</h2>");*/
-		
-	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"c_logs.txt\">");
-	httpd_resp_sendstr_chunk(req, "<button>Log 1</button></form>");
-	httpd_resp_sendstr_chunk(req, "</form>");
-	httpd_resp_sendstr_chunk(req, "<p></p>");
-	
-	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"c_curves.txt\">");
-	httpd_resp_sendstr_chunk(req, "<button>Courbe de gaz</button></form>");
-	httpd_resp_sendstr_chunk(req, "</form>");
-	httpd_resp_sendstr_chunk(req, "<p></p>");
-	
-	httpd_resp_sendstr_chunk(req, "<p></p><form action=\"/\" method=\"get\"><button name="">Retour</button></form>") ;
-
-	httpd_resp_sendstr_chunk(req, "<p></p>");
-
-	Text2Html(req, "/html/footer.html");
-	httpd_resp_sendstr_chunk(req, NULL); //fin de la page
-
-	return ESP_OK;
-}
 
 int find_param_radio(int param,char *buf,char *output)
 {
@@ -1546,14 +1458,6 @@ static esp_err_t configs(httpd_req_t *req)
 	}
 	else if(strcmp(filename, "/c_slider") == 0) 
 		slider(req) ;
-	//else if(strcmp(filename, "/c_logs") == 0) //ancien logs et curve
-	//	logs(req) ;
-	else if(strcmp(filename, "/c_slider") == 0) 
-		slider(req) ;
-	else if(strcmp(filename, "/c_curves.txt") == 0) 
-		curves_get_handler(req) ;
-	else if(strcmp(filename, "/c_logs.txt") == 0) 
-		logs_get_handler(req) ;
 	else if(strcmp(filename, "/c_wifi") == 0) 
 		wifi_get_handler(req) ;
 	else if(strcmp(filename, "/c_stopwifi") == 0) {
@@ -1703,13 +1607,13 @@ esp_err_t start_server(const char *base_path, int port)
 
 	/******** File server ********************/
 	/* URI handler for getting uploaded files */
-	httpd_uri_t logs_download = {
-		.uri       = "/logs*",  // Match all URIs of type /path/to/file
+	httpd_uri_t sdcard_download = {
+		.uri       = "/sdcard*",  // Match all URIs of type /path/to/file
 		.method    = HTTP_GET,
 		.handler   = download_get_handler,
 		.user_ctx  = server_data    // Pass server data as context
 	};
-	httpd_register_uri_handler(server, &logs_download);
+	httpd_register_uri_handler(server, &sdcard_download);
 
 	/* URI handler for getting uploaded files */
 	httpd_uri_t file_download = {
@@ -1862,7 +1766,7 @@ static esp_err_t http_resp_dir_html(httpd_req_t *req, const char *dirpath)
 		const size_t upload_script_size = (upload_script_end - upload_script_start);
 		/* Add file upload form and script which on execution sends a POST request to /upload */
 		httpd_resp_send_chunk(req, (const char *)upload_script_start, upload_script_size);
-	} else if(strcmp(startwith, "/logs") == 0) {
+	} else if(strcmp(startwith, "/sdca") == 0) {
 		const size_t logs_script_size = (logs_script_end - logs_script_start);
 		/* Add file upload form and script which on execution sends a POST request to /upload */
 		httpd_resp_send_chunk(req, (const char *)logs_script_start, logs_script_size);
@@ -2009,7 +1913,9 @@ static esp_err_t download_get_handler(httpd_req_t *req)
             return favicon_get_handler(req);
         } else if (strcmp(filename, "/html/?") == 0) {
             return index_html_get_handler(req);
-        } else if (strcmp(filename, "/logs/?") == 0) {
+        } else if (strcmp(filename, "/sdcard/logs/?") == 0) {
+            return index_html_get_handler(req);
+        } else if (strcmp(filename, "/sdcard/?") == 0) {
             return index_html_get_handler(req);
         }
         ESP_LOGE(TAG, "Failed to stat file : %s", filepath);
@@ -2178,8 +2084,8 @@ static esp_err_t upload_post_handler(httpd_req_t *req)
 	if(strcmp(startwith, "/html") == 0) {
     	httpd_resp_set_hdr(req, "Location", "/html/");
 	}
-	else if(strcmp(startwith, "/logs") == 0) {
-		httpd_resp_set_hdr(req, "Location", "/logs/");
+	else if(strcmp(startwith, "/sdca") == 0) {
+		httpd_resp_set_hdr(req, "Location", "/sdcard/logs/");
 	}
 
 #ifdef CONFIG_EXAMPLE_HTTPD_CONN_CLOSE_HEADER
@@ -2229,8 +2135,8 @@ static esp_err_t delete_post_handler(httpd_req_t *req)
 	if(strcmp(startwith, "/html") == 0) {
     	httpd_resp_set_hdr(req, "Location", "/html/");
 	}
-	else if(strcmp(startwith, "/logs") == 0) {
-		httpd_resp_set_hdr(req, "Location", "/logs/");
+	else if(strcmp(startwith, "/sdca") == 0) {
+		httpd_resp_set_hdr(req, "Location", "/sdcard/logs/");
 	}
 #ifdef CONFIG_EXAMPLE_HTTPD_CONN_CLOSE_HEADER
     httpd_resp_set_hdr(req, "Connection", "close");

@@ -23,6 +23,7 @@
 #include <sys/stat.h>
 #include "esp_log.h"
 #include "esp_err.h"
+#include <dirent.h>
 
 //#include "sd_test_io.h"
 
@@ -66,7 +67,7 @@ static esp_err_t s_example_read_file(const char *path)
     return ESP_OK;
 }
 
-void init_sdcard(sdmmc_card_t *card)
+void init_sdcard(sdmmc_card_t *card2)
 {
     esp_err_t ret;
 
@@ -82,10 +83,9 @@ void init_sdcard(sdmmc_card_t *card)
         .max_files = 5,
         .allocation_unit_size = 16 * 1024
     };
-    //sdmmc_card_t *card
+    sdmmc_card_t *card ;
     const char mount_point[] = MOUNT_POINT;
     ESP_LOGI(TAG, "Initializing SD card");
-
     // Use settings defined above to initialize SD card and mount FAT filesystem.
     // Note: esp_vfs_fat_sdmmc/sdspi_mount is all-in-one convenience functions.
     // Please check its source code and implement error recovery when developing
@@ -96,6 +96,9 @@ void init_sdcard(sdmmc_card_t *card)
     // For setting a specific frequency, use host.max_freq_khz (range 400kHz - 20MHz for SDSPI)
     // Example: for fixed frequency of 10MHz, use host.max_freq_khz = 10000;
     sdmmc_host_t host = SDSPI_HOST_DEFAULT();
+    //host.slot = SPI2_HOST ;
+    host.max_freq_khz = 15000 ;
+
 
     // For SoCs where the SD power can be supplied both via an internal or external (e.g. on-board LDO) power supply.
     // When using specific IO pins (which can be used for ultra high-speed SDMMC) to connect to the SD card
@@ -110,7 +113,8 @@ void init_sdcard(sdmmc_card_t *card)
         .max_transfer_sz = 4000,
     };
 
-    ret = spi_bus_initialize(host.slot, &bus_cfg, SDSPI_DEFAULT_DMA);
+    
+    ret = spi_bus_initialize(host.slot, &bus_cfg, SDSPI_DEFAULT_DMA ) ;//SPI_DMA_CH_AUTO);
     if (ret != ESP_OK) {
         ESP_LOGE(TAG, "Failed to initialize bus.");
         return;
@@ -121,8 +125,8 @@ void init_sdcard(sdmmc_card_t *card)
     sdspi_device_config_t slot_config = SDSPI_DEVICE_CONFIG_DEFAULT();
     slot_config.gpio_cs = PIN_NUM_CS;
     slot_config.host_id = host.slot;
-    slot_config.gpio_cd =  PIN_NUM_DET;
-
+    //slot_config.gpio_cd =  PIN_NUM_DET;
+    
     ESP_LOGI(TAG, "Mounting filesystem");
     ret = esp_vfs_fat_sdspi_mount(mount_point, &host, &slot_config, &mount_config, &card);
 
@@ -146,70 +150,18 @@ void init_sdcard(sdmmc_card_t *card)
 
     // Use POSIX and C standard library functions to work with files.
 
-    // First create a file.
-    const char *file_hello = MOUNT_POINT"/hello.txt";
-    char data[EXAMPLE_MAX_CHAR_SIZE];
-    snprintf(data, EXAMPLE_MAX_CHAR_SIZE, "%s %s!\n", "Hello", card->cid.name);
-    ret = s_example_write_file(file_hello, data);
-    if (ret != ESP_OK) {
-        return;
-    }
-
-    const char *file_foo = MOUNT_POINT"/foo.txt";
-
-    // Check if destination file exists before renaming
-    struct stat st;
-    if (stat(file_foo, &st) == 0) {
-        // Delete it if it exists
-        unlink(file_foo);
-    }
-
-    // Rename original file
-    ESP_LOGI(TAG, "Renaming file %s to %s", file_hello, file_foo);
-    if (rename(file_hello, file_foo) != 0) {
-        ESP_LOGE(TAG, "Rename failed");
-        return;
-    }
-
-    ret = s_example_read_file(file_foo);
-    if (ret != ESP_OK) {
-        return;
-    }
-
-    // Format FATFS
-#ifdef CONFIG_EXAMPLE_FORMAT_SD_CARD
-    ret = esp_vfs_fat_sdcard_format(mount_point, card);
-    if (ret != ESP_OK) {
-        ESP_LOGE(TAG, "Failed to format FATFS (%s)", esp_err_to_name(ret));
-        return;
-    }
-
-    if (stat(file_foo, &st) == 0) {
-        ESP_LOGI(TAG, "file still exists");
-        return;
-    } else {
-        ESP_LOGI(TAG, "file doesn't exist, formatting done");
-    }
-#endif // CONFIG_EXAMPLE_FORMAT_SD_CARD
-
-    const char *file_nihao = MOUNT_POINT"/nihao.txt";
-    memset(data, 0, EXAMPLE_MAX_CHAR_SIZE);
-    snprintf(data, EXAMPLE_MAX_CHAR_SIZE, "%s %s!\n", "Nihao", card->cid.name);
-    ret = s_example_write_file(file_nihao, data);
-    if (ret != ESP_OK) {
-        return;
-    }
-
-    //Open file for reading
-    ret = s_example_read_file(file_nihao);
-    if (ret != ESP_OK) {
-        return;
-    }
-
     // All done, unmount partition and disable SPI peripheral
     //esp_vfs_fat_sdcard_unmount(mount_point, card);
     //ESP_LOGI(TAG, "Card unmounted");
 
     //deinitialize the bus after all devices are removed
     //spi_bus_free(host.slot);
+
+    DIR *dir = opendir(LOGPATH);
+    if (!dir) {
+        ESP_LOGI(TAG, "Création de %s", LOGPATH);
+        int mk_ret = mkdir(LOGPATH,0755) ;
+        ESP_LOGI(TAG, "mkdir ret %d", mk_ret);
+    }
+    
 }

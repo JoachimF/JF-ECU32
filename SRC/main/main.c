@@ -240,6 +240,9 @@ void app_main()
 	gpio_set_direction(GLOW_PIN, GPIO_MODE_OUTPUT);
 	gpio_set_level(GLOW_PIN, 0);
 	
+	// Entrées
+	init_inputs() ;
+
 	const esp_partition_t *partition = esp_ota_get_running_partition();
 	esp_chip_info_t chip_info;
 	esp_chip_info(&chip_info);
@@ -399,7 +402,8 @@ void app_main()
 	battery_check() ;
 	set_power(&turbine.starter,0) ;
 	
-	
+	/* For debugging */
+	//set_defaut_turbine() ;
 	//turbine.EGT = 1000 ;
 	//turbine.GAZ = 1000 ;
 		
