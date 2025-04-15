@@ -28,6 +28,7 @@
 #include "esp_log.h"
 #include "esp_err.h"
 #include "esp_vfs.h"
+
 #include "esp_spiffs.h"
 #include "nvs.h"
 #include "esp_http_server.h"
@@ -51,8 +52,10 @@
 #include "imu.h"
 #endif
 #include "websocket.h"
-#include "file_server.h"
 #include <dirent.h>
+#include "sdcard.h"
+
+struct file_server_data *server_data = NULL;
 
 extern TimerHandle_t xTimer60s ;
 static const char *TAG = "HTTP";
@@ -71,6 +74,15 @@ extern _wifi_params_t wifi_params ;
 //extern TaskHandle_t xlogHandle ;
 //extern TaskHandle_t xWebHandle ;
 //extern TaskHandle_t xecuHandle ;
+
+void WSShowFreeSpace(httpd_req_t *req)
+{
+	char freespace[100] ;
+	httpd_resp_sendstr_chunk(req, "<div style=\"text-align:right;font-size:11px\">") ;	
+	sprintf(freespace,"Freespace : %d KiB",file_space()) ;
+	httpd_resp_sendstr_chunk(req, freespace) ;
+	httpd_resp_sendstr_chunk(req, "</div>") ;
+}
 
 esp_err_t save_key_value(char * key, char * value)
 {
@@ -464,60 +476,21 @@ static esp_err_t root_post_handler(httpd_req_t *req)
 static esp_err_t favicon_get_handler(httpd_req_t *req)
 {
 	ESP_LOGI(TAG, "favicon_get_handler req->uri=[%s]", req->uri);
+//	char filepath[] = "/html/favicon.ico" ;
+    //extern const unsigned char favicon_ico_start[] asm("_binary_favicon_ico_start");
+    //extern const unsigned char favicon_ico_end[]   asm("_binary_favicon_ico_end");
+    //const size_t favicon_ico_size = (favicon_ico_end - favicon_ico_start);
+//    httpd_resp_set_type(req, "image/x-icon");
+//    http_resp_dir_html(req, filepath);
+	extern const unsigned char favicon_ico_start[] asm("_binary_favicon_ico_start");
+    extern const unsigned char favicon_ico_end[]   asm("_binary_favicon_ico_end");
+    const size_t favicon_ico_size = (favicon_ico_end - favicon_ico_start);
+    httpd_resp_set_type(req, "image/x-icon");
+    httpd_resp_send(req, (const char *)favicon_ico_start, favicon_ico_size);
 	return ESP_OK;
 }
 
-static esp_err_t curves_get_handler(httpd_req_t *req)
-{
-    FILE *fd = NULL;
-    struct stat st;
-	char FileName[] = "/html/curves.txt" ;
 
-	update_curve_file() ;
-	if (stat(FileName, &st) != 0) {
-		ESP_LOGE(TAG, "[%s] not found", FileName);
-		return ESP_FAIL;
-	}
-	ESP_LOGI(TAG, "%s st.st_size=%ld", FileName, st.st_size);
-
-	char*	file_buffer = NULL;
-	size_t file_buffer_len = st.st_size;
-	file_buffer = malloc(file_buffer_len);
-	if (file_buffer == NULL) {
-		ESP_LOGE(TAG, "malloc fail. file_buffer_len %d", file_buffer_len);
-		return ESP_FAIL;
-	}
-
-	ESP_LOGI(TAG, "logs_get_handler req->uri=[%s]", req->uri);
-	fd = fopen(FileName, "r");
-	if (!fd) {
-       ESP_LOGE(TAG, "Failed to read existing file : logs.txt");
-        /* Respond with 500 Internal Server Error */
-        httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to read existing file");
-        return ESP_FAIL;
-    }
-	for (int i=0;i<st.st_size;i++) {
-		fread(&file_buffer[i], sizeof(char), 1, fd);
-	}
-	fclose(fd);
-
-	ESP_LOGI(TAG, "Sending file : logs.txt...");
-	ESP_LOGI(TAG, "%s",file_buffer);
-	httpd_resp_set_type(req, "application/octet-stream");
-	if (httpd_resp_send_chunk(req, file_buffer, st.st_size) != ESP_OK) {
-                fclose(fd);
-                ESP_LOGE(TAG, "File sending failed!");
-                /* Abort sending file */
-                httpd_resp_sendstr_chunk(req, NULL);
-                /* Respond with 500 Internal Server Error */
-                httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to send file");
-               return ESP_FAIL;
-	}
-	httpd_resp_sendstr_chunk(req, NULL);
-
-    ESP_LOGI(TAG, "File sending complete");
-	return ESP_OK;
-}
 
 
 int find_param_radio(int param,char *buf,char *output)
@@ -1551,10 +1524,11 @@ esp_err_t start_server(const char *base_path, int port)
 {
 	
 	httpd_config_t config = HTTPD_DEFAULT_CONFIG();
-	config.max_open_sockets = 3 ;
+	config.max_open_sockets = 4 ;
 	config.core_id = 0 ;
 	config.stack_size = 16392 ; // Default 4K -> 20K
 	config.server_port = port;
+	config.max_uri_handlers = 9 ;
 
 	/* Use the URI wildcard matching function in order to
 	 * allow the same handler to respond to multiple different
@@ -1642,6 +1616,14 @@ esp_err_t start_server(const char *base_path, int port)
 	};
 	httpd_register_uri_handler(server, &file_delete);
 
+	/* URI handler for getting favicon */
+	httpd_uri_t favicon_download = {
+		.uri       = "/favicon.ico",  // Match all URIs of type /path/to/file
+		.method    = HTTP_GET,
+		.handler   = favicon_get_handler,
+		.user_ctx  = server_data    // Pass server data as context
+	};
+	httpd_register_uri_handler(server, &favicon_download);
 	//setup_websocket_server(server) ;
 	ESP_LOGI(TAG, "HTTP Server Started");
 	return ESP_OK;
@@ -1695,9 +1677,6 @@ void http_server_task(void *pvParameters)
 	ESP_LOGI(TAG, "finish");
 	vTaskDelete(NULL);
 }
-
-/* File server functions */
-
 
 /* Handler to redirect incoming GET request for /index.html to /
  * This can be overridden by uploading file with same name */
@@ -1826,10 +1805,15 @@ static esp_err_t http_resp_dir_html(httpd_req_t *req, const char *dirpath)
 
     /* Send empty chunk to signal HTTP response completion */
 	WSRetourBouton(req) ;
+	if(strcmp(startwith, "/sdca") == 0) {
+		WSShowFreeSpace(req) ;
+	}
 	Text2Html(req, "/html/footer.html");
     httpd_resp_sendstr_chunk(req, NULL);
     return ESP_OK;
 }
+
+
 
 #define IS_FILE_EXT(filename, ext) \
     (strcasecmp(&filename[strlen(filename) - sizeof(ext) + 1], ext) == 0)
@@ -2144,5 +2128,6 @@ static esp_err_t delete_post_handler(httpd_req_t *req)
     httpd_resp_sendstr(req, "File deleted successfully");
     return ESP_OK;
 }
+
 
 

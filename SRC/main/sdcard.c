@@ -28,6 +28,7 @@
 //#include "sd_test_io.h"
 
 static const char *TAG = "SDCard";
+FILE *log_file ;
 
 
 static esp_err_t s_example_write_file(const char *path, char *data)
@@ -67,7 +68,7 @@ static esp_err_t s_example_read_file(const char *path)
     return ESP_OK;
 }
 
-void init_sdcard(sdmmc_card_t *card2)
+esp_err_t init_sdcard(sdmmc_card_t *card2)
 {
     esp_err_t ret;
 
@@ -96,13 +97,8 @@ void init_sdcard(sdmmc_card_t *card2)
     // For setting a specific frequency, use host.max_freq_khz (range 400kHz - 20MHz for SDSPI)
     // Example: for fixed frequency of 10MHz, use host.max_freq_khz = 10000;
     sdmmc_host_t host = SDSPI_HOST_DEFAULT();
-    //host.slot = SPI2_HOST ;
+    host.slot = SPI_PORT ;
     host.max_freq_khz = 15000 ;
-
-
-    // For SoCs where the SD power can be supplied both via an internal or external (e.g. on-board LDO) power supply.
-    // When using specific IO pins (which can be used for ultra high-speed SDMMC) to connect to the SD card
-    // and the internal LDO power supply, we need to initialize the power supply first.
 
     spi_bus_config_t bus_cfg = {
         .mosi_io_num = PIN_NUM_MOSI,
@@ -114,10 +110,10 @@ void init_sdcard(sdmmc_card_t *card2)
     };
 
     
-    ret = spi_bus_initialize(host.slot, &bus_cfg, SDSPI_DEFAULT_DMA ) ;//SPI_DMA_CH_AUTO);
+    ret = spi_bus_initialize(host.slot, &bus_cfg, SPI_DMA ) ;//SPI_DMA_CH_AUTO);
     if (ret != ESP_OK) {
         ESP_LOGE(TAG, "Failed to initialize bus.");
-        return;
+        return ret ;
     }
 
     // This initializes the slot with card detect (CD) and write protect (WP) signals.
@@ -141,7 +137,7 @@ void init_sdcard(sdmmc_card_t *card2)
             check_sd_card_pins(&config, pin_count);
 #endif
         }
-        return;
+        return ret ;
     }
     ESP_LOGI(TAG, "Filesystem mounted");
 
@@ -163,5 +159,64 @@ void init_sdcard(sdmmc_card_t *card2)
         int mk_ret = mkdir(LOGPATH,0755) ;
         ESP_LOGI(TAG, "mkdir ret %d", mk_ret);
     }
-    
+    file_space() ;
+    return ret ;    
+}
+
+int file_space(void)
+{
+    FATFS *fs;
+    DWORD fre_clust, fre_sect, tot_sect;
+    /* Get volume information and free clusters of drive 0 */
+    int res = f_getfree("/sdcard", &fre_clust, &fs);
+    /* Get total sectors and free sectors */
+    tot_sect = (fs->n_fatent - 2) * fs->csize;
+    fre_sect = fre_clust * fs->csize;
+    /* Print the free space (assuming 512 bytes/sector) */
+    ESP_LOGI(TAG,"%10u KiB total drive space.\r\n%10u KiB available.\r\n%10u free clust.\r\n",tot_sect / 2, fre_sect / 2,fre_clust);
+    return (fre_sect / 2);
+}
+
+static int print_to_sd_card(const char *fmt, va_list list)
+{
+    static int counter = 0 ;
+    if (log_file == NULL) {
+        return -1;
+    }
+    int res = vfprintf(log_file, fmt, list);
+    res = vprintf(fmt,list) ;
+
+    // Committing changes to the file on each write is slower,
+    // but ensures that no data will be lost.
+    //
+    // You may have to figure out when to call fsync.
+    // For example, only call fsync after every 50 log messages,
+    // or after 100ms passed since last fsync, and so on.
+    if(counter < 10 ) {
+        counter ++ ;
+    } else {
+        fsync(fileno(log_file));
+        counter = 0 ;
+    }
+    return res;
+}
+
+void redirect_sytems_logs(void)
+{
+    ESP_LOGI(TAG,"Redirection to SDCard");
+    log_file = fopen(LOGPATH "/"SYSTEM_LOG_FILE,"a") ;
+    if(log_file) {
+        ESP_LOGI(TAG,"Now redirecting stdout to log file as well");
+        esp_log_set_vprintf(&print_to_sd_card);
+        // Save UART stdout stream
+        //FILE* uart_stdout = stdout;
+        // Change stdout for THIS TASK ONLY
+        //stdout = log_file;
+        // Change stdout for all new tasks which will be created
+        //_GLOBAL_REENT->_stdout = log_file;
+        printf("SD Log start");
+        ESP_LOGI(TAG,"SD Log start");
+    } else {
+        ESP_LOGI(TAG,"Unable to redirect LOG");
+    }
 }

@@ -54,7 +54,7 @@
 #if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(4, 0, 0)
 #define HOST    HSPI_HOST
 #else
-#define HOST    SPI2_HOST
+#define HOST    SPI3_HOST
 #endif
 
 

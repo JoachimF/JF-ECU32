@@ -25,6 +25,7 @@
 #include <dirent.h>
 
 #include "jf-ecu32.h"
+#include "sdcard.h"
 #include "http_server.h"
 #include "wifi.h"
 #include "nvs_ecu.h"
@@ -215,10 +216,10 @@ long int timer_old,Timer1,time_ecu ;
 //#define NUM_RECORDS 100
 //static heap_trace_record_t trace_record[NUM_RECORDS]; // This buffer must be in internal RAM
 
-void app_main()
+void init_outputs(void)
 {
-	int res ;
 	//*** A commenter pour utiliser le JTAG ******
+	/* Init outputs t zero */
 	//gpio_pad_select_gpio(STARTER_PIN);
 	gpio_set_direction(STARTER_PIN, GPIO_MODE_OUTPUT);
 	gpio_set_level(STARTER_PIN, 0);
@@ -239,21 +240,36 @@ void app_main()
 	//gpio_pad_select_gpio(GLOW_PIN);
 	gpio_set_direction(GLOW_PIN, GPIO_MODE_OUTPUT);
 	gpio_set_level(GLOW_PIN, 0);
+
+}
+
+void app_main()
+{
+	sdmmc_card_t card ;
+	int res ;
 	
+	init_outputs() ;
+	
+	ESP_LOGI("SDCARD","Init SDCARD");
+    if(init_sdcard(&card) == ESP_OK){
+		//redirect_sytems_logs() ;
+	}
+		
 	// Entrées
 	init_inputs() ;
+
 
 	const esp_partition_t *partition = esp_ota_get_running_partition();
 	esp_chip_info_t chip_info;
 	esp_chip_info(&chip_info);
-	printf("This is %s chip with %d CPU cores, WiFi%s%s, ",
+	ESP_LOGI(TAG,"This is %s chip with %d CPU cores, WiFi%s%s, ",
 			CONFIG_IDF_TARGET,
 			chip_info.cores,
 			(chip_info.features & CHIP_FEATURE_BT) ? "/BT" : "",
 			(chip_info.features & CHIP_FEATURE_BLE) ? "/BLE" : "");
 
-	printf("silicon revision %d, ", chip_info.revision);
-	printf("Currently running partition: %s\r\n", partition->label);
+	ESP_LOGI(TAG,"silicon revision %d, ", chip_info.revision);
+	ESP_LOGI(TAG,"Currently running partition: %s\r\n", partition->label);
 	
 	// Initialize Heap Trace
 	//ESP_ERROR_CHECK( heap_trace_init_standalone(trace_record, NUM_RECORDS) );
@@ -285,11 +301,13 @@ void app_main()
 		ESP_LOGE(TAG, "SPIFFS mount failed");
 		while(1) { vTaskDelay(1); }
 	}
-	if (mountSPIFFS("/logs", "logs", 5) != ESP_OK)
+	
+	// Now on SDCard
+	/*if (mountSPIFFS("/logs", "logs", 5) != ESP_OK)
 	{
 		ESP_LOGE(TAG, "SPIFFS mount failed");
 		//while(1) { vTaskDelay(1); }
-	}
+	}*/
 
 	// Create EventGroup
 	xLogEventGroup = xEventGroupCreate();
@@ -342,10 +360,10 @@ void app_main()
 	//vTaskSuspend( xinputsHandle ); 
 
 	/* Htop */
-	/*ESP_LOGI(TAG, "Initializing Task Htop");
+	ESP_LOGI(TAG, "Initializing Task Htop");
 	sync_spin_task = xSemaphoreCreateCounting(NUM_OF_SPIN_TASKS, 0);
     sync_stats_task = xSemaphoreCreateBinary();
-	xTaskCreatePinnedToCore(stats_task, "stats", 4096, NULL, STATS_TASK_PRIO, NULL, tskNO_AFFINITY);*/
+	xTaskCreatePinnedToCore(stats_task, "stats", 4096, NULL, STATS_TASK_PRIO, NULL, tskNO_AFFINITY);
 
 
 	ESP_LOGI(TAG, "Initializing MAX31855 Task\n"); //EGT
@@ -376,6 +394,7 @@ void app_main()
 			config_ECU.INA219_Present = 1;		
 		}
 	}
+	free(addresses) ;
 	if(config_ECU.INA219_Present) 
 		ESP_LOGI(TAG, "INA219 found\n");  // Glow current + battery voltage
 	else
@@ -385,7 +404,7 @@ void app_main()
 	xTaskCreatePinnedToCore(task_glow_current, "GLOW Current", configMINIMAL_STACK_SIZE * 8, NULL, (configMAX_PRIORITIES -5 ), &task_glow_current_h,1);
 	vTaskSuspend(task_glow_current_h);
 
-	//xSemaphoreGive(sync_stats_task);
+	xSemaphoreGive(sync_stats_task);
 	/* Htop */
 
 	/* Demarrage des taches*/

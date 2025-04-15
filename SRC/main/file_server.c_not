@@ -12,6 +12,7 @@
    CONDITIONS OF ANY KIND, either express or implied.
 */
 
+#include "file_server.h"
 #include <stdio.h>
 #include <string.h>
 #include <sys/param.h>
@@ -37,14 +38,7 @@
 /* Scratch buffer size */
 #define SCRATCH_BUFSIZE  8192
 
-struct file_server_data {
-    /* Base path of file storage */
-    char base_path[ESP_VFS_PATH_MAX + 1];
-
-    /* Scratch buffer for temporary storage during file transfer */
-    char scratch[SCRATCH_BUFSIZE];
-};
-
+struct file_server_data *server_data = NULL;
 static const char *TAG = "file_server";
 
 /* Handler to redirect incoming GET request for /index.html to /
@@ -62,11 +56,13 @@ static esp_err_t index_html_get_handler(httpd_req_t *req)
  * This can be overridden by uploading file with same name */
 static esp_err_t favicon_get_handler(httpd_req_t *req)
 {
-    extern const unsigned char favicon_ico_start[] asm("_binary_favicon_ico_start");
-    extern const unsigned char favicon_ico_end[]   asm("_binary_favicon_ico_end");
-    const size_t favicon_ico_size = (favicon_ico_end - favicon_ico_start);
-    httpd_resp_set_type(req, "image/x-icon");
-    httpd_resp_send(req, (const char *)favicon_ico_start, favicon_ico_size);
+    //char filepath[] = "/html/favicon.ico" ;
+    //extern const unsigned char favicon_ico_start[] asm("_binary_favicon_ico_start");
+    //extern const unsigned char favicon_ico_end[]   asm("_binary_favicon_ico_end");
+    //const size_t favicon_ico_size = (favicon_ico_end - favicon_ico_start);
+    //httpd_resp_set_type(req, "image/x-icon");
+    //http_resp_dir_html(req, filepath);
+    //httpd_resp_send(req, (const char *)favicon_ico_start, favicon_ico_size);
     return ESP_OK;
 }
 

@@ -31,6 +31,8 @@ function getBatt() {
 	};
 	xhr.open("GET", "/c_readings", true);
 	xhr.send();
+	
 }
-setInterval(getBatt,1000) ;
+
+setInterval(getBatt,5000) ;
 </script>

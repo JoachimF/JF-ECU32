@@ -260,29 +260,26 @@ uint8_t scan_i2c(int *addresses)
     devT.cfg.master.clk_speed = 100000; // 100kHz
     
     esp_err_t res;
-    printf("     0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f\n");
-    printf("00:         ");
+    //printf("     0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f\n");
+    //printf("00:         ");
     for (uint8_t addr = 3; addr < 0x78; addr++)
     {
-        if (addr % 16 == 0)
-            printf("\n%.2x:", addr);
-
+        //if (addr % 16 == 0)
+            //printf("\n%.2x:", addr);
         devT.addr = addr;
         res = i2c_dev_probe(&devT, I2C_DEV_WRITE);
 
         if (res == 0){
             
-            printf(" %.2x", addr);
+            //printf(" %.2x", addr);
             nb_periph++ ;
             addresses = realloc(addresses,sizeof(uint8_t)*nb_periph) ;
             addresses[nb_periph] = addr ;
-        }
-
-            
-        else
-            printf(" --");
+        }            
+        //else
+            //printf(" --");
     }
-    printf("\n\n");
+    //printf("\n\n");
     return nb_periph ;
 }
 
@@ -290,21 +287,9 @@ uint8_t scan_i2c(int *addresses)
 void task_egt(void *pvParameter)
 {
     max31855_t dev = { 0 };
-    // **********  Configure SPI bus
-    // Now initialized in init_inputs()
-
-    /*spi_bus_config_t cfg = {
-       .mosi_io_num = -1,
-       .miso_io_num = MISO_GPIO_NUM,
-       .sclk_io_num = CLK_GPIO_NUM,
-       .quadwp_io_num = -1,
-       .quadhd_io_num = -1,
-       .max_transfer_sz = 0,
-       .flags = 0
-    };
-    ESP_ERROR_CHECK(spi_bus_initialize(HOST, &cfg, 1));*/
 
     // Init device
+    
     ESP_ERROR_CHECK(max31855_init_desc(&dev, HOST, MAX31855_MAX_CLOCK_SPEED_HZ, CS_GPIO_NUM));
 
     float tc_t, cj_t;
@@ -354,37 +339,22 @@ void init_inputs(void)
 
     /* SPI pins for SDcard and MAX31855*/
     ESP_LOGI("SPI","Set pins level for SDCARD");
-   /*gpio_set_direction(PIN_NUM_MISO, GPIO_MODE_INPUT);
-    gpio_set_direction(PIN_NUM_MOSI, GPIO_MODE_OUTPUT);
-
-    gpio_set_direction(PIN_NUM_CS, GPIO_MODE_OUTPUT);
-    gpio_set_direction(PIN_NUM_CLK, GPIO_MODE_OUTPUT);
-    gpio_set_direction(PIN_NUM_CS, GPIO_MODE_OUTPUT);
     
-    gpio_set_level(PIN_NUM_CS,1) ;
-    gpio_set_level(PIN_NUM_MOSI,1) ;
-    gpio_set_level(PIN_NUM_CLK,1) ;
-    gpio_set_level(PIN_NUM_CS,1) ;
-    gpio_pullup_en(PIN_NUM_MOSI) ;
-    gpio_pullup_en(PIN_NUM_CS) ;
-    gpio_pullup_en(PIN_NUM_CLK) ;
-    gpio_pullup_en(PIN_NUM_CS) ;*/
-    sdmmc_card_t card ;
-    ESP_LOGI("SDCARD","Init SDCARD");
-    init_sdcard(&card) ;
-
-
-    //** Interruption RPM
+    /********* INPUT PINS CONIFG **************/
+    /* Interruption RPM */
     gpio_set_direction(RPM_PIN, GPIO_MODE_INPUT);
     gpio_pullup_dis(RPM_PIN);
     gpio_pulldown_dis(RPM_PIN);
-    //gpio_pullup_en(SDA_GPIO);
-    //gpio_pullup_en(SCL_GPIO);
     //gpio_pulldown_en(RPM_PIN);
     gpio_set_intr_type(RPM_PIN, GPIO_INTR_POSEDGE);    
     gpio_install_isr_service(ESP_INTR_FLAG_LEVEL3|ESP_INTR_FLAG_IRAM);
     gpio_isr_handler_add(RPM_PIN, gpio_isr_handler, (void *)RPM_PIN);
     gpio_intr_enable(RPM_PIN) ;
+    /* RX Pins */
+    gpio_set_direction(RMT_RX_GPIO_NUM, GPIO_MODE_INPUT);
+    gpio_pulldown_en(RMT_RX_GPIO_NUM);
+    gpio_set_direction(RMT_AUX_GPIO_NUM, GPIO_MODE_INPUT);
+    gpio_pulldown_en(RMT_AUX_GPIO_NUM);
 
     ESP_LOGI("RPM","Initialized");
 
@@ -666,7 +636,7 @@ bool battery_check(void)
     {
         set_batOk(0) ;
         add_error_msg(E_BATTCONF,"Batterie mal configurée");
-        ESP_LOGI(TAG,"Batterie mal configurée") ;		
+        //ESP_LOGI(TAG,"Batterie mal configurée") ;		
     }
 	
     if(nb_lipo > 3 || nb_lipo < 2)

@@ -23,6 +23,8 @@
 #include "esp_vfs_fat.h"
 #include "sdmmc_cmd.h"
 
+//Pin SPI3 - VSPI
+
 #define PIN_NUM_MISO  19
 #define PIN_NUM_MOSI  23
 #define PIN_NUM_CLK   18
@@ -32,8 +34,15 @@
 #define MOUNT_POINT "/sdcard"
 #define EXAMPLE_MAX_CHAR_SIZE    64
 
+#define SPI_PORT  SPI3_HOST
+#define SPI_DMA   SPI_PORT
+
 #define LOGPATH MOUNT_POINT"/logs"
 
-void init_sdcard(sdmmc_card_t *card2) ;
+#define SYSTEM_LOG_FILE "logs.txt"
+
+esp_err_t init_sdcard(sdmmc_card_t *card2) ;
+int file_space(void) ;
+void redirect_sytems_logs(void) ;
 
 #endif

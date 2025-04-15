@@ -579,15 +579,16 @@ void head_logs_file(FILE *fd)
 	if (!fd) {
        ESP_LOGI("File", "Failed to open file");
     } else {
-        fprintf(fd,"Time;RPM;RPMDelta;RPMPeriod;EGT;EGT_delta;Pompe1;Cible Pompe1;Pompe2;Glow;Vanne1;Vanne2;Voie Gaz;Voie Aux;Vbatt;Glow current;Stater;ErrorMsg;PhaseF;PhaseS\n");
+        fprintf(fd,"FunTime;Ticks;Time;RPM;RPMDelta;RPMPeriod;EGT;EGT_delta;Pompe1;Cible Pompe1;Pompe2;Glow;Vanne1;Vanne2;Voie Gaz;Voie Aux;Vbatt;Glow current;Stater;ErrorMsg;PhaseF;PhaseS\n");
     }
 }
 
-void update_logs_file(FILE *fd)
+void update_logs_file(FILE *fd,uint32_t func_time)
 {   
     uint8_t minutes,secondes ;
+    uint32_t ticks ;
     char errors[100] ;
-
+    ticks = xTaskGetTickCount() ;
     get_time_up(&turbine,&secondes,&minutes,NULL) ;
 
 /*    fd = fopen(logpath, "a");
@@ -596,8 +597,8 @@ void update_logs_file(FILE *fd)
     } else {*/
             get_errors(errors) ;
                /*Time;RPM;RPMDelta;RPMPeriod;EGT;EGT_Delta;Pompe1;Cible Pompe1;Pompe2;Glow;Vanne1;Vanne2;Voie Gaz;Voie Aux;Vbatt;Glow current;Stater;ErrorMsg;PhaseF;PhaseS;PhaseSB\n"*/
-            fprintf(fd,"%02u:%02u;%lu;%ld;%llu;%lu;%ld;%f;Cible Pompe1;%f;%u;%u;%u;%lu;%lu;%0.2f;%0.3f;%0.2f;%s;%d;%d\n",
-                    minutes,secondes,get_RPM(&turbine),get_delta_RPM(&turbine),turbine.RPM_period,get_EGT(&turbine),get_delta_EGT(&turbine),
+            fprintf(fd,"%lu;%lu;%02u:%02u;%lu;%ld;%llu;%lu;%ld;%f;Cible Pompe1;%f;%u;%u;%u;%lu;%lu;%0.2f;%0.3f;%0.2f;%s;%d;%d\n",
+                    func_time,ticks,minutes,secondes,get_RPM(&turbine),get_delta_RPM(&turbine),turbine.RPM_period,get_EGT(&turbine),get_delta_EGT(&turbine),
                     get_pump_power_float(&turbine.pump1),get_pump_power_float(&turbine.pump2),get_glow_power(&turbine.glow),get_vanne_power(&turbine.vanne1),get_vanne_power(&turbine.vanne2),
                     get_gaz(&turbine),get_aux(&turbine),get_vbatt(&turbine),get_glow_current(&turbine.glow),get_starter_power(&turbine.starter),errors,turbine.phase_fonctionnement,
                     turbine.phase_start
@@ -624,8 +625,9 @@ void log_task( void * pvParameters )
     char first_log[10] ;
     char startwith[6] ;
     char newLog[FILE_PATH_MAX] ;
+    uint32_t func_time,func_time_prec ;
     
-    
+    func_time = xTaskGetTickCount() ;
 
     struct dirent *entry;
     FILE *fd = NULL;
@@ -646,14 +648,14 @@ void log_task( void * pvParameters )
     const size_t dirpath_len = strlen(MOUNT_POINT"/logs/");
     DIR *dir = opendir(MOUNT_POINT"/logs/");
     
-
+    func_time = 0 ;
     while(1) {
         /* Wait for start log*/
         uxBits = xEventGroupGetBits(xLogEventGroup);
-
+        func_time_prec = xTaskGetTickCount() ;
         if( uxBits == 1 && turbine.log_started == 0 ) // Start logging ?
         {
-            ESP_LOGI("LOG", "New Log");
+            //ESP_LOGI("LOG", "New Log");
             turbine.log_started = 5 ;
             while ((entry = readdir(dir)) != NULL) {
                 entrytype = (entry->d_type == DT_DIR ? "directory" : "file");
@@ -661,7 +663,7 @@ void log_task( void * pvParameters )
                 if(entry->d_type != DT_DIR) //Fichier
                 {
                     strlcpy(startwith,entry->d_name,4) ;
-                    ESP_LOGI(TAG,"startwith : %s",startwith) ;
+                    //ESP_LOGI(TAG,"startwith : %s",startwith) ;
                     if(strcmp(startwith, "LOG") == 0) {
                         strcpy(filetmp,entry->d_name);
                         point = strstr(entry->d_name,".CSV") ;
@@ -678,11 +680,11 @@ void log_task( void * pvParameters )
                                 strcpy(first_log,entry->d_name);
                             }
                         }
-                        ESP_LOGI(TAG, "%s : number %d",entry->d_name, number);
+                        //ESP_LOGI(TAG, "%s : number %d",entry->d_name, number);
                     }
                 }
             }
-            ESP_LOGI(TAG,"Last LOG : %s - First LOG %s",last_log, first_log);
+            //ESP_LOGI(TAG,"Last LOG : %s - First LOG %s",last_log, first_log);
             number = last_number+1 ;
             sprintf(newLog,MOUNT_POINT"/logs/log%d.CSV",number) ;
             fd = fopen(newLog, "w");
@@ -694,7 +696,8 @@ void log_task( void * pvParameters )
         if( turbine.log_started >= 1 ) // Start logging
         {
             if(fd)
-                update_logs_file(fd) ;
+                update_logs_file(fd,func_time) ;
+            func_time = xTaskGetTickCount() - func_time_prec ;
         }
         
         if( uxBits == 0 ) //Stop logging
@@ -704,14 +707,14 @@ void log_task( void * pvParameters )
                 turbine.log_started-- ;
             } else {
                 if(fd){
-                    ESP_LOGI("LOG", "Close Log File");
+                    //ESP_LOGI("LOG", "Close Log File");
                     fclose(fd);
                     fd = NULL ;
                 }
                     
             }
         } 
-        vTaskDelay( pdMS_TO_TICKS(250));
+        vTaskDelay( pdMS_TO_TICKS(200));
     }
     //ESP_LOGI(TAG, "finish");
 	vTaskDelete(xlogHandle);

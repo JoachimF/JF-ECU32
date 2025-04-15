@@ -17,4 +17,4 @@ function getReadings() {
 	xhr.open("GET", "/c_readings", true);
 	xhr.send();
 }
-setInterval(getReadings,500) ;
+setInterval(getReadings,1000) ;

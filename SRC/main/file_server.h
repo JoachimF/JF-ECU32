@@ -41,11 +41,11 @@ struct file_server_data {
     /* Scratch buffer for temporary storage during file transfer */
     char scratch[SCRATCH_BUFSIZE];
 };
-static struct file_server_data *server_data = NULL;
 
 static esp_err_t delete_post_handler(httpd_req_t *req) ;
 static esp_err_t upload_post_handler(httpd_req_t *req) ;
 static esp_err_t download_get_handler(httpd_req_t *req) ;
+static esp_err_t http_resp_dir_html(httpd_req_t *req, const char *dirpath) ;
 
 
 #ifdef __cplusplus

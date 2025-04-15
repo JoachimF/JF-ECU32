@@ -1,0 +1,1230 @@
+[0;32mI (790) SDCard: SD Log start[0m
+[0;32mI (790) RPM: Init timer 1Mhz[0m
+[0;32mI (800) RPM: Init RPM[0m
+[0;32mI (800) SPI: Set pins level for SDCARD[0m
+[0;32mI (820) RPM: Initialized[0m
+[0;32mI (820) PPM: Init PPM[0m
+[0;32mI (820) gpio: GPIO[26]| InputEn: 1| OutputEn: 0| OpenDrain: 0| Pullup: 1| Pulldown: 0| Intr:0 [0m
+[0;32mI (830) INPUTS: PPM RX initialized
+[0m
+[0;32mI (830) gpio: GPIO[35]| InputEn: 1| OutputEn: 0| OpenDrain: 0| Pullup: 1| Pulldown: 0| Intr:0 [0m
+[0;32mI (840) INPUTS: PPM AUX RX initializated
+[0m
+[0;32mI (850) INPUTS: RMT RX initialized
+[0m
+[0;32mI (930) INPUTS: RMT AUX initialized
+[0m
+[0;32mI (930) INPUTS: Receive RX ranges initialized
+[0m
+[0;32mI (950) INPUTS: Receive AUX ranges initialized
+[0m
+[0;32mI (950) PPM: Initialized[0m
+[0;32mI (950) INPUTS: I2C initialized
+[0m
+[0;32mI (950) INPUTS: calibration scheme version is Line Fitting[0m
+[0;32mI (960) INPUTS: Calibration Success[0m
+[0;32mI (960) MAIN: This is esp32 chip with 2 CPU cores, WiFi/BT/BLE, [0m
+[0;32mI (970) MAIN: silicon revision 100, [0m
+[0;32mI (970) MAIN: Currently running partition: ota_0
+[0m
+[0;32mI (980) MAIN: Initializing NVS[0m
+[0;32mI (1070) NVS: Init...[0m
+[0;32mI (1110) NVS: Init OK[0m
+[0;32mI (1110) MAIN: Initializing NVS Wifi[0m
+[0;32mI (1110) NVS: Ouverture du handle[0m
+[0;32mI (1110) NVS: Lecture config wifi[0m
+[0;32mI (1110) NVS: SSID = Zigbee[0m
+[0;32mI (1120) NVS: Password = tototata[0m
+[0;32mI (1120) NVS: Retry = 5[0m
+[0;32mI (1120) NVS: Checksum = 1483[0m
+[0;32mI (1130) NVS: Len = 100[0m
+[0;32mI (1130) NVS: Checksum calculé = 1483[0m
+[0;32mI (1170) NVS: Checkum OK[0m
+[0;32mI (1190) MAIN: Initializing Timer[0m
+[0;32mI (1190) MAIN: Initializing Wifi[0m
+[0;32mI (1190) WIFI: ESP-IDF Ver5.0[0m
+[0;32mI (1190) WIFI: ESP_IDF_VERSION 327688[0m
+[0;32mI (1190) WIFI: ESP-IDF esp_netif[0m
+I (1210) wifi:wifi driver task: 3ffc98f0, prio:23, stack:6656, core=0
+[0;32mI (1210) system_api: Base MAC address is not set[0m
+[0;32mI (1210) system_api: read default base MAC address from EFUSE[0m
+I (1310) wifi:wifi firmware version: 0fff8a6
+I (1310) wifi:wifi certification version: v7.0
+I (1320) wifi:config NVS flash: enabled
+I (1320) wifi:config nano formating: disabled
+I (1410) wifi:Init data frame dynamic rx buffer num: 32
+I (1410) wifi:Init static rx mgmt buffer num: 5
+I (1410) wifi:Init management short buffer num: 32
+I (1410) wifi:Init dynamic tx buffer num: 32
+I (1450) wifi:Init static rx buffer size: 1600
+I (1450) wifi:Init static rx buffer num: 10
+I (1460) wifi:Init dynamic rx buffer num: 32
+[0;32mI (1490) wifi_init: rx ba win: 6[0m
+[0;32mI (1490) wifi_init: tcpip mbox: 32[0m
+[0;32mI (1500) wifi_init: udp mbox: 6[0m
+[0;32mI (1500) wifi_init: tcp mbox: 6[0m
+[0;32mI (1500) wifi_init: tcp tx win: 5760[0m
+[0;32mI (1510) wifi_init: tcp rx win: 5760[0m
+[0;32mI (1510) wifi_init: tcp mss: 1440[0m
+[0;32mI (1510) wifi_init: WiFi IRAM OP enabled[0m
+[0;32mI (1520) wifi_init: WiFi RX IRAM OP enabled[0m
+W (1520) wifi:Password length matches WPA2 standards, authmode threshold changes from OPEN to WPA2
+[0;32mI (1610) phy_init: phy_version 4840,a40f0ac,Aug 16 2024,16:48:06[0m
+I (1690) wifi:mode : sta (ec:94:cb:6f:7c:e0)
+I (1690) wifi:enable tsf
+[0;32mI (1690) WIFI: wifi_init_sta finished.[0m
+[0;32mI (1690) WIFI: connect to ap SSID:Zigbee password:tototata[0m
+I (1700) wifi:new:<10,0>, old:<1,0>, ap:<255,255>, sta:<10,0>, prof:6
+I (1780) wifi:state: init -> auth (b0)
+I (1790) wifi:state: auth -> assoc (0)
+I (1810) wifi:state: assoc -> run (10)
+I (1860) wifi:<ba-add>idx:0 (ifx:0, c2:a8:1d:82:e4:6c), tid:7, ssn:0, winSize:64
+I (1870) wifi:connected with Zigbee, aid = 1, cha[0;32mI (749) SDCard: SD Log start[0m
+[0;32mI (749) RPM: Init timer 1Mhz[0m
+[0;32mI (749) RPM: Init RPM[0m
+[0;32mI (749) SPI: Set pins level for SDCARD[0m
+[0;32mI (759) RPM: Initialized[0m
+[0;32mI (759) PPM: Init PPM[0m
+[0;32mI (759) gpio: GPIO[26]| InputEn: 1| OutputEn: 0| OpenDrain: 0| Pullup: 1| Pulldown: 0| Intr:0 [0m
+[0;32mI (769) INPUTS: PPM RX initialized
+[0m
+[0;32mI (779) gpio: GPIO[35]| InputEn: 1| OutputEn: 0| OpenDrain: 0| Pullup: 1| Pulldown: 0| Intr:0 [0m
+[0;32mI (789) INPUTS: PPM AUX RX initializated
+[0m
+[0;32mI (799) INPUTS: RMT RX initialized
+[0m
+[0;32mI (889) INPUTS: RMT AUX initialized
+[0m
+[0;32mI (889) INPUTS: Receive RX ranges initialized
+[0m
+[0;32mI (889) INPUTS: Receive AUX ranges initialized
+[0m
+[0;32mI (889) PPM: Initialized[0m
+[0;32mI (889) INPUTS: I2C initialized
+[0m
+[0;32mI (899) INPUTS: calibration scheme version is Line Fitting[0m
+[0;32mI (899) INPUTS: Calibration Success[0m
+[0;32mI (909) MAIN: This is esp32 chip with 2 CPU cores, WiFi/BT/BLE, [0m
+[0;32mI (939) MAIN: silicon revision 100, [0m
+[0;32mI (939) MAIN: Currently running partition: ota_0
+[0m
+[0;32mI (949) MAIN: Initializing NVS[0m
+[0;32mI (1039) NVS: Init...[0m
+[0;32mI (1069) NVS: Init OK[0m
+[0;32mI (1069) MAIN: Initializing NVS Wifi[0m
+[0;32mI (1069) NVS: Ouverture du handle[0m
+[0;32mI (1069) NVS: Lecture config wifi[0m
+[0;32mI (1079) NVS: SSID = Zigbee[0m
+[0;32mI (1079) NVS: Password = tototata[0m
+[0;32mI (1089) NVS: Retry = 5[0m
+[0;32mI (1089) NVS: Checksum = 1483[0m
+[0;32mI (1119) NVS: Len = 100[0m
+[0;32mI (1119) NVS: Checksum calculé = 1483[0m
+[0;32mI (1209) NVS: Checkum OK[0m
+[0;32mI (1209) MAIN: Initializing Timer[0m
+[0;32mI (1209) MAIN: Initializing Wifi[0m
+[0;32mI (1209) WIFI: ESP-IDF Ver5.0[0m
+[0;32mI (1209) WIFI: ESP_IDF_VERSION 327688[0m
+[0;32mI (1219) WIFI: ESP-IDF esp_netif[0m
+I (1229) wifi:wifi driver task: 3ffc98f0, prio:23, stack:6656, core=0
+[0;32mI (1229) system_api: Base MAC address is not set[0m
+[0;32mI (1229) system_api: read default base MAC address from EFUSE[0m
+I (1359) wifi:wifi firmware version: 0fff8a6
+I (1359) wifi:wifi certification version: v7.0
+I (1359) wifi:config NVS flash: enabled
+I (1359) wifi:config nano formating: disabled
+I (1409) wifi:Init data frame dynamic rx buffer num: 32
+I (1409) wifi:Init static rx mgmt buffer num: 5
+I (1409) wifi:Init management short buffer num: 32
+I (1419) wifi:Init dynamic tx buffer num: 32
+I (1449) wifi:Init static rx buffer size: 1600
+I (1449) wifi:Init static rx buffer num: 10
+I (1459) wifi:Init dynamic rx buffer num: 32
+[0;32mI (1549) wifi_init: rx ba win: 6[0m
+[0;32mI (1549) wifi_init: tcpip mbox: 32[0m
+[0;32mI (1549) wifi_init: udp mbox: 6[0m
+[0;32mI (1549) wifi_init: tcp mbox: 6[0m
+[0;32mI (1559) wifi_init: tcp tx win: 5760[0m
+[0;32mI (1559) wifi_init: tcp rx win: 5760[0m
+[0;32mI (1569) wifi_init: tcp mss: 1440[0m
+[0;32mI (1569) wifi_init: WiFi IRAM OP enabled[0m
+[0;32mI (1579) wifi_init: WiFi RX IRAM OP enabled[0m
+W (1579) wifi:Password length matches WPA2 standards, authmode threshold changes from OPEN to WPA2
+[0;32mI (1699) phy_init: phy_version 4840,a40f0ac,Aug 16 2024,16:48:06[0m
+I (1769) wifi:mode : sta (ec:94:cb:6f:7c:e0)
+I (1769) wifi:enable tsf
+[0;32mI (1769) WIFI: wifi_init_sta finished.[0m
+[0;32mI (1769) WIFI: connect to ap SSID:Zigbee password:tototata[0m
+I (1779) wifi:new:<10,0>, old:<1,0>, ap:<255,255>, sta:<10,0>, prof:6
+I (1829) wifi:state: init -> auth (b0)
+I (1869) wifi:state: auth -> assoc (0)
+I (1879) wifi:state: assoc -> run (10)
+I (1929) wifi:<ba-add>idx:0 (ifx:0, c2:a8:1d:82:e4:6c), tid:7, ssn:0, winSize:64
+I (1969) wifi:connected with Zigbee, aid = 1, cha[0;32mI (740) SDCard: SD Log start[0m
+[0;32mI (740) RPM: Init timer 1Mhz[0m
+[0;32mI (750) RPM: Init RPM[0m
+[0;32mI (750) SPI: Set pins level for SDCARD[0m
+[0;32mI (760) RPM: Initialized[0m
+[0;32mI (760) PPM: Init PPM[0m
+[0;32mI (760) gpio: GPIO[26]| InputEn: 1| OutputEn: 0| OpenDrain: 0| Pullup: 1| Pulldown: 0| Intr:0 [0m
+[0;32mI (770) INPUTS: PPM RX initialized
+[0m
+[0;32mI (790) gpio: GPIO[35]| InputEn: 1| OutputEn: 0| OpenDrain: 0| Pullup: 1| Pulldown: 0| Intr:0 [0m
+[0;32mI (790) INPUTS: PPM AUX RX initializated
+[0m
+[0;32mI (800) INPUTS: RMT RX initialized
+[0m
+[0;32mI (890) INPUTS: RMT AUX initialized
+[0m
+[0;32mI (890) INPUTS: Receive RX ranges initialized
+[0m
+[0;32mI (890) INPUTS: Receive AUX ranges initialized
+[0m
+[0;32mI (890) PPM: Initialized[0m
+[0;32mI (890) INPUTS: I2C initialized
+[0m
+[0;32mI (900) INPUTS: calibration scheme version is Line Fitting[0m
+[0;32mI (930) INPUTS: Calibration Success[0m
+[0;32mI (930) MAIN: This is esp32 chip with 2 CPU cores, WiFi/BT/BLE, [0m
+[0;32mI (940) MAIN: silicon revision 100, [0m
+[0;32mI (940) MAIN: Currently running partition: ota_0
+[0m
+[0;32mI (940) MAIN: Initializing NVS[0m
+[0;32mI (1040) NVS: Init...[0m
+[0;32mI (1070) NVS: Init OK[0m
+[0;32mI (1070) MAIN: Initializing NVS Wifi[0m
+[0;32mI (1070) NVS: Ouverture du handle[0m
+[0;32mI (1070) NVS: Lecture config wifi[0m
+[0;32mI (1080) NVS: SSID = Zigbee[0m
+[0;32mI (1110) NVS: Password = tototata[0m
+[0;32mI (1110) NVS: Retry = 5[0m
+[0;32mI (1110) NVS: Checksum = 1483[0m
+[0;32mI (1110) NVS: Len = 100[0m
+[0;32mI (1110) NVS: Checksum calculé = 1483[0m
+[0;32mI (1200) NVS: Checkum OK[0m
+[0;32mI (1200) MAIN: Initializing Timer[0m
+[0;32mI (1200) MAIN: Initializing Wifi[0m
+[0;32mI (1200) WIFI: ESP-IDF Ver5.0[0m
+[0;32mI (1210) WIFI: ESP_IDF_VERSION 327688[0m
+[0;32mI (1210) WIFI: ESP-IDF esp_netif[0m
+I (1230) wifi:wifi driver task: 3ffc98f0, prio:23, stack:6656, core=0
+[0;32mI (1260) system_api: Base MAC address is not set[0m
+[0;32mI (1260) system_api: read default base MAC address from EFUSE[0m
+I (1360) wifi:wifi firmware version: 0fff8a6
+I (1370) wifi:wifi certification version: v7.0
+I (1370) wifi:config NVS flash: enabled
+I (1370) wifi:config nano formating: disabled
+I (1410) wifi:Init data frame dynamic rx buffer num: 32
+I (1410) wifi:Init static rx mgmt buffer num: 5
+I (1410) wifi:Init management short buffer num: 32
+I (1420) wifi:Init dynamic tx buffer num: 32
+I (1540) wifi:Init static rx buffer size: 1600
+I (1540) wifi:Init static rx buffer num: 10
+I (1540) wifi:Init dynamic rx buffer num: 32
+[0;32mI (1600) wifi_init: rx ba win: 6[0m
+[0;32mI (1600) wifi_init: tcpip mbox: 32[0m
+[0;32mI (1600) wifi_init: udp mbox: 6[0m
+[0;32mI (1600) wifi_init: tcp mbox: 6[0m
+[0;32mI (1610) wifi_init: tcp tx win: 5760[0m
+[0;32mI (1610) wifi_init: tcp rx win: 5760[0m
+[0;32mI (1610) wifi_init: tcp mss: 1440[0m
+[0;32mI (1620) wifi_init: WiFi IRAM OP enabled[0m
+[0;32mI (1660) wifi_init: WiFi RX IRAM OP enabled[0m
+W (1660) wifi:Password length matches WPA2 standards, authmode threshold changes from OPEN to WPA2
+[0;32mI (1750) phy_init: phy_version 4840,a40f0ac,Aug 16 2024,16:48:06[0m
+I (1830) wifi:mode : sta (ec:94:cb:6f:7c:e0)
+I (1830) wifi:enable tsf
+[0;32mI (1830) WIFI: wifi_init_sta finished.[0m
+[0;32mI (1830) WIFI: connect to ap SSID:Zigbee password:tototata[0m
+I (1840) wifi:new:<10,0>, old:<1,0>, ap:<255,255>, sta:<10,0>, prof:6
+I (1900) wifi:state: init -> auth (b0)
+I (1910) wifi:state: auth -> assoc (0)
+I (1920) wifi:state: assoc -> run (10)
+I (2020) wifi:<ba-add>idx:0 (ifx:0, c2:a8:1d:82:e4:6c), tid:7, ssn:0, winSize:64
+I (2030) wifi:connected with Zigbee, aid = 1, channel 10, BW20, bssid = c2:a8:1d:82:e4:6c
+I (2030) wifi:security: WPA2-PSK, phy: bgn, rssi: -83
+I (2040) wifi:pm start, type: 1
+
+I (2090) wifi:dp: 1, bi: 102400, li: 3, scale listen interval from 307200 us to 307200 us
+I (2230) wifi:AP's beacon interval = 102400 us, DTIM period = 1
+I (2590) wifi:<ba-add>idx:1 (ifx:0, c2:a8:1d:82:e4:6c), tid:0, ssn:0, winSize:64
+[0;32mI (3590) esp_netif_handlers: sta ip: 10.0.0.73, mask: 255.255.255.0, gw: 10.0.0.1[0m
+[0;32mI (3680) WIFI: got ip:10.0.0.73[0m
+[0;32mI (3680) WIFI: Stop Timer[0m
+[0;32mI (3680) WIFI: WIFI_CONNECTED_BIT[0m
+[0;32mI (3680) WIFI: Got IP Address.[0m
+[0;32mI (3680) MAIN: Initializing mDNS[0m
+[0;32mI (3690) mdns_mem: mDNS task will be created from internal RAM[0m
+[0;32mI (3690) WIFI: mdns hostname set to: [JF-ECU32][0m
+[0;32mI (3720) NVS: Ouverture du handle[0m
+[0;32mI (3720) NVS: Lecture config turbine[0m
+[0;32mI (3730) NVS: Fermeture du handle[0m
+[0;32mI (3730) NVS: Name = Nom du moteur[0m
+[0;32mI (3820) NVS: Log count = 1[0m
+[0;32mI (3820) NVS: glow power = 10[0m
+[0;32mI (3820) NVS: Max rpm = 145000[0m
+[0;32mI (3820) NVS: idle rpm = 35000[0m
+[0;32mI (3830) NVS: start_temp = 100[0m
+[0;32mI (3830) NVS: max_temp = 750[0m
+[0;32mI (3830) NVS: acceleration_delay = 10[0m
+[0;32mI (3840) NVS: deceleration_delay = 12[0m
+[0;32mI (3870) NVS: stability_delay = 5[0m
+[0;32mI (3870) NVS: max_pump1 = 1024[0m
+[0;32mI (3870) NVS: min_pump1= 0[0m
+[0;32mI (3960) NVS: max_pump2 = 512[0m
+[0;32mI (3960) NVS: min_pump2= 0[0m
+[0;32mI (3960) NVS: max_vanne1 = 255[0m
+[0;32mI (3960) NVS: max_vanne2= 255[0m
+[0;32mI (3960) NVS: starter_rpm_start = 0[0m
+[0;32mI (3970) NVS: starter_pwm_perc_start= 0.000000[0m
+[0;32mI (3970) NVS: starter_pwm_perc_min = 0.000000[0m
+[0;32mI (3980) NVS: starter_max_rpm= 0[0m
+[0;32mI (4010) NVS: Nb lipos= 2[0m
+[0;32mI (4010) NVS: Vmin décollage= 2[0m
+[0;32mI (4010) NVS: Len = 504[0m
+[0;32mI (4100) NVS: Checksum calculé = 22573[0m
+[0;32mI (4100) NVS: Checkum OK[0m
+[0;32mI (4100) NVS: Len = 412[0m
+[0;32mI (4100) NVS: Checksum calculé = 19521[0m
+[0;32mI (4110) NVS: Checkum OK[0m
+[0;32mI (4110) NVS: Ouverture du handle[0m
+[0;32mI (4110) NVS: Lecture config ECU[0m
+[0;32mI (4120) NVS: Fermeture du handle[0m
+[0;32mI (4120) NVS: config_ECU Done[0m
+[0;32mI (4150) NVS: Len = 12[0m
+[0;32mI (4150) NVS: Checksum calculé = 7[0m
+[0;32mI (4240) NVS: Checkum OK[0m
+[0;32mI (4240) CONFIG_ECU: input : 1[0m
+[0;32mI (4240) CONFIG_ECU: glow_type : 0[0m
+[0;32mI (4240) CONFIG_ECU: start_type : 1[0m
+[0;32mI (4240) CONFIG_ECU: output_pump1 : 0[0m
+[0;32mI (4250) CONFIG_ECU: output_pump2 : 2[0m
+[0;32mI (4250) CONFIG_ECU: output_starter : 1[0m
+[0;32mI (4260) CONFIG_ECU: use_telem : 2[0m
+[0;32mI (4260) CONFIG_ECU: use_input2 : 0[0m
+[0;32mI (4270) CONFIG_ECU: use_led : 0[0m
+[0;32mI (4300) NVS: Ouverture du handle[0m
+[0;32mI (4390) NVS: Lecture horametre[0m
+[0;32mI (4390) NVS: Valeur non trouvée, initialisée à 0
+[0m
+[0;32mI (4390) ECU: initializing mcpwm servo control gpio......[0m
+[0;32mI (4390) ECU: MCPWM_UNIT init outputs Pompe 2 2[0m
+[0;32mI (4400) ECU: MCPWM_UNIT init outputs Pompe 1 PWM[0m
+[0;32mI (4400) ECU: MCPWM_UNIT : 0 ; MCPWM_TIMER : 0 ; MCPWM_GEN : 0 ; MCPWM_TIMER : 0 ; pin : 33[0m
+[0;32mI (4410) ECU: MCPWM_UNIT init outputs Démarreur PPM[0m
+[0;32mI (4440) ECU: MCPWM_UNIT : 1 ; MCPWM_TIMER : 2 ; MCPWM_GEN : 0 ; MCPWM_TIMER : 2 ; pin : 32[0m
+[0;32mI (4440) ECU: Configuring Initial Parameters of mcpwm......[0m
+[0;32mI (4450) ECU: LEDC init[0m
+[0;32mI (4450) ECU: LEDC init outputs[0m
+[0;32mI (4550) MAIN: Initializing SPIFFS[0m
+[0;32mI (4560) MAIN: Mount /html to storage success[0m
+[0;32mI (4560) MAIN: Partition size: total: 180971, used: 118472[0m
+[0;32mI (4560) MAIN: d_name=/html/chart.html d_ino=0 d_type=1[0m
+[0;32mI (4590) MAIN: d_name=/html/chart_starter.html d_ino=0 d_type=1[0m
+[0;32mI (4590) MAIN: d_name=/html/favicon.ico d_ino=0 d_type=1[0m
+[0;32mI (4600) MAIN: d_name=/html/footer.html d_ino=0 d_type=1[0m
+[0;32mI (4610) MAIN: d_name=/html/gauge.min.js d_ino=0 d_type=1[0m
+[0;32mI (4610) MAIN: d_name=/html/gauges.html d_ino=0 d_type=1[0m
+[0;32mI (4620) MAIN: d_name=/html/head.html d_ino=0 d_type=1[0m
+[0;32mI (4620) MAIN: d_name=/html/head2.html d_ino=0 d_type=1[0m
+[0;32mI (4720) MAIN: d_name=/html/script_gauges.js d_ino=0 d_type=1[0m
+[0;32mI (4730) MAIN: d_name=/html/script_status.js d_ino=0 d_type=1[0m
+[0;32mI (4730) MAIN: d_name=/html/slider.html d_ino=0 d_type=1[0m
+[0;32mI (4740) MAIN: Initializing Semaphores[0m
+[0;32mI (4740) MAIN: Initializing Task HTTP[0m
+[0;32mI (4750) MAIN: Initializing Task Log[0m
+[0;32mI (4750) HTTP: Take semaphore[0m
+[0;32mI (4760) MAIN: Initializing Task ECU[0m
+[0;32mI (4760) ECU: Start Logtask[0m
+[0;32mI (4770) MAIN: Initializing Task PPM Inputs[0m
+[0;32mI (4880) MAIN: Initializing MAX31855 Task
+[0m
+[0;32mI (4970) MAIN: Initializing WebSocket Task
+[0m
+[0;32mI (4970) Websocket: WS_TASK start[0m
+[0;32mI (4970) Websocket: WS_TASK Max client = 16[0m
+[0;31mE (4980) Websocket: Plus de client - pause[0m
+[0;32mI (5020) MAIN: INA219 not found
+[0m
+[0;32mI (5020) MAIN: Initializing INA219 + ADC Task
+[0m
+[0;32mI (5020) HTTP: Start task_parameter=10.0.0.73[0m
+[0;32mI (5020) ECU: Start ECU Task[0m
+[0;32mI (5020) HTTP: Starting server on http://10.0.0.73:80[0m
+[0;32mI (5030) INPUTS: Task glow_current start[0m
+[0;32mI (5050) HTTP: Starting HTTP Server on port: '80'[0m
+[0;32mI (5150) HTTP: HTTP Server Started[0m
+[0;32mI (7020) set_power: PPM Value = 0.000000[0m
+[0;32mI (8750) HTTP: filepath : /sdcard/logs/[0m
+[0;32mI (8810) HTTP: Reading /html/head.html[0m
+[0;32mI (8840) HTTP: Reading /html/head2.html[0m
+[0;32mI (8840) HTTP: dirpath : /sdcard/logs/[0m
+[0;32mI (8840) HTTP: startwith : /sdca[0m
+[0;32mI (8920) HTTP: Found file : LOG1.CSV (2084 bytes)[0m
+[0;32mI (9080) HTTP: Found file : CURVES.TXT (530 bytes)[0m
+[0;32mI (9150) HTTP: Found file : LOG2.CSV (2084 bytes)[0m
+[0;32mI (9230) HTTP: Found file : LOG3.CSV (3928 bytes)[0m
+[0;32mI (9370) HTTP: Found file : LOG4.CSV (3573 bytes)[0m
+[0;32mI (9440) HTTP: Found file : LOG5.CSV (2440 bytes)[0m
+[0;32mI (9520) HTTP: Found file : LOG6.CSV (2611 bytes)[0m
+[0;32mI (9600) HTTP: Found file : LOGS.TXT (17152 bytes)[0m
+[0;32mI (9610) SDCard:     258095 KiB total drive space.
+    208518 KiB available.
+    417036 free clust.
+[0m
+[0;32mI (9640) HTTP: Reading /html/footer.html[0m
+[0;32mI (12970) HTTP: filepath : /sdcard/logs/LOGS.TXT[0m
+[0;32mI (13110) HTTP: Sending file : /sdcard/logs/LOGS.TXT (17152 bytes)...[0m
+[0;32mI (13530) HTTP: File sending complete[0m
+[0;32mI (55230) HTTP: filepath : /sdcard/logs/[0m
+[0;32mI (55290) HTTP: Reading /html/head.html[0m
+[0;32mI (55360) HTTP: Reading /html/head2.html[0m
+[0;32mI (55370) HTTP: dirpath : /sdcard/logs/[0m
+[0;32mI (55380) HTTP: startwith : /sdca[0m
+[0;32mI (55500) HTTP: Found file : LOG1.CSV (2084 bytes)[0m
+[0;32mI (55570) HTTP: Found file : CURVES.TXT (530 bytes)[0m
+[0;32mI (55650) HTTP: Found file : LOG2.CSV (2084 bytes)[0m
+[0;32mI (55730) HTTP: Found file : LOG3.CSV (3928 bytes)[0m
+[0;32mI (55810) HTTP: Found file : LOG4.CSV (3573 bytes)[0m
+[0;32mI (55880) HTTP: Found file : LOG5.CSV (2440 bytes)[0m
+[0;32mI (55960) HTTP: Found file : LOG6.CSV (2611 bytes)[0m
+[0;32mI (56040) HTTP: Found file : LOGS.TXT (17920 bytes)[0m
+[0;32mI (56180) SDCard:     258095 KiB total drive space.
+    208516 KiB available.
+    417033 free clust.
+[0m
+[0;32mI (56180) HTTP: Reading /html/footer.html[0m
+[0;33mW (56210) httpd_txrx: httpd_sock_err: error in recv : 104[0m
+[0;32mI (92200) HTTP: filepath : /sdcard/logs/[0m
+[0;32mI (92260) HTTP: Reading /html/head.html[0m
+[0;32mI (92280) HTTP: Reading /html/head2.html[0m
+[0;32mI (92290) HTTP: dirpath : /sdcard/logs/[0m
+[0;32mI (92290) HTTP: startwith : /sdca[0m
+[0;32mI (92430) HTTP: Found file : LOG1.CSV (2084 bytes)[0m
+[0;32mI (92510) HTTP: Found file : CURVES.TXT (530 bytes)[0m
+[0;32mI (92580) HTTP: Found file : LOG2.CSV (2084 bytes)[0m
+[0;32mI (92720) HTTP: Found file : LOG3.CSV (3928 bytes)[0m
+[0;32mI (92800) HTTP: Found file : LOG4.CSV (3573 bytes)[0m
+[0;32mI (92870) HTTP: Found file : LOG5.CSV (2440 bytes)[0m
+[0;32mI (92950) HTTP: Found file : LOG6.CSV (2611 bytes)[0m
+[0;32mI (93030) HTTP: Found file : LOGS.TXT (19200 bytes)[0m
+[0;32mI (93110) SDCard:     258095 KiB total drive space.
+    208515 KiB available.
+    417031 free clust.
+[0m
+[0;32mI (93120) HTTP: Reading /html/footer.html[0m
+[0;32mI (98190) HTTP: Reading /html/head.html[0m
+[0;32mI (98210) HTTP: Reading /html/head2.html[0m
+[0;32mI (98230) HTTP: Reading /html/footer.html[0m
+[0;32mI (98250) HTTP: Reading /html/script_status.js[0m
+[0;32mI (101440) HTTP: Reading /html/head.html[0m
+[0;32mI (101460) HTTP: Reading /html/head2.html[0m
+[0;32mI (101480) HTTP: Reading /html/footer.html[0m
+[0;32mI (101510) HTTP: Reading /html/script_status.js[0m
+[0;32mI (102000) ECU: START[0m
+[0;32mI (102000) ECU: START OK PLEIN GAZ[0m
+[0;32mI (102000) ECU: START INIT[0m
+[0;32mI (103010) ECU: START[0m
+[0;32mI (103010) ECU: START OK PLEIN GAZ[0m
+[0;32mI (103010) ECU: START TESTGLOW[0m
+[0;32mI (103010) ECU: SP : 0 Curr : 0.000000mA [0m
+[0;32mI (103110) ECU: START[0m
+[0;32mI (103110) ECU: START OK PLEIN GAZ[0m
+[0;32mI (103110) ECU: START TESTGLOW[0m
+[0;32mI (103110) ECU: SP : 1 Curr : 0.000000mA [0m
+[0;32mI (103130) ECU: START[0m
+[0;32mI (103130) ECU: START OK PLEIN GAZ[0m
+[0;32mI (103130) ECU: START TESTGLOW[0m
+[0;32mI (103130) ECU: SP : 2 Curr : 0.000000mA [0m
+[0;32mI (103140) ECU: START[0m
+[0;32mI (103140) ECU: START OK PLEIN GAZ[0m
+[0;32mI (103140) ECU: START TESTGLOW[0m
+[0;32mI (103240) ECU: SP : 3 Curr : 0.000000mA [0m
+[0;32mI (103250) ECU: START[0m
+[0;32mI (103250) ECU: START OK PLEIN GAZ[0m
+[0;32mI (103250) ECU: START TESTGLOW[0m
+[0;32mI (103280) ECU: SP : 4 Curr : 0.000000mA [0m
+[0;32mI (103290) ECU: START[0m
+[0;32mI (103290) ECU: START OK PLEIN GAZ[0m
+[0;32mI (103290) ECU: START TESTGLOW[0m
+[0;32mI (103290) ECU: SP : 5 Curr : 0.000000mA [0m
+[0;32mI (103310) ECU: STA[0;32mI (949) SDCard: SD Log start[0m
+[0;32mI (949) RPM: Init timer 1Mhz[0m
+[0;32mI (959) RPM: Init RPM[0m
+[0;32mI (959) SPI: Set pins level for SDCARD[0m
+[0;32mI (959) RPM: Initialized[0m
+[0;32mI (969) PPM: Init PPM[0m
+[0;32mI (969) gpio: GPIO[26]| InputEn: 1| OutputEn: 0| OpenDrain: 0| Pullup: 1| Pulldown: 0| Intr:0 [0m
+[0;32mI (1069) INPUTS: PPM RX initialized
+[0m
+[0;32mI (1079) gpio: GPIO[35]| InputEn: 1| OutputEn: 0| OpenDrain: 0| Pullup: 1| Pulldown: 0| Intr:0 [0m
+[0;32mI (1089) INPUTS: PPM AUX RX initializated
+[0m
+[0;32mI (1089) INPUTS: RMT RX initialized
+[0m
+[0;32mI (1139) INPUTS: RMT AUX initialized
+[0m
+[0;32mI (1139) INPUTS: Receive RX ranges initialized
+[0m
+[0;32mI (1139) INPUTS: Receive AUX ranges initialized
+[0m
+[0;32mI (1149) PPM: Initialized[0m
+[0;32mI (1179) INPUTS: I2C initialized
+[0m
+[0;32mI (1179) INPUTS: calibration scheme version is Line Fitting[0m
+[0;32mI (1179) INPUTS: Calibration Success[0m
+[0;32mI (1189) MAIN: This is esp32 chip with 2 CPU cores, WiFi/BT/BLE, [0m
+[0;32mI (1189) MAIN: silicon revision 100, [0m
+[0;32mI (1199) MAIN: Currently running partition: ota_0
+[0m
+[0;32mI (1199) MAIN: Initializing NVS[0m
+[0;32mI (1299) NVS: Init...[0m
+[0;32mI (1339) NVS: Init OK[0m
+[0;32mI (1339) MAIN: Initializing NVS Wifi[0m
+[0;32mI (1349) NVS: Ouverture du handle[0m
+[0;32mI (1349) NVS: Lecture config wifi[0m
+[0;32mI (1349) NVS: SSID = Zigbee[0m
+[0;32mI (1349) NVS: Password = tototata[0m
+[0;32mI (1359) NVS: Retry = 5[0m
+[0;32mI (1359) NVS: Checksum = 1483[0m
+[0;32mI (1369) NVS: Len = 100[0m
+[0;32mI (1369) NVS: Checksum calculé = 1483[0m
+[0;32mI (1469) NVS: Checkum OK[0m
+[0;32mI (1469) MAIN: Initializing Timer[0m
+[0;32mI (1469) MAIN: Initializing Wifi[0m
+[0;32mI (1469) WIFI: ESP-IDF Ver5.0[0m
+[0;32mI (1499) WIFI: ESP_IDF_VERSION 327688[0m
+[0;32mI (1499) WIFI: ESP-IDF esp_netif[0m
+I (1519) wifi:wifi driver task: 3ffc98f0, prio:23, stack:6656, core=0
+[0;32mI (1519) system_api: Base MAC address is not set[0m
+[0;32mI (1519) system_api: read default base MAC address from EFUSE[0m
+I (1629) wifi:wifi firmware version: 0fff8a6
+I (1629) wifi:wifi certification version: v7.0
+I (1629) wifi:config NVS flash: enabled
+I (1629) wifi:config nano formating: disabled
+I (1669) wifi:Init data frame dynamic rx buffer num: 32
+I (1689) wifi:Init static rx mgmt buffer num: 5
+I (1689) wifi:Init management short buffer num: 32
+I (1689) wifi:Init dynamic tx buffer num: 32
+I (1779) wifi:Init static rx buffer size: 1600
+I (1779) wifi:Init static rx buffer num: 10
+I (1779) wifi:Init dynamic rx buffer num: 32
+[0;32mI (1829) wifi_init: rx ba win: 6[0m
+[0;32mI (1829) wifi_init: tcpip mbox: 32[0m
+[0;32mI (1829) wifi_init: udp mbox: 6[0m
+[0;32mI (1829) wifi_init: tcp mbox: 6[0m
+[0;32mI (1839) wifi_init: tcp tx win: 5760[0m
+[0;32mI (1869) wifi_init: tcp rx win: 5760[0m
+[0;32mI (1869) wifi_init: tcp mss: 1440[0m
+[0;32mI (1869) wifi_init: WiFi IRAM OP enabled[0m
+[0;32mI (1869) wifi_init: WiFi RX IRAM OP enabled[0m
+W (1879) wifi:Password length matches WPA2 standards, authmode threshold changes from OPEN to WPA2
+[0;32mI (1969) phy_init: phy_version 4840,a40f0ac,Aug 16 2024,16:48:06[0m
+I (2039) wifi:mode : sta (ec:94:cb:6f:7c:e0)
+I (2039) wifi:enable tsf
+[0;32mI (2039) WIFI: wifi_init_sta finished.[0m
+I (2049) wifi:new:<10,0>, old:<1,0>, ap:<255,255>, sta:<10,0>, prof:6
+I (2159) wifi:state: init -> auth (b0)
+[0;32mI (2169) WIFI: connect to ap SSID:Zigbee password:tototata[0m
+I (2169) wifi:state: auth -> assoc (0)
+I (2189) wifi:state: assoc -> run (10)
+I (2189) wifi:<ba-add>idx:0 (ifx:0, c2:a8:1d:82:e4:6c), tid:7, ssn:0, winSize:64
+I (2199) wifi:connected with Zigbee, aid = 1, channel 10, BW20, bssid = c2:a8:1d:82:e4:6c
+I (2249) wifi:security: WPA2-PSK, phy: bgn, rssi: -82
+I (2249) wifi:pm start, type: 1
+
+I (2279) wifi:dp: 1, bi: 102400, li: 3, scale listen interval from 307200 us to 307200 us
+I (2369) wifi:AP's beacon interval = 102400 us, DTIM period = 1
+I (2379) wifi:<ba-add>idx:1 (ifx:0, c2:a8:1d:82:e4:6c), tid:0, ssn:0, winSize:64
+[0;32mI (4369) esp_netif_handlers: sta ip: 10.0.0.73, mask: 255.255.255.0, gw: 10.0.0.1[0m
+[0;32mI (4369) WIFI: got ip:10.0.0.73[0m
+[0;32mI (4369) WIFI: Stop Timer[0m
+[0;32mI (4369) WIFI: WIFI_CONNECTED_BIT[0m
+[0;32mI (4379) WIFI: Got IP Address.[0m
+[0;32mI (4429) MAIN: Initializing mDNS[0m
+[0;32mI (4439) mdns_mem: mDNS task will be created from internal RAM[0m
+[0;32mI (4439) WIFI: mdns hostname set to: [JF-ECU32][0m
+[0;32mI (4439) NVS: Ouverture du handle[0m
+[0;32mI (4449) NVS: Lecture config turbine[0m
+[0;32mI (4449) NVS: Fermeture du handle[0m
+[0;32mI (4459) NVS: Name = Nom du moteur[0m
+[0;32mI (4459) NVS: Log count = 1[0m
+[0;32mI (4459) NVS: glow power = 10[0m
+[0;32mI (4469) NVS: Max rpm = 145000[0m
+[0;32mI (4469) NVS: idle rpm = 35000[0m
+[0;32mI (4579) NVS: start_temp = 100[0m
+[0;32mI (4579) NVS: max_temp = 750[0m
+[0;32mI (4579) NVS: acceleration_delay = 10[0m
+[0;32mI (4579) NVS: deceleration_delay = 12[0m
+[0;32mI (4579) NVS: stability_delay = 5[0m
+[0;32mI (4589) NVS: max_pump1 = 1024[0m
+[0;32mI (4589) NVS: min_pump1= 0[0m
+[0;32mI (4589) NVS: max_pump2 = 512[0m
+[0;32mI (4599) NVS: min_pump2= 0[0m
+[0;32mI (4599) NVS: max_vanne1 = 255[0m
+[0;32mI (4599) NVS: max_vanne2= 255[0m
+[0;32mI (4649) NVS: starter_rpm_start = 0[0m
+[0;32mI (4669) NVS: starter_pwm_perc_start= 0.000000[0m
+[0;32mI (4669) NVS: starter_pwm_perc_min = 0.000000[0m
+[0;32mI (4669) NVS: starter_max_rpm= 0[0m
+[0;32mI (4669) NVS: Nb lipos= 2[0m
+[0;32mI (4679) NVS: Vmin décollage= 2[0m
+[0;32mI (4679) NVS: Len = 504[0m
+[0;32mI (4679) NVS: Checksum calculé = 22573[0m
+[0;32mI (4689) NVS: Checkum OK[0m
+[0;32mI (4689) NVS: Len = 412[0m
+[0;32mI (4689) NVS: Checksum calculé = 19521[0m
+[0;32mI (4789) NVS: Checkum OK[0m
+[0;32mI (4789) NVS: Ouverture du handle[0m
+[0;32mI (4799) NVS: Lecture config ECU[0m
+[0;32mI (4799) NVS: Fermeture du handle[0m
+[0;32mI (4799) NVS: config_ECU Done[0m
+[0;32mI (4809) NVS: Len = 12[0m
+[0;32mI (4809) NVS: Checksum calculé = 7[0m
+[0;32mI (4809) NVS: Checkum OK[0m
+[0;32mI (4819) CONFIG_ECU: input : 1[0m
+[0;32mI (4819) CONFIG_ECU: glow_type : 0[0m
+[0;32mI (4829) CONFIG_ECU: start_type : 1[0m
+[0;32mI (4919) CONFIG_ECU: output_pump1 : 0[0m
+[0;32mI (4919) CONFIG_ECU: output_pump2 : 2[0m
+[0;32mI (4919) CONFIG_ECU: output_starter : 1[0m
+[0;32mI (4939) CONFIG_ECU: use_telem : 2[0m
+[0;32mI (4939) CONFIG_ECU: use_input2 : 0[0m
+[0;32mI (4939) CONFIG_ECU: use_led : 0[0m
+[0;32mI (4939) NVS: Ouverture du handle[0m
+[0;32mI (4949) NVS: Lecture horametre[0m
+[0;32mI (4949) NVS: Valeur non trouvée, initialisée à 0
+[0m
+[0;32mI (4959) ECU: initializing mcpwm servo control gpio......[0m
+[0;32mI (4959) ECU: MCPWM_UNIT init outputs Pompe 2 2[0m
+[0;32mI (5059) ECU: MCPWM_UNIT init outputs Pompe 1 PWM[0m
+[0;32mI (5069) ECU: MCPWM_UNIT : 0 ; MCPWM_TIMER : 0 ; MCPWM_GEN : 0 ; MCPWM_TIMER : 0 ; pin : 33[0m
+[0;32mI (5069) ECU: MCPWM_UNIT init outputs Démarreur PPM[0m
+[0;32mI (5079) ECU: MCPWM_UNIT : 1 ; MCPWM_TIMER : 2 ; MCPWM_GEN : 0 ; MCPWM_TIMER : 2 ; pin : 32[0m
+[0;32mI (5089) ECU: Configuring Initial Parameters of mcpwm......[0m
+[0;32mI (5089) ECU: LEDC init[0m
+[0;32mI (5099) ECU: LEDC init outputs[0m
+[0;32mI (5099) MAIN: Initializing SPIFFS[0m
+[0;32mI (5119) MAIN: Mount /html to storage success[0m
+[0;32mI (5139) MAIN: Partition size: total: 180971, used: 118472[0m
+[0;32mI (5139) MAIN: d_name=/html/chart.html d_ino=0 d_type=1[0m
+[0;32mI (5229) MAIN: d_name=/html/chart_starter.html d_ino=0 d_type=1[0m
+[0;32mI (5229) MAIN: d_name=/html/favicon.ico d_ino=0 d_type=1[0m
+[0;32mI (5229) MAIN: d_name=/html/footer.html d_ino=0 d_type=1[0m
+[0;32mI (5239) MAIN: d_name=/html/gauge.min.js d_ino=0 d_type=1[0m
+[0;32mI (5249) MAIN: d_name=/html/gauges.html d_ino=0 d_type=1[0m
+[0;32mI (5249) MAIN: d_name=/html/head.html d_ino=0 d_type=1[0m
+[0;32mI (5279) MAIN: d_name=/html/head2.html d_ino=0 d_type=1[0m
+[0;32mI (5279) MAIN: d_name=/html/script_gauges.js d_ino=0 d_type=1[0m
+[0;32mI (5289) MAIN: d_name=/html/script_status.js d_ino=0 d_type=1[0m
+[0;32mI (5299) MAIN: d_name=/html/slider.html d_ino=0 d_type=1[0m
+[0;32mI (5299) MAIN: Initializing Sem[0;32mI (798) SDCard: SD Log start[0m
+[0;32mI (798) RPM: Init timer 1Mhz[0m
+[0;32mI (808) RPM: Init RPM[0m
+[0;32mI (808) SPI: Set pins level for SDCARD[0m
+[0;32mI (808) RPM: Initialized[0m
+[0;32mI (818) PPM: Init PPM[0m
+[0;32mI (818) gpio: GPIO[26]| InputEn: 1| OutputEn: 0| OpenDrain: 0| Pullup: 1| Pulldown: 0| Intr:0 [0m
+[0;32mI (828) INPUTS: PPM RX initialized
+[0m
+[0;32mI (828) gpio: GPIO[35]| InputEn: 1| OutputEn: 0| OpenDrain: 0| Pullup: 1| Pulldown: 0| Intr:0 [0m
+[0;32mI (838) INPUTS: PPM AUX RX initializated
+[0m
+[0;32mI (848) INPUTS: RMT RX initialized
+[0m
+[0;32mI (898) INPUTS: RMT AUX initialized
+[0m
+[0;32mI (898) INPUTS: Receive RX ranges initialized
+[0m
+[0;32mI (908) INPUTS: Receive AUX ranges initialized
+[0m
+[0;32mI (908) PPM: Initialized[0m
+[0;32mI (908) INPUTS: I2C initialized
+[0m
+[0;32mI (918) INPUTS: calibration scheme version is Line Fitting[0m
+[0;32mI (918) INPUTS: Calibration Success[0m
+[0;32mI (928) MAIN: This is esp32 chip with 2 CPU cores, WiFi/BT/BLE, [0m
+[0;32mI (928) MAIN: silicon revision 100, [0m
+[0;32mI (938) MAIN: Currently running partition: ota_0
+[0m
+[0;32mI (938) MAIN: Initializing NVS[0m
+[0;32mI (1048) NVS: Init...[0m
+[0;32mI (1078) NVS: Init OK[0m
+[0;32mI (1078) MAIN: Initializing NVS Wifi[0m
+[0;32mI (1078) NVS: Ouverture du handle[0m
+[0;32mI (1078) NVS: Lecture config wifi[0m
+[0;32mI (1088) NVS: SSID = Zigbee[0m
+[0;32mI (1088) NVS: Password = tototata[0m
+[0;32mI (1088) NVS: Retry = 5[0m
+[0;32mI (1098) NVS: Checksum = 1483[0m
+[0;32mI (1098) NVS: Len = 100[0m
+[0;32mI (1098) NVS: Checksum calculé = 1483[0m
+[0;32mI (1148) NVS: Checkum OK[0m
+[0;32mI (1168) MAIN: Initializing Timer[0m
+[0;32mI (1168) MAIN: Initializing Wifi[0m
+[0;32mI (1168) WIFI: ESP-IDF Ver5.0[0m
+[0;32mI (1168) WIFI: ESP_IDF_VERSION 327688[0m
+[0;32mI (1168) WIFI: ESP-IDF esp_netif[0m
+I (1188) wifi:wifi driver task: 3ffc9a1c, prio:23, stack:6656, core=0
+[0;32mI (1188) system_api: Base MAC address is not set[0m
+[0;32mI (1188) system_api: read default base MAC address from EFUSE[0m
+I (1298) wifi:wifi firmware version: 0fff8a6
+I (1298) wifi:wifi certification version: v7.0
+I (1318) wifi:config NVS flash: enabled
+I (1318) wifi:config nano formating: disabled
+I (1408) wifi:Init data frame dynamic rx buffer num: 32
+I (1408) wifi:Init static rx mgmt buffer num: 5
+I (1408) wifi:Init management short buffer num: 32
+I (1408) wifi:Init dynamic tx buffer num: 32
+I (1458) wifi:Init static rx buffer size: 1600
+I (1458) wifi:Init static rx buffer num: 10
+I (1458) wifi:Init dynamic rx buffer num: 32
+[0;32mI (1498) wifi_init: rx ba win: 6[0m
+[0;32mI (1498) wifi_init: tcpip mbox: 32[0m
+[0;32mI (1508) wifi_init: udp mbox: 6[0m
+[0;32mI (1508) wifi_init: tcp mbox: 6[0m
+[0;32mI (1508) wifi_init: tcp tx win: 5760[0m
+[0;32mI (1518) wifi_init: tcp rx win: 5760[0m
+[0;32mI (1518) wifi_init: tcp mss: 1440[0m
+[0;32mI (1518) wifi_init: WiFi IRAM OP enabled[0m
+[0;32mI (1528) wifi_init: WiFi RX IRAM OP enabled[0m
+W (1528) wifi:Password length matches WPA2 standards, authmode threshold changes from OPEN to WPA2
+[0;32mI (1628) phy_init: phy_version 4840,a40f0ac,Aug 16 2024,16:48:06[0m
+I (1708) wifi:mode : sta (ec:94:cb:6f:7c:e0)
+I (1708) wifi:enable tsf
+[0;32mI (1708) WIFI: wifi_init_sta finished.[0m
+[0;32mI (1708) WIFI: connect to ap SSID:Zigbee password:tototata[0m
+I (1718) wifi:new:<10,0>, old:<1,0>, ap:<255,255>, sta:<10,0>, prof:6
+I (1808) wifi:state: init -> auth (b0)
+I (1838) wifi:state: auth -> assoc (0)
+I (1868) wifi:state: assoc -> run (10)
+I (1918) wifi:<ba-add>idx:0 (ifx:0, c2:a8:1d:82:e4:6c), tid:7, ssn:0, winSize:64
+I (2878) wifi:connected with Zigbee, aid = 1, cha[0;32mI (749) SDCard: SD Log start[0m
+[0;32mI (749) RPM: Init timer 1Mhz[0m
+[0;32mI (749) RPM: Init RPM[0m
+[0;32mI (749) SPI: Set pins level for SDCARD[0m
+[0;32mI (759) RPM: Initialized[0m
+[0;32mI (759) PPM: Init PPM[0m
+[0;32mI (759) gpio: GPIO[26]| InputEn: 1| OutputEn: 0| OpenDrain: 0| Pullup: 1| Pulldown: 0| Intr:0 [0m
+[0;32mI (769) INPUTS: PPM RX initialized
+[0m
+[0;32mI (779) gpio: GPIO[35]| InputEn: 1| OutputEn: 0| OpenDrain: 0| Pullup: 1| Pulldown: 0| Intr:0 [0m
+[0;32mI (789) INPUTS: PPM AUX RX initializated
+[0m
+[0;32mI (809) INPUTS: RMT RX initialized
+[0m
+[0;32mI (899) INPUTS: RMT AUX initialized
+[0m
+[0;32mI (899) INPUTS: Receive RX ranges initialized
+[0m
+[0;32mI (899) INPUTS: Receive AUX ranges initialized
+[0m
+[0;32mI (909) PPM: Initialized[0m
+[0;32mI (909) INPUTS: I2C initialized
+[0m
+[0;32mI (909) INPUTS: calibration scheme version is Line Fitting[0m
+[0;32mI (919) INPUTS: Calibration Success[0m
+[0;32mI (919) MAIN: This is esp32 chip with 2 CPU cores, WiFi/BT/BLE, [0m
+[0;32mI (959) MAIN: silicon revision 100, [0m
+[0;32mI (959) MAIN: Currently running partition: ota_0
+[0m
+[0;32mI (959) MAIN: Initializing NVS[0m
+[0;32mI (1069) NVS: Init...[0m
+[0;32mI (1099) NVS: Init OK[0m
+[0;32mI (1099) MAIN: Initializing NVS Wifi[0m
+[0;32mI (1099) NVS: Ouverture du handle[0m
+[0;32mI (1099) NVS: Lecture config wifi[0m
+[0;32mI (1109) NVS: SSID = Zigbee[0m
+[0;32mI (1109) NVS: Password = tototata[0m
+[0;32mI (1119) NVS: Retry = 5[0m
+[0;32mI (1119) NVS: Checksum = 1483[0m
+[0;32mI (1159) NVS: Len = 100[0m
+[0;32mI (1159) NVS: Checksum calculé = 1483[0m
+[0;32mI (1249) NVS: Checkum OK[0m
+[0;32mI (1249) MAIN: Initializing Timer[0m
+[0;32mI (1249) MAIN: Initializing Wifi[0m
+[0;32mI (1249) WIFI: ESP-IDF Ver5.0[0m
+[0;32mI (1249) WIFI: ESP_IDF_VERSION 327688[0m
+[0;32mI (1259) WIFI: ESP-IDF esp_netif[0m
+I (1269) wifi:wifi driver task: 3ffc9a1c, prio:23, stack:6656, core=0
+[0;32mI (1269) system_api: Base MAC address is not set[0m
+[0;32mI (1269) system_api: read default base MAC address from EFUSE[0m
+I (1409) wifi:wifi firmware version: 0fff8a6
+I (1409) wifi:wifi certification version: v7.0
+I (1409) wifi:config NVS flash: enabled
+I (1409) wifi:config nano formating: disabled
+I (1459) wifi:Init data frame dynamic rx buffer num: 32
+I (1459) wifi:Init static rx mgmt buffer num: 5
+I (1459) wifi:Init management short buffer num: 32
+I (1469) wifi:Init dynamic tx buffer num: 32
+I (1499) wifi:Init static rx buffer size: 1600
+I (1499) wifi:Init static rx buffer num: 10
+I (1509) wifi:Init dynamic rx buffer num: 32
+[0;32mI (1599) wifi_init: rx ba win: 6[0m
+[0;32mI (1599) wifi_init: tcpip mbox: 32[0m
+[0;32mI (1599) wifi_init: udp mbox: 6[0m
+[0;32mI (1599) wifi_init: tcp mbox: 6[0m
+[0;32mI (1609) wifi_init: tcp tx win: 5760[0m
+[0;32mI (1609) wifi_init: tcp rx win: 5760[0m
+[0;32mI (1619) wifi_init: tcp mss: 1440[0m
+[0;32mI (1619) wifi_init: WiFi IRAM OP enabled[0m
+[0;32mI (1619) wifi_init: WiFi RX IRAM OP enabled[0m
+W (1629) wifi:Password length matches WPA2 standards, authmode threshold changes from OPEN to WPA2
+[0;32mI (1749) phy_init: phy_version 4840,a40f0ac,Aug 16 2024,16:48:06[0m
+I (1819) wifi:mode : sta (ec:94:cb:6f:7c:e0)
+I (1819) wifi:enable tsf
+[0;32mI (1819) WIFI: wifi_init_sta finished.[0m
+[0;32mI (1819) WIFI: connect to ap SSID:Zigbee password:tototata[0m
+I (1929) wifi:new:<10,0>, old:<1,0>, ap:<255,255>, sta:<10,0>, prof:6
+I (1989) wifi:state: init -> auth (b0)
+I (2009) wifi:state: auth -> assoc (0)
+I (2019) wifi:state: assoc -> run (10)
+I (2069) wifi:<ba-add>idx:0 (ifx:0, c2:a8:1d:82:e4:6c), tid:7, ssn:0, winSize:64
+I (2109) wifi:connected with Zigbee, aid = 1, channel 10, BW20, bssid = c2:a8:1d:82:e4:6c
+I (2109) wifi:security: WPA2-PSK, phy: bgn, rssi: -82
+I (2109) wifi:pm start, type: 1
+
+I (2199) wifi:dp: 1, bi: 102400, li: 3, scale listen interval from 307200 us to 307200 us
+I (2199) wifi:AP's beacon interval = 102400 us, DTIM period = 1
+I (2209) wifi:<ba-add>idx:1 (ifx:0, c2:a8:1d:82:e4:6c), tid:0, ssn:0, winSize:64
+[0;32mI (4209) esp_netif_handlers: sta ip: 10.0.0.73, mask: 255.255.255.0, gw: 10.0.0.1[0m
+[0;32mI (4329) WIFI: got ip:10.0.0.73[0m
+[0;32mI (4329) WIFI: Stop Timer[0m
+[0;32mI (4329) WIFI: WIFI_CONNECTED_BIT[0m
+[0;32mI (4329) WIFI: Got IP Address.[0m
+[0;32mI (4329) MAIN: Initializing mDNS[0m
+[0;32mI (4339) mdns_mem: mDNS task will be created from internal RAM[0m
+[0;32mI (4339) WIFI: mdns hostname set to: [JF-ECU32][0m
+[0;32mI (4349) NVS: Ouverture du handle[0m
+[0;32mI (4349) NVS: Lecture config turbine[0m
+[0;32mI (4359) NVS: Fermeture du handle[0m
+[0;32mI (4469) NVS: Name = Nom du moteur[0m
+[0;32mI (4569) NVS: Log count = 1[0m
+[0;32mI (4569) NVS: glow power = 10[0m
+[0;32mI (4569) NVS: Max rpm = 145000[0m
+[0;32mI (4569) NVS: idle rpm = 35000[0m
+[0;32mI (4569) NVS: start_temp = 100[0m
+[0;32mI (4579) NVS: max_temp = 750[0m
+[0;32mI (4579) NVS: acceleration_delay = 10[0m
+[0;32mI (4579) NVS: deceleration_delay = 12[0m
+[0;32mI (4589) NVS: stability_delay = 5[0m
+[0;32mI (4589) NVS: max_pump1 = 1024[0m
+[0;32mI (4619) NVS: min_pump1= 0[0m
+[0;32mI (4699) NVS: max_pump2 = 512[0m
+[0;32mI (4699) NVS: min_pump2= 0[0m
+[0;32mI (4699) NVS: max_vanne1 = 255[0m
+[0;32mI (4699) NVS: max_vanne2= 255[0m
+[0;32mI (4699) NVS: starter_rpm_start = 0[0m
+[0;32mI (4709) NVS: starter_pwm_perc_start= 0.000000[0m
+[0;32mI (4709) NVS: starter_pwm_perc_min = 0.000000[0m
+[0;32mI (4719) NVS: starter_max_rpm= 0[0m
+[0;32mI (4719) NVS: Nb lipos= 2[0m
+[0;32mI (4729) NVS: Vmin décollage= 2[0m
+[0;32mI (4729) NVS: Len = 504[0m
+[0;32mI (4839) NVS: Checksum calculé = 22573[0m
+[0;32mI (4839) NVS: Checkum OK[0m
+[0;32mI (4839) NVS: Len = 412[0m
+[0;32mI (4839) NVS: Checksum calculé = 19521[0m
+[0;32mI (4839) NVS: Checkum OK[0m
+[0;32mI (4839) NVS: Ouverture du handle[0m
+[0;32mI (4849) NVS: Lecture config ECU[0m
+[0;32mI (4849) NVS: Fermeture du handle[0m
+[0;32mI (4859) NVS: config_ECU Done[0m
+[0;32mI (4859) NVS: Len = 12[0m
+[0;32mI (4859) NVS: Checksum calculé = 7[0m
+[0;32mI (4909) NVS: Checkum OK[0m
+[0;32mI (4919) CONFIG_ECU: input : 1[0m
+[0;32mI (4919) CONFIG_ECU: glow_type : 0[0m
+[0;32mI (4919) CONFIG_ECU: start_type : 1[0m
+[0;32mI (4919) CONFIG_ECU: output_pump1 : 0[0m
+[0;32mI (4929) CONFIG_ECU: output_pump2 : 2[0m
+[0;32mI (4929) CONFIG_ECU: output_starter : 1[0m
+[0;32mI (4939) CONFIG_ECU: use_telem : 2[0m
+[0;32mI (4939) CONFIG_ECU: use_input2 : 0[0m
+[0;32mI (4949) CONFIG_ECU: use_led : 0[0m
+[0;32mI (4949) NVS: Ouverture du handle[0m
+[0;32mI (5039) NVS: Lecture horametre[0m
+[0;32mI (5049) NVS: Valeur non trouvée, initialisée à 0
+[0m
+[0;32mI (5049) ECU: initializing mcpwm servo control gpio......[0m
+[0;32mI (5049) ECU: MCPWM_UNIT init outputs Pompe 2 2[0m
+[0;32mI (5059) ECU: MCPWM_UNIT init outputs Pompe 1 PWM[0m
+[0;32mI (5059) ECU: MCPWM_UNIT : 0 ; MCPWM_TIMER : 0 ; MCPWM_GEN : 0 ; MCPWM_TIMER : 0 ; pin : 33[0m
+[0;32mI (5069) ECU: MCPWM_UNIT init outputs Démarreur PPM[0m
+[0;32mI (5079) ECU: MCPWM_UNIT : 1 ; MCPWM_TIMER : 2 ; MCPWM_GEN : 0 ; MCPWM_TIMER : 2 ; pin : 32[0m
+[0;32mI (5089) ECU: Configuring Initial Parameters of mcpwm......[0m
+[0;32mI (5099) ECU: LEDC init[0m
+[0;32mI (5099) ECU: LEDC init outputs[0m
+[0;32mI (5189) MAIN: Initializing SPIFFS[0m
+[0;32mI (5199) MAIN: Mount /html to storage success[0m
+[0;32mI (5199) MAIN: Partition size: total: 180971, used: 118472[0m
+[0;32mI (5199) MAIN: d_name=/html/chart.html d_ino=0 d_type=1[0m
+[0;32mI (5209) MAIN: d_name=/html/chart_starter.html d_ino=0 d_type=1[0m
+[0;32mI (5209) MAIN: d_name=/html/favicon.ico d_ino=0 d_type=1[0m
+[0;32mI (5239) MAIN: d_name=/html/footer.html d_ino=0 d_type=1[0m
+[0;32mI (5239) MAIN: d_name=/html/gauge.min.js d_ino=0 d_type=1[0m
+[0;32mI (5249) MAIN: d_name=/html/gauges.html d_ino=0 d_type=1[0m
+[0;32mI (5249) MAIN: d_name=/html/head.html d_ino=0 d_type=1[0m
+[0;32mI (5259) MAIN: d_name=/html/head2.html d_ino=0 d_type=1[0m
+[0;32mI (5349) MAIN: d_name=/html/script_gauges.js d_ino=0 d_type=1[0m
+[0;32mI (5349) MAIN: d_name=/html/script_status.js d_ino=0 d_type=1[0m
+[0;32mI (5369) MAIN: d_name=/html/slider.html d_ino=0 d_type=1[0m
+[0;32mI (5379) MAIN: Initializing Semaphores[0m
+[0;32mI (5379) MAIN: Initializing Task HTTP[0m
+[0;32mI (5379) MAIN: Initializing Task Log[0m
+[0;32mI (5379) HTTP: Take semaphore[0m
+[0;32mI (5389) ECU: Start Logtask[0m
+[0;32mI (5389) MAIN: Initializing Task ECU[0m
+[0;32mI (5399) MAIN: Initializing Task PPM Inputs[0m
+[0;32mI (5479) MAIN: Initializing MAX31855 Task
+[0m
+[0;32mI (5539) MAIN: Initializing WebSocket Task
+[0m
+[0;32mI (5549) Websocket: WS_TASK start[0m
+[0;32mI (5549) Websocket: WS_TASK Max client = 16[0m
+[0;31mE (5549) Websocket: Plus de client - pause[0m
+[0;32mI (5599) MAIN: INA219 not found
+[0m
+[0;32mI (5599) MAIN: Initializing INA219 + ADC Task
+[0m
+[0;32mI (5599) HTTP: Start task_parameter=10.0.0.73[0m
+[0;32mI (5599) ECU: Start ECU Task[0m
+[0;32mI (5599) HTTP: Starting server on http://10.0.0.73:80[0m
+[0;32mI (5599) INPUTS: Task glow_current start[0m
+[0;32mI (5609) HTTP: Starting HTTP Server on port: '80'[0m
+[0;32mI (5709) HTTP: HTTP Server Started[0m
+[0;32mI (7599) set_power: PPM Value = 0.000000[0m
+[0;32mI (14679) HTTP: filepath : /html/[0m
+[0;32mI (14679) HTTP: Reading /html/head.html[0m
+[0;32mI (14699) HTTP: Reading /html/head2.html[0m
+[0;32mI (14709) HTTP: dirpath : /html/[0m
+[0;32mI (14709) HTTP: startwith : /html[0m
+[0;32mI (14719) HTTP: Found file : chart.html (5388 bytes)[0m
+[0;32mI (14729) HTTP: Found file : chart_starter.html (4280 bytes)[0m
+[0;32mI (14739) HTTP: Found file : favicon.ico (15406 bytes)[0m
+[0;32mI (14769) HTTP: Found file : footer.html (1054 bytes)[0m
+[0;32mI (14859) HTTP: Found file : gauge.min.js (66260 bytes)[0m
+[0;32mI (14869) HTTP: Found file : gauges.html (2479 bytes)[0m
+[0;32mI (14879) HTTP: Found file : head.html (1670 bytes)[0m
+[0;32mI (14889) HTTP: Found file : head2.html (243 bytes)[0m
+[0;32mI (14899) HTTP: Found file : script_gauges.js (11885 bytes)[0m
+[0;32mI (14909) HTTP: Found file : script_status.js (642 bytes)[0m
+[0;32mI (14909) HTTP: Found file : slider.html (4629 bytes)[0m
+[0;32mI (14949) HTTP: Reading /html/footer.html[0m
+[0;33mW (14979) httpd_txrx: httpd_sock_err: error in send : 104[0m
+[0;33mW (14979) httpd_txrx: httpd_sock_err: error in send : 128[0m
+[0;33mW (14979) httpd_txrx: httpd_sock_err: error in recv : 104[0m
+[0;32mI (15279) HTTP: favicon_get_handler req->uri=[/favicon.ico][0m
+[0;33mW (15289) httpd_txrx: httpd_sock_err: error in send : 104[0m
+[0;33mW (15289) httpd_txrx: httpd_sock_err: error in recv : 104[0m
+[0;32mI (19239) HTTP: Reading /html/head.html[0m
+[0;32mI (19259) HTTP: Reading /html/head2.html[0m
+[0;32mI (19279) HTTP: Reading /html/footer.html[0m
+[0;32mI (19299) HTTP: Reading /html/script_status.js[0m
+[0;32mI (21669) HTTP: filepath : /sdcard/logs/[0m
+[0;32mI (21729) HTTP: Reading /html/head.html[0m
+[0;32mI (21739) HTTP: Reading /html/head2.html[0m
+[0;32mI (21749) HTTP: dirpath : /sdcard/logs/[0m
+[0;32mI (21789) HTTP: startwith : /sdca[0m
+[0;32mI (21869) HTTP: Found file : LOG1.CSV (2084 bytes)[0m
+[0;32mI (21999) HTTP: Found file : CURVES.TXT (530 bytes)[0m
+[0;32mI (22069) HTTP: Found file : LOG2.CSV (2084 bytes)[0m
+[0;32mI (22149) HTTP: Found file : LOG3.CSV (3928 bytes)[0m
+[0;32mI (22219) HTTP: Found file : LOG4.CSV (3573 bytes)[0m
+[0;32mI (22299) HTTP: Found file : LOG5.CSV (2440 bytes)[0m
+[0;32mI (22379) HTTP: Found file : LOG6.CSV (2611 bytes)[0m
+[0;32mI (22449) HTTP: Found file : LOGS.TXT (44544 bytes)[0m
+[0;32mI (22529) HTTP: Found file : LOG7.CSV (0 bytes)[0m
+[0;32mI (22669) HTTP: Found file : LOG8.CSV (2611 bytes)[0m
+[0;32mI (22739) SDCard:     258095 KiB total drive space.
+    208487 KiB available.
+    416975 free clust.
+[0m
+[0;32mI (22739) HTTP: Reading /html/footer.html[0m
+[0;32mI (30539) HTTP: filepath : /sdcard/logs/LOGS.TXT[0m
+[0;32mI (30669) HTTP: Sending file : /sdcard/logs/LOGS.TXT (45184 bytes)...[0m
+[0;33mW (42469) httpd_txrx: httpd_sock_err: error in send : 11[0m
+[0;31mE (42469) HTTP: File sending failed![0m
+[0;33mW (46469) httpd_txrx: httpd_resp_send_err: 500 Internal Server Error - Failed to send file[0m
+[0;33mW (46499) httpd_txrx: httpd_resp_send_err: error calling setsockopt : 22[0m
+[0;33mW (46499) httpd_txrx: httpd_sock_err: error in send : 104[0m
+[0;33mW (46509) httpd_uri: httpd_uri: uri handler execution failed[0m
+[0;32mI (52509) HTTP: filepath : /sdcard/logs/[0m
+[0;32mI (52609) HTTP: Reading /html/head.html[0m
+[0;32mI (52629) HTTP: Reading /html/head2.html[0m
+[0;32mI (52639) HTTP: dirpath : /sdcard/logs/[0m
+[0;32mI (52659) HTTP: startwith : /sdca[0m
+[0;32mI (52769) HTTP: Found file : LOG1.CSV (2084 bytes)[0m
+[0;32mI (52849) HTTP: Found file : CURVES.TXT (530 bytes)[0m
+[0;32mI (52929) HTTP: Found file : LOG2.CSV (2084 bytes)[0m
+[0;32mI (52999) HTTP: Found file : LOG3.CSV (3928 bytes)[0m
+[0;32mI (53079) HTTP: Found file : LOG4.CSV (3573 bytes)[0m
+[0;32mI (53159) HTTP: Found file : LOG5.CSV (2440 bytes)[0m
+[0;32mI (53229) HTTP: Found file : LOG6.CSV (2611 bytes)[0m
+[0;32mI (53369) HTTP: Found file : LOGS.TXT (46592 bytes)[0m
+[0;32mI (53489) HTTP: Found file : LOG7.CSV (0 bytes)[0m
+[0;32mI (53569) HTTP: Found file : LOG8.CSV (2611 bytes)[0m
+[0;32mI (53579) SDCard:     258095 KiB total drive space.
+    208486 KiB available.
+    416972 free clust.
+[0m
+[0;32mI (53579) HTTP: Reading /html/footer.html[0m
+[0;32mI (59519) HTTP: filepath : /sdcard/logs/[0m
+[0;32mI (59579) HTTP: Reading /html/head.html[0m
+[0;32mI (59599) HTTP: Reading /html/head2.html[0m
+[0;32mI (59609) HTTP: dirpath : /sdcard/logs/[0m
+[0;32mI (59629) HTTP: startwith : /sdca[0m
+[0;32mI (59749) HTTP: Found file : LOG1.CSV (2084 bytes)[0m
+[0;32mI (59879) HTTP: Found file : CURVES.TXT (530 bytes)[0m
+[0;32mI (59949) HTTP: Found file : LOG2.CSV (2084 bytes)[0m
+[0;32mI (60029) HTTP: Found file : LOG3.CSV (3928 bytes)[0m
+[0;32mI (60099) HTTP: Found file : LOG4.CSV (3573 bytes)[0m
+[0;32mI (60179) HTTP: Found file : LOG5.CSV (2440 bytes)[0m
+[0;32mI (60249) HTTP: Found file : LOG6.CSV (2611 bytes)[0m
+[0;32mI (60329) HTTP: Found file : LOGS.TXT (47360 bytes)[0m
+[0;32mI (60469) HTTP: Found file : LOG7.CSV (0 bytes)[0m
+[0;32mI (60549) HTTP: Found file : LOG8.CSV (2611 bytes)[0m
+[0;32mI (60559) SDCard:     258095 KiB total drive space.
+    208485 KiB available.
+    416970 free clust.
+[0m
+[0;32mI (60559) HTTP: Reading /html/footer.html[0m
+[0;32mI (67259) HTTP: Reading /html/head.html[0m
+[0;32mI (67269) HTTP: Reading /html/head2.html[0m
+[0;32mI (67299) HTTP: Reading /html/footer.html[0m
+[0;32mI (67309) HTTP: Reading /html/script_status.js[0m
+[0;32mI (107429) HTTP: Reading /html/head.html[0m
+[0;32mI (107449) HTTP: Reading /html/head2.html[0m
+[0;32mI (107469) HTTP: Reading /html/footer.html[0m
+[0;32mI (107489) HTTP: Reading /html/script_status.js[0m
+[0;32mI (107619) ECU: START[0m
+[0;32mI (107619) ECU: START OK PLEIN GAZ[0m
+[0;32mI (107619) ECU: START INIT[0m
+[0;32mI (108709) ECU: START[0m
+[0;32mI (108709) ECU: START OK PLEIN GAZ[0m
+[0;32mI (108709) ECU: START TESTGLOW[0m
+[0;32mI (108709) ECU: SP : 0 Curr : 0.000000mA [0m
+[0;32mI (108719) ECU: START[0m
+[0;32mI (108719) ECU: START OK PLEIN GAZ[0m
+[0;32mI (108719) ECU: START TESTGLOW[0m
+[0;32mI (108729) ECU: SP : 1 Curr : 0.000000mA [0m
+[0;32mI (108739) ECU: START[0m
+[0;32mI (108739) ECU: START OK PLEIN GAZ[0m
+[0;32mI (108739) ECU: START TESTGLOW[0m
+[0;32mI (108819) ECU: SP : 2 Curr : 0.000000mA [0m
+[0;32mI (108829) ECU: START[0m
+[0;32mI (108829) ECU: START OK PLEIN GAZ[0m
+[0;32mI (108829) ECU: START TESTGLOW[0m
+[0;32mI (108859) ECU: SP : 3 Curr : 0.000000mA [0m
+[0;32mI (108869) ECU: START[0m
+[0;32mI (108869) ECU: START OK PLEIN GAZ[0m
+[0;32mI (108869) ECU: START TESTGLOW[0m
+[0;32mI (108869) ECU: SP : 4 Curr : 0.000000mA [0m
+[0;32mI (108879) ECU: START[0m
+[0;32mI (108879) ECU: START OK PLEIN GAZ[0m
+[0;32mI (108959) ECU: START TESTGLOW[0m
+[0;32mI (108959) ECU: SP : 5 Curr : 0.000000mA [0m
+[0;32mI (108969) ECU: START[0m
+[0;32mI (108969) ECU: START OK PLEIN GAZ[0m
+[0;32mI (108969) ECU: START TESTGLOW[0m
+[0;32mI (108999) ECU: SP : 6 Curr : 0.000000mA [0m
+[0;32mI (109009) ECU: START[0m
+[0;32mI (109009) ECU: START OK PLEIN GAZ[0m
+[0;32mI (109009) ECU: START TESTGLOW[0m
+[0;32mI (109009) ECU: SP : 7 Curr : 0.000000mA [0m
+[0;32mI (109019) ECU: START[0m
+[0;32mI (109099) ECU: START OK PLEIN GAZ[0m
+[0;32mI (109099) ECU: START TESTGLOW[0m
+[0;32mI (109099) ECU: SP : 8 Curr : 0.000000mA [0m
+[0;32mI (109109) ECU: START[0m
+[0;32mI (109109) ECU: START OK PLEIN GAZ[0m
+[0;32mI (109109) ECU: START TESTGLOW[0m
+[0;32mI (109139) ECU: SP : 9 Curr : 0.000000mA [0m
+[0;32mI (109149) ECU: START[0m
+[0;32mI (109149) ECU: START OK PLEIN GAZ[0m
+[0;32mI (109149) ECU: START TESTGLOW[0m
+[0;32mI (109149) ECU: SP : 10 Curr : 0.000000mA [0m
+[0;32mI (109249) ECU: START[0m
+[0;32mI (109249) ECU: START OK PLEIN GAZ[0m
+[0;32mI (109249) ECU: START TESTGLOW[0m
+[0;32mI (109249) ECU: SP : 11 Curr : 0.000000mA [0m
+[0;32mI (109259) ECU: START[0m
+[0;32mI (109259) ECU: START OK PLEIN GAZ[0m
+[0;32mI (109259) ECU: START TESTGLOW[0m
+[0;32mI (109289) ECU: SP : 12 Curr : 0.000000mA [0m
+[0;32mI (109299) ECU: START[0m
+[0;32mI (109299) ECU: START OK PLEIN GAZ[0m
+[0;32mI (109309) ECU: START TESTGLOW[0m
+[0;32mI (109389) ECU: SP : 13 Curr : 0.000000mA [0m
+[0;32mI (109399) ECU: START[0m
+[0;32mI (109399) ECU: START OK PLEIN GAZ[0m
+[0;32mI (109399) ECU: START TESTGLOW[0m
+[0;32mI (109399) ECU: SP : 14 Curr : 0.000000mA [0m
+[0;32mI (109409) ECU: START[0m
+[0;32mI (109409) ECU: START OK PLEIN GAZ[0m
+[0;32mI (109439) ECU: START TESTGLOW[0m
+[0;32mI (109439) ECU: SP : 15 Curr : 0.000000mA [0m
+[0;32mI (109449) ECU: START[0m
+[0;32mI (109449) ECU: START OK PLEIN GAZ[0m
+[0;32mI (109529) ECU: START TESTGLOW[0m
+[0;32mI (109529) ECU: SP : 16 Curr : 0.000000mA [0m
+[0;32mI (109539) ECU: START[0m
+[0;32mI (109539) ECU: START OK PLEIN GAZ[0m
+[0;32mI (109539) ECU: START TESTGLOW[0m
+[0;32mI (109539) ECU: SP : 17 Curr : 0.000000mA [0m
+[0;32mI (109559) ECU: START[0m
+[0;32mI (109559) ECU: START OK PLEIN GAZ[0m
+[0;32mI (109589) ECU: START TESTGLOW[0m
+[0;32mI (109589) ECU: SP : 18 Curr : 0.000000mA [0m
+[0;32mI (109599) ECU: START[0m
+[0;32mI (109679) ECU: START OK PLEIN GAZ[0m
+[0;32mI (109679) ECU: START TESTGLOW[0m
+[0;32mI (109679) ECU: SP : 19 Curr : 0.000000mA [0m
+[0;32mI (109689) ECU: START[0m
+[0;32mI (109689) ECU: START OK PLEIN GAZ[0m
+[0;32mI (109689) ECU: START TESTGLOW[0m
+[0;32mI (109689) ECU: SP : 20 Curr : 0.000000mA [0m
+[0;32mI (109709) ECU: START[0m
+[0;32mI (109709) ECU: START OK PLEIN GAZ[0m
+[0;32mI (109739) ECU: START TESTGLOW[0m
+[0;32mI (109739) ECU: SP : 21 Curr : 0.000000mA [0m
+[0;32mI (109829) ECU: START[0m
+[0;32mI (109829) ECU: START OK PLEIN GAZ[0m
+[0;32mI (109829) ECU: START TESTGLOW[0m
+[0;32mI (109829) ECU: SP : 22 Curr : 0.000000mA [0m
+[0;32mI (109839) ECU: START[0m
+[0;32mI (109839) ECU: START OK PLEIN GAZ[0m
+[0;32mI (109839) ECU: START TESTGLOW[0m
+[0;32mI (109849) ECU: SP : 23 Curr : 0.000000mA [0m
+[0;32mI (109859) ECU: START[0m
+[0;32mI (109889) ECU: START OK PLEIN GAZ[0m
+[0;32mI (109889) ECU: START TESTGLOW[0m
+[0;32mI (109969) ECU: SP : 24 Curr : 0.000000mA [0m
+[0;32mI (109979) ECU: START[0m
+[0;32mI (109979) ECU: START OK PLEIN GAZ[0m
+[0;32mI (109979) ECU: START TESTGLOW[0m
+[0;32mI (109979) ECU: SP : 25 Curr : 0.000000mA [0m
+[0;32mI (109989) ECU: START[0m
+[0;32mI (109989) ECU: START OK PLEIN GAZ[0m
+[0;32mI (109989) ECU: START TESTGLOW[0m
+[0;32mI (109999) ECU: SP : 26 Curr : 0.000000mA [0m
+[0;32mI (110009) ECU: START[0m
+[0;32mI (110039) ECU: START OK PLEIN GAZ[0m
+[0;32mI (110129) ECU: START TESTGLOW[0m
+[0;32mI (110129) ECU: SP : 27 Curr : 0.000000mA [0m
+[0;32mI (110139) ECU: START[0m
+[0;32mI (110139) ECU: START OK PLEIN GAZ[0m
+[0;32mI (110139) ECU: START TESTGLOW[0m
+[0;32mI (110139) ECU: SP : 28 Curr : 0.000000mA [0m
+[0;32mI (110159) ECU: START[0m
+[0;32mI (110159) ECU: START OK PLEIN GAZ[0m
+[0;32mI (110159) ECU: START TESTGLOW[0m
+[0;32mI (110159) ECU: SP : 29 Curr : 0.000000mA [0m
+[0;32mI (110169) ECU: START[0m
+[0;32mI (110309) ECU: START OK PLEIN GAZ[0m
+[0;32mI (110309) ECU: START TESTGLOW[0m
+[0;32mI (110309) ECU: SP : 30 Curr : 0.000000mA [0m
+[0;32mI (110329) ECU: START[0m
+[0;32mI (110329) ECU: START OK PLEIN GAZ[0m
+[0;32mI (110329) ECU: START TESTGLOW[0m
+[0;32mI (110329) ECU: SP : 31 Curr : 0.000000mA [0m
+[0;32mI (110339) ECU: START[0m
+[0;32mI (110339) ECU: START OK PLEIN GAZ[0m
+[0;32mI (110339) ECU: START TESTGLOW[0m
+[0;32mI (110349) ECU: SP : 32 Curr : 0.000000mA [0m
+[0;32mI (110479) ECU: START[0m
+[0;32mI (110479) ECU: START OK PLEIN GAZ[0m
+[0;32mI (110479) ECU: START TESTGLOW[0m
+[0;32mI (110479) ECU: SP : 33 Curr : 0.000000mA [0m
+[0;32mI (110489) ECU: START[0m
+[0;32mI (110489) ECU: START OK PLEIN GAZ[0m
+[0;32mI (110489) ECU: START TESTGLOW[0m
+[0;32mI (110499) ECU: SP : 34 Curr : 0.000000mA [0m
+[0;32mI (110509) ECU: START[0m
+[0;32mI (110509) ECU: START OK PLEIN GAZ[0m
+[0;32mI (110509) ECU: START TESTGLOW[0m
+[0;32mI (110549) ECU: SP : 35 Curr : 0.000000mA [0m
+[0;32mI (110569) ECU: START[0m
+[0;32mI (110569) ECU: START OK PLEIN GAZ[0m
+[0;32mI (110569) ECU: START TESTGLOW[0m
+[0;32mI (110569) ECU: SP : 36 Curr : 0.000000mA [0m
+[0;32mI (110579) ECU: START[0m
+[0;32mI (110579) ECU: START OK PLEIN GAZ[0m
+[0;32mI (110579) ECU: START TESTGLOW[0m
+[0;32mI (110579) ECU: SP : 37 Curr : 0.000000mA [0m
+[0;32mI (110599) ECU: START[0m
+[0;32mI (110599) ECU: START OK PLEIN GAZ[0m
+[0;32mI (110679) ECU: START TESTGLOW[0m
+[0;32mI (110679) ECU: SP : 38 Curr : 0.000000mA [0m
+[0;32mI (110699) ECU: START[0m
+[0;32mI (110699) ECU: START OK PLEIN GAZ[0m
+[0;32mI (110699) ECU: START TESTGLOW[0m
+[0;31mE (110699) ECU: TEST GLOW TIMEOUT[0m
+[0;32mI (110919) LOG: End Log[0m
+[0;32mI (111119) LOG: End Log[0m
+[0;32mI (111319) LOG: End Log[0m
+[0;32mI (111519) LOG: End Log[0m
+[0;32mI (111729) LOG: End Log[0m
+[0;32mI (130099) HTTP: filepath : /sdcard/logs/[0m
+[0;32mI (130159) HTTP: Reading /html/head.html[0m
+[0;32mI (130179) HTTP: Reading /html/head2.html[0m
+[0;32mI (130239) HTTP: dirpath : /sdcard/logs/[0m
+[0;32mI (130239) HTTP: startwith : /sdca[0m
+[0;32mI (130349) HTTP: Found file : LOG1.CSV (2084 bytes)[0m
+[0;32mI (130429) HTTP: Found file : CURVES.TXT (530 bytes)[0m
+[0;32mI (130509) HTTP: Found file : LOG2.CSV (2084 bytes)[0m
+[0;32mI (130579) HTTP: Found file : LOG3.CSV (3928 bytes)[0m
+[0;32mI (130659) HTTP: Found file : LOG4.CSV (3573 bytes)[0m
+[0;32mI (130739) HTTP: Found file : LOG5.CSV (2440 bytes)[0m
+[0;32mI (130869) HTTP: Found file : LOG6.CSV (2611 bytes)[0m
+[0;32mI (130989) HTTP: Found file : LOGS.TXT (56320 bytes)[0m
+[0;32mI (131069) HTTP: Found file : LOG7.CSV (0 bytes)[0m
+[0;32mI (131139) HTTP: Found file : LOG8.CSV (2611 bytes)[0m
+[0;32mI (131219) HTTP: Found file : LOG9.CSV (2811 bytes)[0m
+[0;32mI (131229) SDCard:     258095 KiB total drive space.
+    208473 KiB available.
+    416947 free clust.
+[0m
+[0;32mI (131229) HTTP: Reading /html/footer.html[0m
+[0;32mI (144509) HTTP: filepath : /sdcard/logs/[0m
+[0;32mI (144619) HTTP: Reading /html/head.html[0m
+[0;32mI (144639) HTTP: Reading /html/head2.html[0m
+[0;32mI (144649) HTTP: dirpath : /sdcard/logs/[0m
+[0;32mI (144699) HTTP: startwith : /sdca[0m
+[0;32mI (144789) HTTP: Found file : LOG1.CSV (2084 bytes)[0m
+[0;32mI (144859) HTTP: Found file : CURVES.TXT (530 bytes)[0m
+[0;32mI (144939) HTTP: Found file : LOG2.CSV (2084 bytes)[0m
+[0;32mI (145019) HTTP: Found file : LOG3.CSV (3928 bytes)[0m
+[0;32mI (145089) HTTP: Found file : LOG4.CSV (3573 bytes)[0m
+[0;32mI (145239) HTTP: Found file : LOG5.CSV (2440 bytes)[0m
+[0;32mI (145309) HTTP: Found file : LOG6.CSV (2611 bytes)[0m
+[0;32mI (145389) HTTP: Found file : LOGS.TXT (57088 bytes)[0m
+[0;32mI (145469) HTTP: Found file : LOG7.CSV (0 bytes)[0m
+[0;32mI (145539) HTTP: Found file : LOG8.CSV (2611 bytes)[0m
+[0;32mI (145669) HTTP: Found file : LOG9.CSV (2811 bytes)[0m
+[0;32mI (145689) SDCard:     258095 KiB total drive space.
+    208472 KiB available.
+    416945 free clust.
+[0m
+[0;32mI (145689) HTTP: Reading /html/footer.html[0m
+[0;32mI (160969) HTTP: filepath : /sdcard/logs/[0m
+[0;32mI (161029) HTTP: Reading /html/head.html[0m
+[0;32mI (161049) HTTP: Reading /html/head2.html[0m
+[0;32mI (161049) HTTP: dirpath : /sdcard/logs/[0m
+[0;32mI (161049) HTTP: startwith : /sdca[0m
+[0;32mI (161139) HTTP: Found file : LOG1.CSV (2084 bytes)[0m
+[0;32mI (161219) HTTP: Found file : CURVES.TXT (530 bytes)[0m
+[0;32mI (161289) HTTP: Found file : LOG2.CSV (2084 bytes)[0m
+[0;32mI (161399) HTTP: Found file : LOG3.CSV (3928 bytes)[0m
+[0;32mI (161529) HTTP: Found file : LOG4.CSV (3573 bytes)[0m
+[0;32mI (161599) HTTP: Found file : LOG5.CSV (2440 bytes)[0m
+[0;32mI (161679) HTTP: Found file : LOG6.CSV (2611 bytes)[0m
+[0;32mI (161759) HTTP: Found file : LOGS.TXT (58368 bytes)[0m
+[0;32mI (161829) HTTP: Found file : LOG7.CSV (0 bytes)[0m
+[0;32mI (161909) HTTP: Found file : LOG8.CSV (2611 bytes)[0m
+[0;32mI (161989) HTTP: Found file : LOG9.CSV (2811 bytes)[0m
+[0;32mI (161999) SDCard:     258095 KiB total drive space.
+    208471 KiB available.
+    416943 free clust.
+[0m
+[0;32mI (162029) HTTP: Reading /h
