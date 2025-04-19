@@ -18,13 +18,14 @@
 */
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "esp_log.h"
+#include "freertos/queue.h"
 
 #include "calibration.h"
 #include "jf-ecu32.h"
 #include "inputs.h"
+#include "outputs.h"
 #include "nvs_ecu.h"
-#include "esp_log.h"
-#include "freertos/queue.h"
 
 #define DEBUG false
 
@@ -115,8 +116,8 @@ void starter_calibration()
     while(get_RPM(&turbine) > 0 && error == 0) //Descendre le PWM pour trouver à quel moment le moteur s'arrête
     {
         set_power(&turbine.starter,pwm_perc) ;
-        pwm_perc -= 0.1 ;
-        vTaskDelay(500 / portTICK_PERIOD_MS);
+        pwm_perc -= 0.01 ;
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
         c_datas.data = get_RPM(&turbine) ;
         c_datas.label = pwm_perc ;
         c_datas.powermin = pwm_perc ;
@@ -146,7 +147,7 @@ void starter_calibration()
         xQueueSendToFront(Q_Calibration_Values,&c_datas,0) ;
         vTaskDelete( NULL );    
     }
-    pwm_perc_min = pwm_perc ;
+    pwm_perc_min = pwm_perc + 0.2 ;
     //c_datas.powermin = pwm_perc_min ;
     ESP_LOGI(TAG, "Valeur minimale de rotation du démarreur : %f",pwm_perc);
 

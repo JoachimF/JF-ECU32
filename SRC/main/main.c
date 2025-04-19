@@ -25,6 +25,8 @@
 #include <dirent.h>
 
 #include "jf-ecu32.h"
+#include "logs.h"
+#include "outputs.h"
 #include "sdcard.h"
 #include "http_server.h"
 #include "wifi.h"
@@ -250,10 +252,11 @@ void app_main()
 	
 	init_outputs() ;
 	
-	ESP_LOGI("SDCARD","Init SDCARD");
+	ESP_LOGI("SDCARD","Init SPI + SDCARD");
     if(init_sdcard(&card) == ESP_OK){
 		//redirect_sytems_logs() ;
 	}
+
 		
 	// Entrées
 	init_inputs() ;
@@ -302,12 +305,13 @@ void app_main()
 		while(1) { vTaskDelay(1); }
 	}
 	
-	// Now on SDCard
-	/*if (mountSPIFFS("/logs", "logs", 5) != ESP_OK)
+	#ifdef SPIFFS_LOG
+	if (mountSPIFFS("/logs", "logs", 5) != ESP_OK)
 	{
 		ESP_LOGE(TAG, "SPIFFS mount failed");
 		//while(1) { vTaskDelay(1); }
-	}*/
+	}
+	#endif
 
 	// Create EventGroup
 	xLogEventGroup = xEventGroupCreate();
@@ -360,11 +364,11 @@ void app_main()
 	//vTaskSuspend( xinputsHandle ); 
 
 	/* Htop */
-	ESP_LOGI(TAG, "Initializing Task Htop");
+	/*ESP_LOGI(TAG, "Initializing Task Htop");
 	sync_spin_task = xSemaphoreCreateCounting(NUM_OF_SPIN_TASKS, 0);
     sync_stats_task = xSemaphoreCreateBinary();
 	xTaskCreatePinnedToCore(stats_task, "stats", 4096, NULL, STATS_TASK_PRIO, NULL, tskNO_AFFINITY);
-
+*/
 
 	ESP_LOGI(TAG, "Initializing MAX31855 Task\n"); //EGT
     SEM_EGT = xSemaphoreCreateMutex();
@@ -384,7 +388,7 @@ void app_main()
 	
 	/* Search I2C Peripherals*/
 	config_ECU.INA219_Present = 0;	
-	uint8_t *addresses,nb_periph ;
+	int *addresses,nb_periph ;
 	addresses = malloc(sizeof(uint8_t)) ;
 	nb_periph = scan_i2c(addresses) ;
 	for(int i = 0; i<nb_periph;i++)
@@ -404,7 +408,7 @@ void app_main()
 	xTaskCreatePinnedToCore(task_glow_current, "GLOW Current", configMINIMAL_STACK_SIZE * 8, NULL, (configMAX_PRIORITIES -5 ), &task_glow_current_h,1);
 	vTaskSuspend(task_glow_current_h);
 
-	xSemaphoreGive(sync_stats_task);
+	//xSemaphoreGive(sync_stats_task);
 	/* Htop */
 
 	/* Demarrage des taches*/

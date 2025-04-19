@@ -79,9 +79,10 @@ enum glow_types {
 #define PWM_TIMER MCPWM_TIMER_0
 #define PPM_TIMER MCPWM_TIMER_1
 
-#define TESTGLOW_TIMEOUT 2000 // X10 pour avoir des millis
-#define IGNITE_TIMEOUT 10000 //
+#define TESTGLOW_TIMEOUT 2000 // temps en millisecondes
+#define IGNITE_TIMEOUT 10000//
 #define PREHEAT_TIMEOUT 20000 //
+#define RAMP_TIMEOUT 10000 //
 
 enum yesno_type {
     NO,YES
@@ -186,10 +187,10 @@ typedef struct _GLOW_{
   uint8_t value;
   bool state;  // On - Off
   _ledc_config config ;
-  void (*set_power)(_ledc_config *config,uint32_t power);
-  uint32_t (*get_power)(struct _GLOW_ * glow);
-  void (*on)(_pwm_config *config);
-  void (*off)(_pwm_config *config);
+  //void (*set_power)(_ledc_config *config,uint32_t power);
+  //uint32_t (*get_power)(struct _GLOW_ * glow);
+  //void (*on)(_pwm_config *config);
+  //void (*off)(_pwm_config *config);
   float current ;
 } _GLOW_t ;
 
@@ -199,20 +200,20 @@ typedef struct _PUMP_{
   bool state; // On - Off
   bool new_target ;
   _pwm_config config ;
-  void (*set_power)( _pwm_config *config,float power);
-  void (*set_power_us)( _pwm_config *config,uint32_t power);
-  uint32_t (*get_power)(struct _PUMP_ * config) ;
-  void (*off)(_pwm_config *config);
+  //void (*set_power)( _pwm_config *config,float power);
+  //void (*set_power_us)( _pwm_config *config,uint32_t power);
+  //uint32_t (*get_power)(struct _PUMP_ * config) ;
+  //void (*off)(_pwm_config *config);
 } _PUMP_t;
 
 typedef struct _VALVE_{
   uint8_t value;
   bool state;
   _ledc_config config ;
-  void (*set_power)(_ledc_config *config,uint32_t power);
-  uint8_t (*get_power)(struct _VALVE_ * valve);
-  void (*on)(_pwm_config *config);
-  void (*off)(_pwm_config *config);
+  //void (*set_power)(_ledc_config *config,uint32_t power);
+  //uint8_t (*get_power)(struct _VALVE_ * valve);
+  //void (*on)(_pwm_config *config);
+  //void (*off)(_pwm_config *config);
 } _VALVE_t;
 
 typedef struct _engine_ {
@@ -286,7 +287,7 @@ extern _BITsconfigECU_u config_ECU ;
 
 void init(void);
 void linear_interpolation(uint32_t x0,uint32_t y0,uint32_t x1,uint32_t y1,uint32_t rpm,uint32_t *res) ;
-void set_kero_pump_target(uint32_t RPM) ;
+
 
 void update_curve_file(void) ;
 void head_logs_file(FILE *fd) ;
@@ -302,23 +303,7 @@ void log_task( void * pvParameters ) ;
 void ecu_task(void * pvParameters ) ;
 void inputs_task(void * pvParameters) ;
 
-void init_mcpwm(void) ;
-//void set_power_func_us(_PUMP_t *config ,float value) ;
-//void set_power_func(_PUMP_t *config ,float value) ;
-void set_power(_PUMP_t *starter ,float value) ;
-void set_power_vanne(_VALVE_t *vanne, uint32_t value) ;
-void set_power_glow(_VALVE_t *vanne, uint32_t value) ;
 
-float get_pump_power_float(_PUMP_t *config) ;
-float get_starter_power(_PUMP_t *config) ;
-
-uint32_t get_pump_power_int(_PUMP_t *config) ;
-uint8_t get_glow_power(_GLOW_t *config) ;
-float get_glow_current(_GLOW_t *glow) ;
-void set_glow_current(_GLOW_t *glow, float current) ;
-uint8_t get_vanne_power(_VALVE_t *config) ;
-float get_starter_power(_PUMP_t *config) ;
-float get_power(_PUMP_t *starter) ;
 
 /* Batterie */
 float get_vbatt(_engine_t *turbine) ;

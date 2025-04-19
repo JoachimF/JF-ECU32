@@ -42,6 +42,7 @@
 
 #include "jf-ecu32.h"
 #include "inputs.h"
+#include "outputs.h"
 #include "nvs_ecu.h"
 #include "http_server.h"
 #include "wifi.h"
@@ -1582,7 +1583,12 @@ esp_err_t start_server(const char *base_path, int port)
 	/******** File server ********************/
 	/* URI handler for getting uploaded files */
 	httpd_uri_t sdcard_download = {
+		#ifdef SPIFFS_LOG
+		.uri       = "/logs*",  // Match all URIs of type /path/to/file
+		#endif
+		#ifdef SD_LOG
 		.uri       = "/sdcard*",  // Match all URIs of type /path/to/file
+		#endif		
 		.method    = HTTP_GET,
 		.handler   = download_get_handler,
 		.user_ctx  = server_data    // Pass server data as context
@@ -1897,11 +1903,19 @@ static esp_err_t download_get_handler(httpd_req_t *req)
             return favicon_get_handler(req);
         } else if (strcmp(filename, "/html/?") == 0) {
             return index_html_get_handler(req);
+		#ifdef SD_LOG
         } else if (strcmp(filename, "/sdcard/logs/?") == 0) {
             return index_html_get_handler(req);
         } else if (strcmp(filename, "/sdcard/?") == 0) {
             return index_html_get_handler(req);
         }
+		#endif
+		#ifdef SPIFFS_LOG
+        } else if (strcmp(filename, "/logs/?") == 0) {
+            return index_html_get_handler(req);
+        }
+		#endif
+
         ESP_LOGE(TAG, "Failed to stat file : %s", filepath);
         /* Respond with 404 Not Found */
         httpd_resp_send_err(req, HTTPD_404_NOT_FOUND, "File does not exist");
@@ -2119,9 +2133,18 @@ static esp_err_t delete_post_handler(httpd_req_t *req)
 	if(strcmp(startwith, "/html") == 0) {
     	httpd_resp_set_hdr(req, "Location", "/html/");
 	}
+	#ifdef SD_LOG
 	else if(strcmp(startwith, "/sdca") == 0) {
 		httpd_resp_set_hdr(req, "Location", "/sdcard/logs/");
 	}
+	#endif
+	#ifdef SPIFFS_LOG
+	else if(strcmp(startwith, "/logs") == 0) {
+		httpd_resp_set_hdr(req, "Location", "/logs/");
+	}
+	#endif
+
+	
 #ifdef CONFIG_EXAMPLE_HTTPD_CONN_CLOSE_HEADER
     httpd_resp_set_hdr(req, "Connection", "close");
 #endif

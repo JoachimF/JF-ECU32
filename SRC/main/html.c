@@ -24,6 +24,7 @@
 #include <sys/stat.h>
 #include "esp_log.h"
 #include "esp_http_server.h"
+
 #include "jf-ecu32.h"
 
 const uint16_t CHUNKED_BUFFER_SIZE = 500;                // Chunk buffer size (needs to be well below stack space (4k for ESP8266, 8k for ESP32) but large enough to cache some small messages)
@@ -61,12 +62,21 @@ const char htmlBoutonFrontpage[]  =
   B_CHART "|"
   B_START_ENGINE "|" B_STOP_ENGINE"|" B_FILES "|" B_MAJ "|" B_CUT_WIFI ;
 
-
+#ifdef SD_LOG
 const char BoutonFrontpageAction[]  =
   "c_ecu|c_moteur|"
   "c_info|sdcard/logs/|c_wifi|c_slider|c_gauges|c_cals|c_st_cal|c_stop_st_cal|c_save_st_cal|"
   "c_chart|"
   "c_start|c_stop|html/|c_upgrade|c_stopwifi";
+#endif
+#ifdef SPIFFS_LOG
+const char BoutonFrontpageAction[]  =
+  "c_ecu|c_moteur|"
+  "c_info|logs/|c_wifi|c_slider|c_gauges|c_cals|c_st_cal|c_stop_st_cal|c_save_st_cal|"
+  "c_chart|"
+  "c_start|c_stop|html/|c_upgrade|c_stopwifi";
+#endif
+
 
 const char htmlInputParamEng[] =
   IN_NAME "|" IN_GLOWPOWER "|" 

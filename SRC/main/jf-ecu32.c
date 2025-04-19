@@ -39,6 +39,8 @@
 #include <dirent.h>
 
 #include "jf-ecu32.h"
+#include "logs.h"
+#include "outputs.h"
 #include "nvs_ecu.h"
 #include "inputs.h"
 #include "error.h"
@@ -174,97 +176,7 @@ void set_power_func(_PUMP_t *config ,float value)
     ESP_LOGI("set_power_func", "config->value = %f", config->value);
 }*/
 
-/*Configure la valeur de puissance de 0.0-100.0 en PWM, en PPM la valeur est convertie entre 1000us et 2000us*/
-void set_power(_PUMP_t *peripheral, float value)
-{
-    if(peripheral->config.ppm_pwm == PWM) // Valeur en pourcent 0-100
-    {
-        ESP_LOGI("set_power", "PWM Value = %f", value);
-        mcpwm_set_duty(peripheral->config.MCPWM_UNIT, peripheral->config.MCPWM_TIMER, peripheral->config.MCPWM_GEN, value);        
-    }
-    else    // Valeur en microsecondes 1000-2000
-    {
-        ESP_LOGI("set_power", "PPM Value = %f", value);
-        uint32_t value_us;
-        value_us = (value * 10) + 1000;
-        mcpwm_set_duty_in_us(peripheral->config.MCPWM_UNIT, peripheral->config.MCPWM_TIMER, peripheral->config.MCPWM_GEN, value_us);
-    }
-    peripheral->value = value  ;
-}
 
-uint32_t get_pump_power_int(_PUMP_t *pump)
-{
-    return pump->value ;
-}
-
-float get_pump_power_float(_PUMP_t *pump)
-{
-    return pump->value ;
-}
-
-float get_starter_power(_PUMP_t *starter)
-{
-    return starter->value ;
-}
-
-/*Renvoie la valeur en pourcent de la puissance demandé en cours*/
-float get_power(_PUMP_t *starter)
-{
-    return starter->value ;
-}
-
-/*Renvoie la valeur de la bouige de la puissance demandé en cours de 0-255*/
-uint8_t get_glow_power(_GLOW_t *glow)
-{
-    return glow->value ;
-}
-
-/*Renvoie le courant dans la bougie */
-float get_glow_current(_GLOW_t *glow)
-{
-    //ESP_LOGI(TAG, "Get Glow current : %0.3fA", glow->current) ;
-    return glow->current ;
-}
-
-/*Met a jour le courrant de la bougie 0.0f*/
-void set_glow_current(_GLOW_t *glow, float current)
-{
-    //ESP_LOGI(TAG, "Set Glow current : %0.3fA", current) ;
-    glow->current = current ;
-}
-
-
-/*Renvoie la tension de la batterie 0.0f*/
-float get_vbatt(_engine_t *turbine)
-{
-    return turbine->Vbatt ;
-}
-
-/*Met a jour la tension de la batterie 0.0f*/
-void set_vbatt(_engine_t *turbine, float tension)
-{
-    turbine->Vbatt = tension ;
-}
-
-
-/*Renvoie la valeur d'une vanne de la puissance demandé en cours de 0-1024*/
-uint8_t get_vanne_power(_VALVE_t *vanne)
-{
-    return vanne->value ;
-}
-
-/*Configure la valeur d'une vanne ou bougie de puissance de 0-1024*/
-void set_power_vanne(_VALVE_t *vanne, uint32_t value)
-{
-    ESP_ERROR_CHECK(ledc_set_duty(LEDC_LOW_SPEED_MODE, vanne->config.ledc_channel, value));
-    ESP_ERROR_CHECK(ledc_update_duty(LEDC_LOW_SPEED_MODE, vanne->config.ledc_channel));
-    vanne->value = value ;
-}
-
-void set_power_glow(_VALVE_t *vanne, uint32_t value)
-{
-    set_power_vanne(vanne, value) ;
-}
 
 uint8_t get_conf_lipo_elements(void)
 {
@@ -290,29 +202,6 @@ float get_Vmin_decollage(void)
 {
     return turbine_config.Vmin_decollage ;
 }
-
-/*Configure la valeur de puissance de 0-255*/
-void set_power_ledc(_ledc_config *config, uint32_t value)
-{
-    ESP_ERROR_CHECK(ledc_set_duty(LEDC_LOW_SPEED_MODE, config->ledc_channel, value));
-    ESP_ERROR_CHECK(ledc_update_duty(LEDC_LOW_SPEED_MODE, config->ledc_channel));
-    //ESP_LOGI(TAG,"ledc_channel %d ; value : %d ; pin : %d",config->ledc_channel,value,config->gpio_num);
-    //ESP_LOGI(TAG,"ledc_channel %d ; value : %d ; pin : %d",config->ledc_channel,ledc_get_duty(LEDC_LOW_SPEED_MODE, config->ledc_channel),config->gpio_num);
-}
-
-ledc_timer_config_t ledc_timer = {
-    .speed_mode = LEDC_LOW_SPEED_MODE,
-    .timer_num  = LEDC_TIMER_0,
-    .duty_resolution = LEDC_TIMER_8_BIT,
-    .freq_hz = 2000,
-    .clk_cfg = LEDC_AUTO_CLK
-};
-
-static ledc_channel_config_t ledc_channel[3];
-static mcpwm_config_t pwm_config[2]; //IDF 4.3.4
-//mcpwm_timer_handle_t timer[2] = NULL; //IDF 5.0
-//mcpwm_timer_config_t timer_config[2] = NULL ;
-
 
 _engine_t turbine = { 
     .time_up = 0 ,
@@ -349,131 +238,23 @@ _engine_t turbine = {
 // Configuration en LEDC
     .vanne1.config.gpio_num = VANNE1_PIN,
     .vanne1.config.ledc_channel = LEDC_CHANNEL_0,
-    .vanne1.set_power = set_power_ledc,
+    //.vanne1.set_power = set_power_ledc,
     .vanne1.value = 0 ,
 
     .vanne2.config.gpio_num = VANNE2_PIN,
     .vanne2.config.ledc_channel = LEDC_CHANNEL_1,
-    .vanne2.set_power = set_power_ledc,
+    //.vanne2.set_power = set_power_ledc,
     .vanne2.value = 0 ,
     
     .glow.config.gpio_num = GLOW_PIN,    
     .glow.config.ledc_channel = LEDC_CHANNEL_2,
-    .glow.set_power = set_power_ledc,
+    //.glow.set_power = set_power_ledc,
     .glow.value = 0 ,
  };
  
  _configEngine_t turbine_config ;
  _BITsconfigECU_u config_ECU ;
 
-void init_pwm_outputs(_pwm_config *config)
-{
-    mcpwm_gpio_init(config->MCPWM_UNIT, config->MCPWM, config->gpio_num);   
-    ESP_LOGI(TAG,"MCPWM_UNIT : %d ; MCPWM_TIMER : %d ; MCPWM_GEN : %d ; MCPWM_TIMER : %d ; pin : %d",config->MCPWM_UNIT,config->MCPWM_TIMER,config->MCPWM_GEN,config->MCPWM_TIMER,config->gpio_num); 
-}
-
-
-
-
-// IDF 4.3.4
-void init_mcpwm(void) // IDF 4.3.4
-{
-    ESP_LOGI(TAG,"initializing mcpwm servo control gpio......");
-    
-    /* Init PUMP 1*/
-    turbine.pump1.config.MCPWM_GEN = MCPWM_GEN_A ;
-    if(turbine.pump1.config.ppm_pwm == PWM){
-        turbine.pump1.config.MCPWM = MCPWM0A ;
-        turbine.pump1.config.MCPWM_TIMER = PWM_TIMER ;
-        turbine.pump1.config.MCPWM_UNIT = MCPWM_UNIT_0 ;
-    }
-    else{
-        turbine.pump1.config.MCPWM = MCPWM1A ;
-        turbine.pump1.config.MCPWM_TIMER = PPM_TIMER ;
-        turbine.pump1.config.MCPWM_UNIT = MCPWM_UNIT_1 ; 
-    }
-    
-    /* Init PUMP 2*/
-    ESP_LOGI(TAG,"MCPWM_UNIT init outputs %s %d",ST_PUMP2,turbine.pump2.config.ppm_pwm) ;
-    if(turbine.pump2.config.ppm_pwm != NONE)
-    {
-        turbine.pump2.config.MCPWM_GEN = MCPWM_GEN_B ;
-        if(turbine.pump2.config.ppm_pwm == PWM )
-        {
-            turbine.pump2.config.MCPWM = MCPWM0B ;
-            turbine.pump2.config.MCPWM_TIMER = PWM_TIMER ;
-            turbine.pump2.config.MCPWM_UNIT = MCPWM_UNIT_0 ;
-        }
-        else if(turbine.pump2.config.ppm_pwm == PPM )
-        {
-            turbine.pump2.config.MCPWM = MCPWM1B ;
-            turbine.pump2.config.MCPWM_TIMER = PPM_TIMER ;
-            turbine.pump2.config.MCPWM_UNIT = MCPWM_UNIT_1 ;
-        }
-        init_pwm_outputs(&turbine.pump2.config) ;
-    }
-
-    /* Init STARTER*/
-    turbine.starter.config.MCPWM_TIMER = MCPWM_TIMER_2 ;
-    turbine.starter.config.MCPWM_GEN = MCPWM_GEN_A ; // Test GENB au lieu de GENA crash fopen() quand duty des > 1ms
-    turbine.starter.config.MCPWM = MCPWM2A ;
-    if(config_ECU.output_starter == PWM)
-        turbine.starter.config.MCPWM_UNIT = MCPWM_UNIT_0 ;
-    else
-        turbine.starter.config.MCPWM_UNIT = MCPWM_UNIT_1 ;
-    
-    ESP_LOGI(TAG,"MCPWM_UNIT init outputs %s %s",ST_PUMP1,turbine.pump1.config.ppm_pwm ? "PPM" : "PWM" ) ;
-    init_pwm_outputs(&turbine.pump1.config) ;
-    ESP_LOGI(TAG,"MCPWM_UNIT init outputs %s %s",ST_STARTER,turbine.starter.config.ppm_pwm ? "PPM" : "PWM") ;
-    init_pwm_outputs(&turbine.starter.config) ;
-
-
-    
-    //2. initial mcpwm configuration
-    ESP_LOGI(TAG,"Configuring Initial Parameters of mcpwm......");
-
-    //Config pour PWM
-    pwm_config[0].frequency = 10000;    //frequency = 10000Hz, pour les moteur DC
-    pwm_config[0].cmpr_a = 0;    //duty cycle of PWMxA = 0  Pompe1
-    pwm_config[0].cmpr_b = 0;    //duty cycle of PWMxb = 0  Pompe2
-    pwm_config[0].counter_mode = MCPWM_UP_COUNTER;
-    pwm_config[0].duty_mode = MCPWM_DUTY_MODE_0;
-    //Config pour PPM
-    pwm_config[1].frequency = 50;    //frequency = 50Hz, pour les variateur et la bougie
-    pwm_config[1].cmpr_a = 0;    //duty cycle of PWMxA = 0 Pompe1
-    pwm_config[1].cmpr_b = 0;    //duty cycle of PWMxb = 0 Pompe2
-    pwm_config[1].counter_mode = MCPWM_UP_COUNTER;
-    pwm_config[1].duty_mode = MCPWM_DUTY_MODE_0;
-    
-    mcpwm_init(MCPWM_UNIT_0, PWM_TIMER, &pwm_config[0]);    //Configure PWM0A (pompe1) & PWM1B (pompe2) 10KHz
-    mcpwm_init(MCPWM_UNIT_1, PPM_TIMER, &pwm_config[1]);    //Configure PWM1A (pompe1) & PWM0B (pompe2) 50Hz
-    if(config_ECU.output_starter == PWM) {
-        mcpwm_init(MCPWM_UNIT_0, MCPWM_TIMER_2, &pwm_config[0]);    //Configure PWM2A 10KHz (Starter)
-        mcpwm_set_frequency(MCPWM_UNIT_0, MCPWM_TIMER_2,pwm_config[0].frequency);
-    }
-    else
-        mcpwm_init(MCPWM_UNIT_1, MCPWM_TIMER_2, &pwm_config[1]);    //Configure PWM2A 50KHz (Starter)
-    
-    ESP_LOGI(TAG,"LEDC init") ;
-    ledc_timer_config(&ledc_timer);
-    ESP_LOGI(TAG,"LEDC init outputs") ;
-    ledc_channel[0].channel = turbine.vanne1.config.ledc_channel;
-    ledc_channel[0].gpio_num = turbine.vanne1.config.gpio_num ;
-    ledc_channel[1].channel = turbine.vanne2.config.ledc_channel;
-    ledc_channel[1].gpio_num = turbine.vanne2.config.gpio_num ;
-    ledc_channel[2].channel = turbine.glow.config.ledc_channel;
-    ledc_channel[2].gpio_num = turbine.glow.config.gpio_num ;
-    for (int i = 0; i < 3; i++)
-    {   
-        ledc_channel[i].speed_mode = LEDC_LOW_SPEED_MODE;
-        ledc_channel[i].timer_sel = LEDC_TIMER_0;
-        ledc_channel[i].intr_type = LEDC_INTR_DISABLE;
-        ledc_channel[i].duty = 0;
-        ledc_channel[i].hpoint = 0;
-        ESP_ERROR_CHECK(ledc_channel_config(&ledc_channel[i]));
-    }
-
-}
 
 
 
@@ -500,28 +281,7 @@ void init(void)
 //    turbine.GAZ = 1000 ;
 }
 
-void set_kero_pump_target(uint32_t RPM)
-{
-    uint32_t rpm1=0,pump1=0,pump2=0,rpm2=0,res=0 ;
-    for(int i = 0;i<50;i++)
-    {
-        if(RPM >= turbine_config.power_table.RPM[i])
-        {
-            pump1 = turbine_config.power_table.pump[i] ;
-            rpm1 = turbine_config.power_table.RPM[i] ;
-        }
-        else if(RPM <= turbine_config.power_table.RPM[i])
-        {
-            pump2 = turbine_config.power_table.pump[i] ;
-            rpm2 = turbine_config.power_table.RPM[i] ;
-            i = 50 ;
-        }
-    }
-    linear_interpolation(rpm1,pump1,rpm2,pump2,RPM,&res) ;
-    turbine.pump1.target = res ;
-    turbine.pump1.new_target = 1 ;
-    //ESP_LOGI(TAG,"Target : %d - pump : %d\n",RPM,res) ;
-}
+
 
 void phase_to_str(char *status)
 {
@@ -572,154 +332,6 @@ void update_curve_file(void)
     fclose(fd);
     }
 }
-
-
-void head_logs_file(FILE *fd)
-{
-	if (!fd) {
-       ESP_LOGI("File", "Failed to open file");
-    } else {
-        fprintf(fd,"FunTime;Ticks;Time;RPM;RPMDelta;RPMPeriod;EGT;EGT_delta;Pompe1;Cible Pompe1;Pompe2;Glow;Vanne1;Vanne2;Voie Gaz;Voie Aux;Vbatt;Glow current;Stater;ErrorMsg;PhaseF;PhaseS\n");
-    }
-}
-
-void update_logs_file(FILE *fd,uint32_t func_time)
-{   
-    uint8_t minutes,secondes ;
-    uint32_t ticks ;
-    char errors[100] ;
-    ticks = xTaskGetTickCount() ;
-    get_time_up(&turbine,&secondes,&minutes,NULL) ;
-
-/*    fd = fopen(logpath, "a");
-    if (!fd) {
-        ESP_LOGI("File", "Failed to read existing file : logs.txt");
-    } else {*/
-            get_errors(errors) ;
-               /*Time;RPM;RPMDelta;RPMPeriod;EGT;EGT_Delta;Pompe1;Cible Pompe1;Pompe2;Glow;Vanne1;Vanne2;Voie Gaz;Voie Aux;Vbatt;Glow current;Stater;ErrorMsg;PhaseF;PhaseS;PhaseSB\n"*/
-            fprintf(fd,"%lu;%lu;%02u:%02u;%lu;%ld;%llu;%lu;%ld;%f;Cible Pompe1;%f;%u;%u;%u;%lu;%lu;%0.2f;%0.3f;%0.2f;%s;%d;%d\n",
-                    func_time,ticks,minutes,secondes,get_RPM(&turbine),get_delta_RPM(&turbine),turbine.RPM_period,get_EGT(&turbine),get_delta_EGT(&turbine),
-                    get_pump_power_float(&turbine.pump1),get_pump_power_float(&turbine.pump2),get_glow_power(&turbine.glow),get_vanne_power(&turbine.vanne1),get_vanne_power(&turbine.vanne2),
-                    get_gaz(&turbine),get_aux(&turbine),get_vbatt(&turbine),get_glow_current(&turbine.glow),get_starter_power(&turbine.starter),errors,turbine.phase_fonctionnement,
-                    turbine.phase_start
-            );
-/*        fclose(fd);                                                                                            
-    }*/
-}
-
-void log_task( void * pvParameters )
-{
-    
-    EventBits_t uxBits;
-    const TickType_t xTicksToWait = 100 / portTICK_PERIOD_MS;
-
-    char entrypath[FILE_PATH_MAX];
-    char entrysize[16];
-    char filetmp[10] ;
-    char *point;
-    char *log_number ;
-    uint8_t number = 0;
-    uint8_t last_number = 0 ;
-    uint8_t first_number = 255 ;
-    char last_log[10] ;
-    char first_log[10] ;
-    char startwith[6] ;
-    char newLog[FILE_PATH_MAX] ;
-    uint32_t func_time,func_time_prec ;
-    
-    func_time = xTaskGetTickCount() ;
-
-    struct dirent *entry;
-    FILE *fd = NULL;
-    const char *entrytype;
-    
-    turbine.log_started = 0 ;
-    //xSemaphoreTake(log_task_start, portMAX_DELAY);
- 	ESP_LOGI(TAG, "Start Logtask");
-
-     
-     // Was the event group created successfully?
-    if( xLogEventGroup == NULL )
-    {
-        ESP_LOGE(TAG, "Fail to create Log event");
-    }
-
-    /*cherche le dernier log*/
-    const size_t dirpath_len = strlen(MOUNT_POINT"/logs/");
-    DIR *dir = opendir(MOUNT_POINT"/logs/");
-    
-    func_time = 0 ;
-    while(1) {
-        /* Wait for start log*/
-        uxBits = xEventGroupGetBits(xLogEventGroup);
-        func_time_prec = xTaskGetTickCount() ;
-        if( uxBits == 1 && turbine.log_started == 0 ) // Start logging ?
-        {
-            //ESP_LOGI("LOG", "New Log");
-            turbine.log_started = 5 ;
-            while ((entry = readdir(dir)) != NULL) {
-                entrytype = (entry->d_type == DT_DIR ? "directory" : "file");
-                //ESP_LOGI(TAG, "Found %s : %s (%s bytes)", entrytype, entry->d_name, entrysize);
-                if(entry->d_type != DT_DIR) //Fichier
-                {
-                    strlcpy(startwith,entry->d_name,4) ;
-                    //ESP_LOGI(TAG,"startwith : %s",startwith) ;
-                    if(strcmp(startwith, "LOG") == 0) {
-                        strcpy(filetmp,entry->d_name);
-                        point = strstr(entry->d_name,".CSV") ;
-                        if(point) { //Si la fin est trouvée
-                            *point = '\0' ;
-                            log_number = filetmp + 3 ;
-                            number = atoi(log_number) ;
-                            if(number > last_number) {
-                                last_number = number ;
-                                strcpy(last_log,entry->d_name);
-                            }
-                            if(number < first_number && number > 0) {
-                                first_number = number ;
-                                strcpy(first_log,entry->d_name);
-                            }
-                        }
-                        //ESP_LOGI(TAG, "%s : number %d",entry->d_name, number);
-                    }
-                }
-            }
-            //ESP_LOGI(TAG,"Last LOG : %s - First LOG %s",last_log, first_log);
-            number = last_number+1 ;
-            sprintf(newLog,MOUNT_POINT"/logs/log%d.CSV",number) ;
-            fd = fopen(newLog, "w");
-            if (fd) {
-                head_logs_file(fd) ;
-            }
-        }
-
-        if( turbine.log_started >= 1 ) // Start logging
-        {
-            if(fd)
-                update_logs_file(fd,func_time) ;
-            func_time = xTaskGetTickCount() - func_time_prec ;
-        }
-        
-        if( uxBits == 0 ) //Stop logging
-        {
-            if(turbine.log_started > 0 ) {
-                ESP_LOGI("LOG", "End Log");
-                turbine.log_started-- ;
-            } else {
-                if(fd){
-                    //ESP_LOGI("LOG", "Close Log File");
-                    fclose(fd);
-                    fd = NULL ;
-                }
-                    
-            }
-        } 
-        vTaskDelay( pdMS_TO_TICKS(200));
-    }
-    //ESP_LOGI(TAG, "finish");
-	vTaskDelete(xlogHandle);
-}
-
 
 
 void start_timers(void)
@@ -873,17 +485,12 @@ void ecu_task(void * pvParameters )
             {
                 case STOP :
                         ESP_LOGI(TAG, "STOP");
-                        //turbine.starter.value = 0 ;
                         set_power(&turbine.starter,0) ;
-                    	//turbine.vanne1.value = 0 ;
-			            set_power_vanne(&turbine.vanne1,0);
+                    	set_power_vanne(&turbine.vanne1,0);
                         set_power_vanne(&turbine.vanne2,0);
-                        //turbine.pump1.value = 0 ;
                         set_power(&turbine.pump1,0) ;
-                        //turbine.pump2.value = 0 ;
                         set_power(&turbine.pump2,0) ;
-                        //turbine.glow.value = 0 ;	
-			            set_power_glow(&turbine.glow,0) ;
+                        set_power_glow(&turbine.glow,0) ;
                         turbine.phase_fonctionnement = WAIT ;
                         break ;
                 case WAIT :
@@ -919,7 +526,10 @@ void ecu_task(void * pvParameters )
                         }
                         if(!fail){
                             turbine.phase_start = INIT ;
-                            turbine.phase_fonctionnement = START ;
+                            if(config_ECU.glow_type == GAS)
+                                turbine.phase_fonctionnement = START ;
+                            else
+                                turbine.phase_fonctionnement = KEROSTART ;
                         }
                             
                     }                      
@@ -940,13 +550,13 @@ void ecu_task(void * pvParameters )
                             turbine.phase_fonctionnement = PURGE ;
                     }
                     break;
-                case START :
+                case START : //Demarrage GAZ
                     ESP_LOGI(TAG, "START");
                     //xSemaphoreGive(log_task_start) ;
-                    xEventGroupSetBits(xLogEventGroup,BIT_0 );// The bits being set.
+                    xEventGroupSetBits(xLogEventGroup,BIT_0 );// Demarrage du log
                     if(battery_check()) {
                         if(0){//turbine.position_gaz == COUPE) {
-                            turbine.phase_fonctionnement = WAIT ;
+                            turbine.phase_fonctionnement = STOP ;
                             ESP_LOGI(TAG, "START GAZ COUPE");
                         }
                         else if(1){//turbine.position_gaz == PLEINGAZ) {
@@ -957,7 +567,10 @@ void ecu_task(void * pvParameters )
                                     ESP_LOGI(TAG, "START INIT");
                                     avg_current = 0 ;
                                     count_curr_sample = 0 ;
-                                    turbine.phase_start = TESTGLOW ;
+                                    if(get_EGT(&turbine) < 50)
+                                        turbine.phase_start = TESTGLOW ;
+                                    else
+                                        turbine.phase_fonctionnement = STOP ;
                                     starter_power_perc = turbine_config.starter_pwm_perc_start ;
                                     avg_cur = 0 ;
                                     vTaskDelay(pdMS_TO_TICKS(1000));
@@ -1002,7 +615,8 @@ void ecu_task(void * pvParameters )
                                     break ;
                                 case IGNITE :                                    
                                     ESP_LOGI(TAG, "START IGNITE");
-                                    if((xTaskGetTickCount() - turbine.phase_start_begin) < pdMS_TO_TICKS(IGNITE_TIMEOUT)) //Ajouter abort)
+                                    if((xTaskGetTickCount() - turbine.phase_start_begin) < pdMS_TO_TICKS(IGNITE_TIMEOUT)
+                                        && get_EGT(&turbine) < &turbine_config.max_temp) //Ajouter abort)
                                     {
                                         if(xTaskGetTickCount() - turbine.phase_start_begin < pdMS_TO_TICKS(500)) { /// Attendre 500ms
                                             // Ventilation
@@ -1023,27 +637,20 @@ void ecu_task(void * pvParameters )
                                         } else if(xTaskGetTickCount() - turbine.phase_start_begin > pdMS_TO_TICKS(IGNITE_TIMEOUT)) //10 seconde max
                                         { 
                                             ESP_LOGE(TAG, "IGNITE FAIL");
-                                            set_power_glow(&turbine.glow,0) ;
-                                            set_power_vanne(&turbine.vanne1,0);
-                                            set_power_vanne(&turbine.vanne2,0);
-                                            set_power(&turbine.starter,0) ;
-                                            turbine.phase_fonctionnement = WAIT ; 
+                                            turbine.phase_fonctionnement = STOP ; 
                                             turbine.phase_start = INIT ;
                                             break ;
                                         }
                                     } else {
                                         ESP_LOGE(TAG, "IGNITE TIMEOUT") ;
-                                        set_power_glow(&turbine.glow,0) ;
-                                        set_power_vanne(&turbine.vanne1,0);
-                                        set_power_vanne(&turbine.vanne2,0);
-                                        set_power(&turbine.starter,0) ;
                                         turbine.phase_start = INIT ;
-                                        turbine.phase_fonctionnement = WAIT ;                                        
+                                        turbine.phase_fonctionnement = STOP ;                                        
                                     }
                                     break ;
                                 case PREHEAT :
                                     ESP_LOGI(TAG, "START PREHEAT");
-                                    if((xTaskGetTickCount() - turbine.phase_start_begin) < pdMS_TO_TICKS(PREHEAT_TIMEOUT)) //Ajouter abort)
+                                    if((xTaskGetTickCount() - turbine.phase_start_begin) < pdMS_TO_TICKS(PREHEAT_TIMEOUT)
+                                    && get_EGT(&turbine) < &turbine_config.max_temp) //Ajouter abort)
                                     {
                                         if(xTaskGetTickCount() - turbine.phase_start_begin < pdMS_TO_TICKS(3000)) { /// Attendre 2000ms que les tubes chauffent
                                             // Augementation de la température
@@ -1052,14 +659,18 @@ void ecu_task(void * pvParameters )
                                                 starter_power_perc = starter_power_perc + 0.05 ;
                                                 set_power(&turbine.starter,starter_power_perc) ;
                                             }
-                                        } else {
+                                        } else if(xTaskGetTickCount() - turbine.phase_start_begin < pdMS_TO_TICKS(3100)) {
                                             if(get_EGT(&turbine) > 250) {
                                                 ESP_LOGI(TAG, "PREHEAT Envoie du kerozene");
                                                 set_power_vanne(&turbine.vanne1,turbine_config.max_vanne1);
                                                 set_power(&turbine.pump1,turbine_config.min_pump1) ;
-                                                set_power_glow(&turbine.glow,0) ; 
-                                                starter_power_perc = starter_power_perc + 0.05 ;
-                                                set_power(&turbine.starter,starter_power_perc) ;
+                                            }
+                                        } else if(xTaskGetTickCount() - turbine.phase_start_begin < pdMS_TO_TICKS(6000) && get_EGT(&turbine) < 400) {
+                                            if(get_EGT(&turbine) > 400) {
+                                                set_power_glow(&turbine.glow,0) ;
+                                                turbine.phase_start = RAMP ;
+                                                ESP_LOGE(TAG, "PREHEAT KERO 400° atteint");
+                                                turbine.phase_start_begin = xTaskGetTickCount() ;
                                             }
                                         }
                                      
@@ -1076,44 +687,67 @@ void ecu_task(void * pvParameters )
                                     }
                                     break ;
                                 case RAMP :
+                                    ESP_LOGI(TAG, "START RAMP");
+                                    if((xTaskGetTickCount() - turbine.phase_start_begin) < pdMS_TO_TICKS(RAMP_TIMEOUT)
+                                    && get_EGT(&turbine) < &turbine_config.max_temp) //Ajouter abort)
+                                    {
+                                        if(get_RPM(&turbine) < &turbine_config.jet_idle_rpm) {
+                                            if(starter_power_perc < 75) {
+                                            starter_power_perc = starter_power_perc + 0.05 ;
+                                                set_power(&turbine.starter,starter_power_perc) ;
+                                            }
+                                            if(get_RPM(&turbine) < &turbine_config.jet_idle_rpm && get_EGT(&turbine) < (&turbine_config.max_temp -50))
+                                            {
+                                                //On incremente la pompe de 0.1%
+                                                set_power(&turbine.pump1,get_pump_power_float(&turbine.pump1) + 0.1) ;
+                                            }
+                                        } else {
+                                            ESP_LOGE(TAG, "Régime IDLE atteint");
+                                            turbine.phase_start_begin = xTaskGetTickCount() ;
+                                            turbine.phase_fonctionnement = IDLE ;
+                                        }
+                                    } else {
+                                        ESP_LOGE(TAG, "RAMP TIMEOUT") ;
+                                        turbine.phase_start = INIT ;
+                                        turbine.phase_fonctionnement = STOP ;                                        
+                                    }
                                     break ;
                             }                  
                         } else {
-                            turbine.glow.off(&turbine.glow.config) ;
-                            turbine.vanne1.off(&turbine.vanne1.config);
-                            turbine.starter.set_power(&turbine.starter,0) ;
                             turbine.phase_start = INIT ;
-                            turbine.phase_fonctionnement = WAIT ;
+                            turbine.phase_fonctionnement = STOP ;
                             ESP_LOGI(TAG, "START GAZ NON FULL");// Battery check
                         }
                     } else {
                         turbine.phase_start = INIT ;
-                        turbine.phase_fonctionnement = WAIT ;
+                        turbine.phase_fonctionnement = STOP ;
                         ESP_LOGE(TAG, "START Batterie trop faible");// Battery check
                     }
                     break;
                     default :
                         ESP_LOGE(TAG, "START phase inconnue");// Battery check
-                        turbine.glow.off(&turbine.glow.config) ;
-                        turbine.vanne1.off(&turbine.vanne1.config);
-                        turbine.starter.set_power(&turbine.starter,0) ;
                         turbine.phase_start = INIT ;
-                        turbine.phase_fonctionnement = WAIT ;
+                        turbine.phase_fonctionnement = STOP ;
                         break;
-                case KEROSTART :
-                    if(turbine.position_gaz == COUPE)
-                        turbine.phase_fonctionnement = WAIT ;
-                    else if(turbine.position_gaz == PLEINGAZ){
-                        turbine.glow.set_power(&turbine.glow.config,turbine_config.glow_power) ;
-                        //Attendre 10 secondes
-                        //Mettre des petits coups de pompe
-                        turbine.starter.set_power(&turbine.starter.config,300) ; //2000RPM
-                        
-                        if(turbine.EGT > 100)
-                            turbine.phase_fonctionnement = PREHEAT ;
-                        else{}
-                            //Attendre 5 secondes Max sinon GOTO WAIT
+                case KEROSTART : //DEMARRAGE KEO
+                    xEventGroupSetBits(xLogEventGroup,BIT_0 );// Demarrage du log
+                    if(battery_check()) {
+                        if(turbine.position_gaz == COUPE) {
+                            turbine.phase_fonctionnement = WAIT ;
+                            ESP_LOGI(TAG, "START GAZ COUPE");
                         }
+                        else if(turbine.position_gaz == PLEINGAZ) {
+                            ESP_LOGI(TAG, "START OK PLEIN GAZ");
+                        } else {
+                            turbine.phase_start = INIT ;
+                            turbine.phase_fonctionnement = STOP ;
+                            ESP_LOGI(TAG, "START GAZ NON FULL");// Battery check
+                        }
+                    } else {
+                        turbine.phase_start = INIT ;
+                        turbine.phase_fonctionnement = STOP ;
+                        ESP_LOGE(TAG, "START Batterie trop faible");// Battery check
+                    }
                     break;
                 case IDLE :
 

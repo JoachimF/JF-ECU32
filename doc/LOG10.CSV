@@ -1,0 +1,18 @@
+FunTime;Ticks;Time;RPM;RPMDelta;RPMPeriod;EGT;EGT_delta;Pompe1;Cible Pompe1;Pompe2;Glow;Vanne1;Vanne2;Voie Gaz;Voie Aux;Vbatt;Glow current;Stater;ErrorMsg;PhaseF;PhaseS
+0;1251;00:00;0;0;0;0;0;0.000000;Cible Pompe1;0.000000;0;0;0;0;0;7.77;0.000;0.00;Thr signal lost - K shorted to VCC! - Aux signal lost;1;1
+12;1272;00:00;0;0;0;0;0;0.000000;Cible Pompe1;0.000000;0;0;0;0;0;7.77;0.000;0.00;Thr signal lost - K shorted to VCC! - Aux signal lost;1;1
+0;1292;00:00;0;0;0;0;0;0.000000;Cible Pompe1;0.000000;0;0;0;0;0;7.77;0.000;0.00;Thr signal lost - K shorted to VCC! - Aux signal lost;1;1
+0;1312;00:01;0;0;0;0;0;0.000000;Cible Pompe1;0.000000;0;0;0;0;0;7.77;0.000;0.00;Thr signal lost - K shorted to VCC! - Aux signal lost;1;1
+4;1336;00:01;0;0;0;0;0;0.000000;Cible Pompe1;0.000000;5;0;0;0;0;7.77;0.000;0.00;Thr signal lost - K shorted to VCC! - Aux signal lost;1;1
+0;1356;00:01;0;0;0;0;0;0.000000;Cible Pompe1;0.000000;5;0;0;0;0;7.77;0.000;0.00;Thr signal lost - K shorted to VCC! - Aux signal lost;1;1
+0;1376;00:01;0;0;0;0;0;0.000000;Cible Pompe1;0.000000;5;0;0;0;0;7.77;0.000;0.00;Thr signal lost - K shorted to VCC! - Aux signal lost;1;1
+0;1396;00:01;0;0;0;0;0;0.000000;Cible Pompe1;0.000000;5;0;0;0;0;7.77;0.000;0.00;Thr signal lost - K shorted to VCC! - Aux signal lost;1;1
+3;1419;00:02;0;0;0;0;0;0.000000;Cible Pompe1;0.000000;5;0;0;0;0;7.77;0.000;0.00;Thr signal lost - K shorted to VCC! - Aux signal lost;1;1
+0;1439;00:02;0;0;0;0;0;0.000000;Cible Pompe1;0.000000;5;0;0;0;0;7.77;0.000;0.00;Thr signal lost - K shorted to VCC! - Aux signal lost;1;1
+0;1459;00:02;0;0;0;0;0;0.000000;Cible Pompe1;0.000000;5;0;0;0;0;7.77;0.000;0.00;Thr signal lost - K shorted to VCC! - Aux signal lost;1;1
+1;1480;00:02;0;0;0;0;0;0.000000;Cible Pompe1;0.000000;5;0;0;0;0;7.77;0.000;0.00;Thr signal lost - K shorted to VCC! - Aux signal lost;1;1
+0;1500;00:02;0;0;0;0;0;0.000000;Cible Pompe1;0.000000;0;0;0;0;0;7.77;0.000;0.00;Thr signal lost - K shorted to VCC! - Aux signal lost - NO GLOW DETECTED;0;0
+0;1520;00:00;0;0;0;0;0;0.000000;Cible Pompe1;0.000000;0;0;0;0;0;7.77;0.000;0.00;Thr signal lost - K shorted to VCC! - Aux signal lost - NO GLOW DETECTED;0;0
+0;1540;00:00;0;0;0;0;0;0.000000;Cible Pompe1;0.000000;0;0;0;0;0;7.77;0.000;0.00;Thr signal lost - K shorted to VCC! - Aux signal lost - NO GLOW DETECTED;0;0
+1;1561;00:00;0;0;0;0;0;0.000000;Cible Pompe1;0.000000;0;0;0;0;0;7.77;0.000;0.00;Thr signal lost - K shorted to VCC! - Aux signal lost - NO GLOW DETECTED;0;0
+0;1581;00:00;0;0;0;0;0;0.000000;Cible Pompe1;0.000000;0;0;0;0;0;7.77;0.000;0.00;Thr signal lost - K shorted to VCC! - Aux signal lost - NO GLOW DETECTED;0;0

@@ -28,12 +28,17 @@
 #include "esp_http_server.h"
 #include "esp_log.h"
 #include "cJSON.h"
+
 #include "jf-ecu32.h"
 #include "inputs.h"
 #include "mpu6050.h"
 #include "http_server.h"
 #include "error.h"
-#include "imu.h"
+#ifdef IMU
+	#include "imu.h"
+#endif
+#include "outputs.h"
+
 
 
 static const char *TAG = "Websocket";

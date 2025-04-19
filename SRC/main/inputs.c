@@ -40,6 +40,8 @@
 #include "esp_adc/adc_cali.h"
 #include "esp_adc/adc_cali_scheme.h"
 
+#include "outputs.h"
+
 
 #ifdef DS18B20
     #include "ds18b20.h"
@@ -260,26 +262,28 @@ uint8_t scan_i2c(int *addresses)
     devT.cfg.master.clk_speed = 100000; // 100kHz
     
     esp_err_t res;
-    //printf("     0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f\n");
-    //printf("00:         ");
+    printf("     0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f\n");
+    printf("00:         ");
     for (uint8_t addr = 3; addr < 0x78; addr++)
     {
-        //if (addr % 16 == 0)
-            //printf("\n%.2x:", addr);
+        if (addr % 16 == 0)
+            printf("\n%.2x:", addr);
         devT.addr = addr;
         res = i2c_dev_probe(&devT, I2C_DEV_WRITE);
 
         if (res == 0){
             
-            //printf(" %.2x", addr);
-            nb_periph++ ;
-            addresses = realloc(addresses,sizeof(uint8_t)*nb_periph) ;
+            printf(" %.2x", addr);
+            
+            addresses = realloc(addresses,sizeof(uint8_t)*nb_periph+1) ;
             addresses[nb_periph] = addr ;
+            nb_periph++ ;
         }            
-        //else
-            //printf(" --");
+        else
+            printf(" --");
     }
-    //printf("\n\n");
+    printf("\n\n");
+    ESP_LOGI(TAG,"Found %d peripherals",nb_periph) ;
     return nb_periph ;
 }
 

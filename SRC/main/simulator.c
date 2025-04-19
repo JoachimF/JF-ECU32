@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include "esp_system.h"
 #include "inputs.h"
+#include "outputs.h"
 
 #define TAG "Simulator"
 

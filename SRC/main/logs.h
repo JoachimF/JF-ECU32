@@ -1,5 +1,5 @@
 /*  
-  sdcard.h
+  logs.h
 
   Copyright (C) 2022  Joachim Franken
 
@@ -17,39 +17,9 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _SDCARD_H_
-#define _SDCARD_H_
+#ifndef _LOGS_H_
+#define _LOGS_H_
 
-#include "esp_vfs_fat.h"
-#include "sdmmc_cmd.h"
-#include "jf-ecu32.h"
-
-//Pin SPI3 - VSPI
-
-#define PIN_NUM_MISO  19
-#define PIN_NUM_MOSI  23
-#define PIN_NUM_CLK   18
-#define PIN_NUM_CS    15 //16
-#define PIN_NUM_DET   -1 //39 //VN_SENSOR
-
-#ifdef SD_LOG
-  #define MOUNT_POINT "/sdcard"
-#endif
-#ifdef SPIFFS_LOG
-  #define MOUNT_POINT ""
-#endif
-
-#define EXAMPLE_MAX_CHAR_SIZE    64
-
-#define SPI_PORT  SPI3_HOST
-#define SPI_DMA   SPI_PORT
-
-#define LOGPATH MOUNT_POINT"/logs"
-
-#define SYSTEM_LOG_FILE "logs.txt"
-
-esp_err_t init_sdcard(sdmmc_card_t *card2) ;
-int file_space(void) ;
-void redirect_sytems_logs(void) ;
+void log_task( void * pvParameters ) ;
 
 #endif
