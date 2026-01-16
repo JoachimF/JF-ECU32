@@ -1,5 +1,8 @@
 # JF-ECU32
 RC Jet Engine ECU
+
+Details ici : https://www.usinages.com/threads/creation-dun-ecu-opensource-pour-micro-reacteur.160245/
+
 ## Environement
 - VsCode
 - IDF 5.0.8
