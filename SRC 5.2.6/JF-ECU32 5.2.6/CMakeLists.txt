@@ -1,0 +1,17 @@
+# The following lines of boilerplate have to be in your project's CMakeLists
+# in this exact order for cmake to work correctly
+cmake_minimum_required(VERSION 3.5)
+
+include($ENV{IDF_PATH}/tools/cmake/project.cmake)
+project(JF-ECU32 5.2.6)
+set(EXTRA_COMPONENT_DIRS components/)
+
+# Create a SPIFFS image from the contents of the 'font' directory
+# that fits the partition named 'storage'. FLASH_IN_PROJECT indicates that
+# the generated image should be flashed when the entire project is flashed to
+# the target with 'idf.py -p PORT flash
+# Création de la partition de log et html
+spiffs_create_partition_image(storage html FLASH_IN_PROJECT)
+spiffs_create_partition_image(logs logs FLASH_IN_PROJECT)
+
+idf_build_set_property(COMPILE_OPTIONS "-Wno-error=format" APPEND)

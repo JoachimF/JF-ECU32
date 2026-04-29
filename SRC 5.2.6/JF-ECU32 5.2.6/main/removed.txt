@@ -1,0 +1,855 @@
+/*	static esp_err_t configmoteur(httpd_req_t *req)
+
+httpd_resp_sendstr_chunk(req, "<b>Nom du moteur</b><br>");
+	httpd_resp_sendstr_chunk(req, "<input id=\"name\" placeholder=\"\" value=\"");
+	httpd_resp_sendstr_chunk(req, turbine_config.name) ;
+	httpd_resp_sendstr_chunk(req, "\" name=\"name\" minlength=\"1\" maxlength=\"20\"></p><p>");
+
+	httpd_resp_sendstr_chunk(req, "<b>Puissance de la bougie 0-255</b><br>");
+	httpd_resp_sendstr_chunk(req, "<input id=\"glow_power\" placeholder=\"\" value=\"");
+	itoa(turbine_config.glow_power,tmp,10) ;
+	httpd_resp_sendstr_chunk(req, tmp) ;
+	httpd_resp_sendstr_chunk(req, "\" name=\"glow_power\" type=\"number\" min=\"0\" max=\"255\"></p><p>");
+
+	httpd_resp_sendstr_chunk(req, "<b>RPM plein gaz</b><br>");
+	httpd_resp_sendstr_chunk(req, "<input id=\"jet_full_power_rpm\" placeholder=\"\" value=\"");
+	itoa(turbine_config.jet_full_power_rpm,tmp,10) ;
+	httpd_resp_sendstr_chunk(req, tmp) ;
+	httpd_resp_sendstr_chunk(req, "\" name=\"jet_full_power_rpm\" type=\"number\" min=\"0\" max=\"300000\"></p><p>");
+
+	httpd_resp_sendstr_chunk(req, "<b>RPM ralenti</b><br>");
+	httpd_resp_sendstr_chunk(req, "<input id=\"jet_idle_rpm\" placeholder=\"\" value=\"");
+	itoa(turbine_config.jet_idle_rpm,tmp,10) ;
+	httpd_resp_sendstr_chunk(req, tmp) ;
+	httpd_resp_sendstr_chunk(req, "\" name=\"\"  type=\"number\" min=\"0\" max=\"300000\"></p><p>");
+
+	httpd_resp_sendstr_chunk(req, "<b>RPM mini</b><br>");
+	httpd_resp_sendstr_chunk(req, "<input id=\"jet_min_rpm\" placeholder=\"\" value=\"");
+	itoa(turbine_config.jet_min_rpm,tmp,10) ;
+	httpd_resp_sendstr_chunk(req, tmp) ;
+	httpd_resp_sendstr_chunk(req, "\" name=\"jet_min_rpm\"  type=\"number\" min=\"0\" max=\"100000\"></p><p>");
+
+	httpd_resp_sendstr_chunk(req, "<b>Température de démarrage en °C</b><br>");
+	httpd_resp_sendstr_chunk(req, "<input id=\"start_temp\" placeholder=\"\" value=\"");
+	itoa(turbine_config.start_temp,tmp,10) ;
+	httpd_resp_sendstr_chunk(req, tmp) ;
+	httpd_resp_sendstr_chunk(req, "\" name=\"start_temp\"  type=\"number\" min=\"0\" max=\"500\"></p><p>");
+
+	httpd_resp_sendstr_chunk(req, "<b>Température max en °C</b><br>");
+	httpd_resp_sendstr_chunk(req, "<input id=\"max_temp\" placeholder=\"\" value=\"");
+	itoa(turbine_config.max_temp,tmp,10) ;
+	httpd_resp_sendstr_chunk(req, tmp) ;
+	httpd_resp_sendstr_chunk(req, "\" name=\"max_temp\"  type=\"number\" min=\"0\" max=\"1000\"></p><p>");
+
+	httpd_resp_sendstr_chunk(req, "<b>Délai d'accélération (0-100)</b><br>");
+	httpd_resp_sendstr_chunk(req, "<input id=\"acceleration_delay\" placeholder=\"\" value=\"");
+	itoa(turbine_config.acceleration_delay,tmp,10) ;
+	httpd_resp_sendstr_chunk(req, tmp) ;
+	httpd_resp_sendstr_chunk(req, "\" name=\"acceleration_delay\"  type=\"number\" min=\"0\" max=\"30\"></p><p>");
+
+	httpd_resp_sendstr_chunk(req, "<b>Délai de décélération (0-100)</b><br>");
+	httpd_resp_sendstr_chunk(req, "<input id=\"deceleration_delay\" placeholder=\"\" value=\"");
+	itoa(turbine_config.deceleration_delay,tmp,10) ;
+	httpd_resp_sendstr_chunk(req, tmp) ;
+	httpd_resp_sendstr_chunk(req, "\" name=\"deceleration_delay\"  type=\"number\" min=\"0\" max=\"30\"></p><p>");
+
+	httpd_resp_sendstr_chunk(req, "<b>Délai de stabilité (0-100)</b><br>");
+	httpd_resp_sendstr_chunk(req, "<input id=\"stability_delay\" placeholder=\"\" value=\"");
+	itoa(turbine_config.stability_delay,tmp,10) ;
+	httpd_resp_sendstr_chunk(req, tmp) ;
+	httpd_resp_sendstr_chunk(req, "\" name=\"stability_delay\"  type=\"number\" min=\"0\" max=\"30\"></p><p>");
+
+	httpd_resp_sendstr_chunk(req, "<b>PWM Max pompe 1 (0-1024)</b><br>");
+	httpd_resp_sendstr_chunk(req, "<input id=\"max_pump1\" placeholder=\"\" value=\"");
+	itoa(turbine_config.max_pump1,tmp,10) ;
+	httpd_resp_sendstr_chunk(req, tmp) ;
+	httpd_resp_sendstr_chunk(req, "\" name=\"max_pump1\"  type=\"number\" min=\"0\" max=\"1024\"></p><p>");
+
+	httpd_resp_sendstr_chunk(req, "<b>PWM Min pompe 1 (0-1024)</b><br>");
+	httpd_resp_sendstr_chunk(req, "<input id=\"min_pump1\" placeholder=\"\" value=\"");
+	itoa(turbine_config.min_pump1,tmp,10) ;
+	httpd_resp_sendstr_chunk(req, tmp) ;
+	httpd_resp_sendstr_chunk(req, "\" name=\"min_pump1\" type=\"number\" min=\"0\" max=\"1024\"></p><p>");
+
+	httpd_resp_sendstr_chunk(req, "<b>PWM Max pompe 2 (0-1024)</b><br>");
+	httpd_resp_sendstr_chunk(req, "<input id=\"max_pump2\" placeholder=\"\" value=\"");
+	itoa(turbine_config.max_pump2,tmp,10) ;
+	httpd_resp_sendstr_chunk(req, tmp) ;
+	httpd_resp_sendstr_chunk(req, "\" name=\"max_pump2\" type=\"number\" min=\"0\" max=\"1024\"></p><p>");
+
+	httpd_resp_sendstr_chunk(req, "<b>PWM Min pompe 2 (0-1024)</b><br>");
+	httpd_resp_sendstr_chunk(req, "<input id=\"min_pump2\" placeholder=\"\" value=\"");
+	itoa(turbine_config.min_pump2,tmp,10) ;
+	httpd_resp_sendstr_chunk(req, tmp) ;
+	httpd_resp_sendstr_chunk(req, "\" name=\"min_pump2\" type=\"number\" min=\"0\" max=\"1024\"></p><p>");
+
+	httpd_resp_sendstr_chunk(req, "<b>PWM Max vanne 1 (0-1024)</b><br>");
+	httpd_resp_sendstr_chunk(req, "<input id=\"max_vanne1\" placeholder=\"\" value=\"");
+	itoa(turbine_config.max_vanne1,tmp,10) ;
+	httpd_resp_sendstr_chunk(req, tmp) ;
+	httpd_resp_sendstr_chunk(req, "\" name=\"max_vanne1\" type=\"number\" min=\"0\" max=\"1024\"></p><p>");
+
+	httpd_resp_sendstr_chunk(req, "<b>PWM Max vanne 2 (0-1024)</b><br>");
+	httpd_resp_sendstr_chunk(req, "<input id=\"max_vanne2\" placeholder=\"\" value=\"");
+	itoa(turbine_config.max_vanne2,tmp,10) ;
+	httpd_resp_sendstr_chunk(req, tmp) ;
+	httpd_resp_sendstr_chunk(req, "\" name=\"max_vanne2\" type=\"number\" min=\"0\" max=\"1024\"></p><p>");
+
+	httpd_resp_sendstr_chunk(req, "<b>RPM Allumage (0-5000RPM)</b><br>");
+	httpd_resp_sendstr_chunk(req, "<input id=\"starter_rpm_start\" placeholder=\"\" value=\"");
+	itoa(turbine_config.starter_rpm_start,tmp,10) ;
+	httpd_resp_sendstr_chunk(req, tmp) ;
+	httpd_resp_sendstr_chunk(req, "\" name=\"starter_rpm_start\" type=\"number\" min=\"0\" max=\"5000\"></p><p>");	*/
+
+/*static esp_err_t frontpage(httpd_req_t *req)
+	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"configecu\">");
+	httpd_resp_sendstr_chunk(req, "<button>Paramètres ECU</button></form>");
+	httpd_resp_sendstr_chunk(req, "</form>");
+	httpd_resp_sendstr_chunk(req, "<p></p>");
+	
+	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"configmoteur\">");
+	httpd_resp_sendstr_chunk(req, "<button>Paramètres moteur</button></form>");
+	httpd_resp_sendstr_chunk(req, "</form>");
+	httpd_resp_sendstr_chunk(req, "<p></p>");
+	
+	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"info\">");
+	httpd_resp_sendstr_chunk(req, "<button>Information</button></form>");
+	httpd_resp_sendstr_chunk(req, "</form>");
+	httpd_resp_sendstr_chunk(req, "<p></p>");
+	
+	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"logs\">");
+	httpd_resp_sendstr_chunk(req, "<button>Logs</button></form>");
+	httpd_resp_sendstr_chunk(req, "</form>");
+	httpd_resp_sendstr_chunk(req, "<p></p>");
+
+	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"wifi\">");
+	httpd_resp_sendstr_chunk(req, "<button>WiFi</button></form>");
+	httpd_resp_sendstr_chunk(req, "</form>");
+	httpd_resp_sendstr_chunk(req, "<p></p>");
+
+	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"slider\">");
+	httpd_resp_sendstr_chunk(req, "<button>Slider</button></form>");
+	httpd_resp_sendstr_chunk(req, "</form>");
+	httpd_resp_sendstr_chunk(req, "<p></p>");
+
+	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"gauges\">");
+	httpd_resp_sendstr_chunk(req, "<button>Jauges</button></form>");
+	httpd_resp_sendstr_chunk(req, "</form>");
+	httpd_resp_sendstr_chunk(req, "<p></p>");
+
+	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"start\">");
+	httpd_resp_sendstr_chunk(req, "<button>Start engine</button></form>");
+	httpd_resp_sendstr_chunk(req, "</form>");
+	httpd_resp_sendstr_chunk(req, "<p></p>");
+
+	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"stop\">");
+	httpd_resp_sendstr_chunk(req, "<button>Stop engine</button></form>");
+	httpd_resp_sendstr_chunk(req, "</form>");
+	httpd_resp_sendstr_chunk(req, "<p></p>");
+
+	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"upgrade\">");
+	httpd_resp_sendstr_chunk(req, "<button class=\"button bred\">Mise à jour</button></form>");
+	httpd_resp_sendstr_chunk(req, "</form>");
+	httpd_resp_sendstr_chunk(req, "<p></p>");
+
+	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"stopwifi\">");
+	httpd_resp_sendstr_chunk(req, "<button class=\"button bred\">Couper le WiFi</button></form>");
+	httpd_resp_sendstr_chunk(req, "</form>");
+	httpd_resp_sendstr_chunk(req, "<p></p>");
+*/
+
+/*static esp_err_t configecu(httpd_req_t *req)
+
+httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Voie des gaz</b></legend>") ;
+
+		httpd_resp_sendstr_chunk(req, "<p><input id=\"input_ppm\" name=\"input\" type=\"radio\" value=\"0\"") ;
+		httpd_resp_sendstr_chunk(req, (config_ECU.input_type == PPM) ? "checked=\"\"" :" " ) ;
+		httpd_resp_sendstr_chunk(req, "><b>Standard</b>") ;
+		
+		httpd_resp_sendstr_chunk(req, "<p><input id=\"input_sbus\" name=\"input\" type=\"radio\" value=\"1\"") ;
+		httpd_resp_sendstr_chunk(req, (config_ECU.input_type == SBUS) ? "checked=\"\"" :" " ) ;
+		httpd_resp_sendstr_chunk(req, "><b>SBUS</b>") ;*/
+	
+	//httpd_resp_sendstr_chunk(req, "</fieldset><p>") ;
+	/*Type de bougie*/
+	
+
+	/*httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Type de bougie</b></legend>") ;
+		httpd_resp_sendstr_chunk(req, "<p><input id=\"glow_type_gas\" name=\"glow_type\" type=\"radio\" value=\"0\"") ;
+		httpd_resp_sendstr_chunk(req, (config_ECU.glow_type == GAS) ? "checked=\"\"" :" " ) ;
+		httpd_resp_sendstr_chunk(req, "><b>Gaz</b>") ;
+		
+		httpd_resp_sendstr_chunk(req, "<p><input id=\"glow_type_kero\" name=\"glow_type\" type=\"radio\" value=\"1\"") ;
+		httpd_resp_sendstr_chunk(req, (config_ECU.glow_type == KERO) ? "checked=\"\"" :" " ) ;
+		httpd_resp_sendstr_chunk(req, "><b>Kérostart</b>") ;
+	httpd_resp_sendstr_chunk(req, "</fieldset><p>") ;*/
+	/*Type de démarrage*/
+	/*httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Démarrage</b></legend>") ;
+		httpd_resp_sendstr_chunk(req, "<p><input id=\"start_type_manual\" name=\"start_type\" type=\"radio\" value=\"0\"") ;
+		httpd_resp_sendstr_chunk(req, (config_ECU.start_type == MANUAL ) ? "checked=\"\"" :" " ) ;
+		httpd_resp_sendstr_chunk(req, "><b>Manuel</b>") ;
+	
+		httpd_resp_sendstr_chunk(req, "<p><input id=\"start_type_auto\" name=\"start_type\" type=\"radio\" value=\"1\"") ;
+		httpd_resp_sendstr_chunk(req, (config_ECU.start_type == AUTO ) ? "checked=\"\"" :" " ) ;
+		httpd_resp_sendstr_chunk(req, "><b>Auto</b>") ;
+	httpd_resp_sendstr_chunk(req, "</fieldset><p>") ;*/
+	/*Type de pompe*/
+	/*httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Pompe 1</b></legend>") ;
+		httpd_resp_sendstr_chunk(req, "<p><input id=\"output_pump1_pwm\" name=\"output_pump1\" type=\"radio\" value=\"1\"") ;
+		httpd_resp_sendstr_chunk(req, (config_ECU.output_pump1 == PWM) ? "checked=\"\"" :" " ) ;
+		httpd_resp_sendstr_chunk(req, "><b>Moteur DC</b>") ;
+		
+		httpd_resp_sendstr_chunk(req, "<p><input id=\"output_pump1_ppm\" name=\"output_pump1\" type=\"radio\" value=\"0\"") ;
+		httpd_resp_sendstr_chunk(req, (config_ECU.output_pump1 == PPM) ? "checked=\"\"" :" " ) ;
+		httpd_resp_sendstr_chunk(req, "><b>Variateur</b>") ;
+	httpd_resp_sendstr_chunk(req, "</fieldset><p>") ;*/
+	/*Type de démarreur*/
+	/*httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Démarreur</b></legend>") ;
+		httpd_resp_sendstr_chunk(req, "<p><input id=\"output_starter_pwm\" name=\"output_starter\" type=\"radio\" value=\"1\"") ;
+		httpd_resp_sendstr_chunk(req, (config_ECU.output_starter == PWM) ? "checked=\"\"" :" " ) ;
+		httpd_resp_sendstr_chunk(req, "><b>Moteur DC</b>") ;
+		
+		httpd_resp_sendstr_chunk(req, "<p><input id=\"output_starter_ppm\" name=\"output_starter\" type=\"radio\" value=\"0\"") ;
+		httpd_resp_sendstr_chunk(req, (config_ECU.output_starter == PPM) ? "checked=\"\"" :" " ) ;
+		httpd_resp_sendstr_chunk(req, "><b>Variateur</b>") ;
+	httpd_resp_sendstr_chunk(req, "</fieldset><p>") ;*/
+	/*Type de télémétrie*/
+	/*httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Télémétrie</b></legend>") ;
+		httpd_resp_sendstr_chunk(req, "<p><input id=\"futaba_telem\" name=\"telem\" type=\"radio\" value=\"0\"") ;
+		httpd_resp_sendstr_chunk(req, (config_ECU.use_telem == FUTABA ) ? "checked=\"\"" :" " ) ;
+		httpd_resp_sendstr_chunk(req, "><b>Désactivée</b>") ;
+	
+		httpd_resp_sendstr_chunk(req, "<p><input id=\"use_frsky_telem\" name=\"telem\" type=\"radio\" value=\"1\"") ;
+		httpd_resp_sendstr_chunk(req, (config_ECU.use_telem == FRSKY ) ? "checked=\"\"" :" " ) ;
+		httpd_resp_sendstr_chunk(req, "><b>FrSky</b>") ;
+
+		httpd_resp_sendstr_chunk(req, "<p><input id=\"use_hott_telem\" name=\"telem\" type=\"radio\" value=\"3\"") ;
+		httpd_resp_sendstr_chunk(req, (config_ECU.use_telem == HOTT ) ? "checked=\"\"" :" " ) ;
+		httpd_resp_sendstr_chunk(req, "><b>FrSky</b>") ;
+		
+		httpd_resp_sendstr_chunk(req, "<p><input id=\"no_telem\" name=\"telem\" type=\"radio\" value=\"2\"") ;
+		httpd_resp_sendstr_chunk(req, (config_ECU.use_telem == NONE ) ? "checked=\"\"" :" " ) ;
+		httpd_resp_sendstr_chunk(req, "><b>Futaba</b>") ;
+	httpd_resp_sendstr_chunk(req, "</fieldset><p>") ;*/
+	/*Pompe 2*/
+	/*httpd_resp_sendstr_chunk(req, "<fieldset><legend><b>&nbsp;Pompe 2</b></legend>") ;
+		httpd_resp_sendstr_chunk(req, "<p><input id=\"no_pump2\" name=\"output_pump2\" type=\"radio\" value=\"0\"") ;
+		httpd_resp_sendstr_chunk(req, (config_ECU.output_pump2 == PPM) ? "checked=\"\"" :" " ) ;
+		httpd_resp_sendstr_chunk(req, "><b>Variateur</b>") ;
+
+		httpd_resp_sendstr_chunk(req, "<p><input id=\"output_pump2_pwm\" name=\"output_pump2\" type=\"radio\" value=\"1\"") ;
+		httpd_resp_sendstr_chunk(req, (config_ECU.output_pump2 == PWM) ? "checked=\"\"" :" " ) ;
+		httpd_resp_sendstr_chunk(req, "><b>Moteur DC</b>") ;
+		
+		httpd_resp_sendstr_chunk(req, "<p><input id=\"output_pump2_ppm\" name=\"output_pump2\" type=\"radio\" value=\"2\"") ;
+		httpd_resp_sendstr_chunk(req, (config_ECU.output_pump2 == NONE) ? "checked=\"\"" :" " ) ;
+		httpd_resp_sendstr_chunk(req, "><b>Désactivée</b>") ;
+	httpd_resp_sendstr_chunk(req, "</fieldset><p>") ;*/
+	/*Voie aux*/
+	/*httpd_resp_sendstr_chunk(req, "<p><input id=\"use_input2\" type=\"checkbox\"") ;
+	httpd_resp_sendstr_chunk(req, (config_ECU.use_input2 == YES) ? "checked=\"\"" :" " ) ;
+	httpd_resp_sendstr_chunk(req, " name=\"use_input2\"><b>Voie 2 Activée</b>") ;*/
+	/*Leds*/
+	/*httpd_resp_sendstr_chunk(req, "<p><input id=\"use_led\" type=\"checkbox\" " ) ;
+	httpd_resp_sendstr_chunk(req, (config_ECU.use_led == YES) ? "checked=\"\"" :" " ) ;
+	httpd_resp_sendstr_chunk(req, " name=\"use_led\"><b>Leds Activées</b>") ;*/
+/*
+	static esp_err_t logs(httpd_req_t *req)
+{
+	ESP_LOGI(TAG, "root_get_handler req->uri=[%s]", req->uri);
+
+	// Send HTML header
+	send_head(req) ;
+	httpd_resp_sendstr_chunk(req, "<!DOCTYPE html><html>");
+	Text2Html(req, "/html/head.html");
+
+	httpd_resp_sendstr_chunk(req, "<h2>");
+	httpd_resp_sendstr_chunk(req, turbine_config.name);
+	httpd_resp_sendstr_chunk(req, "</h2>");
+		
+	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"c_logs.txt\">");
+	httpd_resp_sendstr_chunk(req, "<button>Log 1</button></form>");
+	httpd_resp_sendstr_chunk(req, "</form>");
+	httpd_resp_sendstr_chunk(req, "<p></p>");
+	
+	httpd_resp_sendstr_chunk(req, "<form method=\"GET\" action=\"c_curves.txt\">");
+	httpd_resp_sendstr_chunk(req, "<button>Courbe de gaz</button></form>");
+	httpd_resp_sendstr_chunk(req, "</form>");
+	httpd_resp_sendstr_chunk(req, "<p></p>");
+	
+	httpd_resp_sendstr_chunk(req, "<p></p><form action=\"/\" method=\"get\"><button name="">Retour</button></form>") ;
+
+	httpd_resp_sendstr_chunk(req, "<p></p>");
+
+	Text2Html(req, "/html/footer.html");
+	httpd_resp_sendstr_chunk(req, NULL); //fin de la page
+
+	return ESP_OK;
+}*/
+/*
+else if(strcmp(filename, "/c_curves.txt") == 0) 
+curves_get_handler(req) ;
+else if(strcmp(filename, "/c_logs.txt") == 0) 
+logs_get_handler(req) ;
+*/
+
+/*static esp_err_t logs_get_handler(httpd_req_t *req)
+{
+    FILE *fd = NULL;
+    struct stat st;
+	char FileName[] = "/sdcard/logs/logs.txt" ;
+    vTaskSuspend( xlogHandle );
+	if (stat(FileName, &st) != 0) {
+		ESP_LOGE(TAG, "[%s] not found", FileName);
+		return ESP_FAIL;
+	}
+	ESP_LOGI(TAG, "%s st.st_size=%ld", FileName, st.st_size);
+
+	char*	file_buffer = NULL;
+	size_t file_buffer_len = st.st_size;
+	if(file_buffer_len > 0)
+	{
+		file_buffer = malloc(file_buffer_len);
+		if (file_buffer == NULL) {
+			ESP_LOGE(TAG, "malloc fail. file_buffer_len %d", file_buffer_len);
+			return ESP_FAIL;
+		}
+
+		ESP_LOGI(TAG, "logs_get_handler req->uri=[%s]", req->uri);
+		fd = fopen(FileName, "r");
+		if (!fd) {
+		ESP_LOGE(TAG, "Failed to read existing file : logs.txt");
+			// Respond with 500 Internal Server Error 
+			httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to read existing file");
+			return ESP_FAIL;
+		}
+		for (int i=0;i<st.st_size;i++) {
+			fread(&file_buffer[i], sizeof(char), 1, fd);
+		}
+		fclose(fd);
+
+		ESP_LOGI(TAG, "Sending file : logs.txt...");
+		//ESP_LOGI(TAG, "%s",file_buffer);
+		httpd_resp_set_type(req, "application/octet-stream");
+		if (httpd_resp_send_chunk(req, file_buffer, st.st_size) != ESP_OK) {
+					fclose(fd);
+					ESP_LOGE(TAG, "File sending failed!");
+					// Abort sending file 
+					httpd_resp_sendstr_chunk(req, NULL);
+					// Respond with 500 Internal Server Error 
+					httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to send file");
+				return ESP_FAIL;
+		}
+		httpd_resp_sendstr_chunk(req, NULL);
+		ESP_LOGI(TAG, "File sending complete");
+	}
+    vTaskResume( xlogHandle );
+	return ESP_OK;
+}*/
+
+/* File server functions */
+
+
+/* Handler to redirect incoming GET request for /index.html to /
+ * This can be overridden by uploading file with same name */
+static esp_err_t index_html_get_handler(httpd_req_t *req)
+{
+    httpd_resp_set_status(req, "307 Temporary Redirect");
+    httpd_resp_set_hdr(req, "Location", "/");
+    httpd_resp_send(req, NULL, 0);  // Response body can be empty
+    return ESP_OK;
+}
+
+/* Handler to redirect incoming GET request for /index.html to /
+ * This can be overridden by uploading file with same name */
+static esp_err_t path_html_get_handler(httpd_req_t *req)
+{
+    httpd_resp_set_status(req, "307 Temporary Redirect");
+    httpd_resp_set_hdr(req, "Location", "/html/");
+    httpd_resp_send(req, NULL, 0);  // Response body can be empty
+    return ESP_OK;
+}
+
+
+/* Send HTTP response with a run-time generated html consisting of
+ * a list of all files and folders under the requested path.
+ * In case of SPIFFS this returns empty list when path is any
+ * string other than '/', since SPIFFS doesn't support directories */
+static esp_err_t http_resp_dir_html(httpd_req_t *req, const char *dirpath)
+{
+    char entrypath[FILE_PATH_MAX];
+    char entrysize[16];
+	char URL[255] ;
+	char startwith[10] ;
+    const char *entrytype;
+
+    struct dirent *entry;
+    struct stat entry_stat;
+
+    DIR *dir = opendir(dirpath);
+    const size_t dirpath_len = strlen(dirpath);
+
+    /* Retrieve the base path of file storage to construct the full path */
+    strlcpy(entrypath, dirpath, sizeof(entrypath));
+
+    if (!dir) {
+        ESP_LOGE(TAG, "Failed to stat dir : %s", dirpath);
+        /* Respond with 404 Not Found */
+        httpd_resp_send_err(req, HTTPD_404_NOT_FOUND, "Directory does not exist");
+        return ESP_FAIL;
+    }
+
+    /* Send HTML file header */
+    send_head(req) ;
+
+    /* Get handle to embedded file upload script */
+	
+	
+    	extern const unsigned char upload_script_start[] asm("_binary_upload_script_html_start");
+    	extern const unsigned char upload_script_end[]   asm("_binary_upload_script_html_end");
+	
+		extern const unsigned char logs_script_start[] asm("_binary_logs_script_html_start");
+    	extern const unsigned char logs_script_end[]   asm("_binary_logs_script_html_end");
+	ESP_LOGI(TAG, "dirpath : %s", dirpath);
+	strlcpy(startwith,dirpath,6) ;
+	ESP_LOGI(TAG, "startwith : %s", startwith);
+	if(strcmp(startwith, "/html") == 0) {
+		const size_t upload_script_size = (upload_script_end - upload_script_start);
+		/* Add file upload form and script which on execution sends a POST request to /upload */
+		httpd_resp_send_chunk(req, (const char *)upload_script_start, upload_script_size);
+	} else if(strcmp(startwith, "/sdca") == 0) {
+		const size_t logs_script_size = (logs_script_end - logs_script_start);
+		/* Add file upload form and script which on execution sends a POST request to /upload */
+		httpd_resp_send_chunk(req, (const char *)logs_script_start, logs_script_size);
+	}
+
+    /* Send file-list table definition and column labels */
+    httpd_resp_sendstr_chunk(req,
+        "<table class=\"fixed\" border=\"1\">"
+        "<col width=\"150px\" /><col width=\"50px\" /><col width=\"50px\" /><col width=\"50px\" />"
+        "<thead><tr><th>Name</th><th>Type</th><th>Size (Bytes)</th><th>Delete</th></tr></thead>"
+        "<tbody>");
+
+    /* Iterate over all files / folders and fetch their names and sizes */
+    while ((entry = readdir(dir)) != NULL) {
+        entrytype = (entry->d_type == DT_DIR ? "directory" : "file");
+
+        strlcpy(entrypath + dirpath_len, entry->d_name, sizeof(entrypath) - dirpath_len);
+        if (stat(entrypath, &entry_stat) == -1) {
+            ESP_LOGE(TAG, "Failed to stat %s : %s", entrytype, entry->d_name);
+            continue;
+        }
+        sprintf(entrysize, "%ld", entry_stat.st_size);
+        ESP_LOGI(TAG, "Found %s : %s (%s bytes)", entrytype, entry->d_name, entrysize);
+
+		
+		strcpy(URL,req->uri) ;
+		if(URL[strlen(URL)-1] == '?')
+			URL[strlen(URL)-1] = '\0' ;
+
+        /* Send chunk of HTML file containing table entries with file name and size */
+        httpd_resp_sendstr_chunk(req, "<tr><td><a href=\"");
+        httpd_resp_sendstr_chunk(req, URL);
+        httpd_resp_sendstr_chunk(req, entry->d_name);
+        if (entry->d_type == DT_DIR) {
+            httpd_resp_sendstr_chunk(req, "/");
+        }
+        httpd_resp_sendstr_chunk(req, "\">");
+        httpd_resp_sendstr_chunk(req, entry->d_name);
+        httpd_resp_sendstr_chunk(req, "</a></td><td>");
+        httpd_resp_sendstr_chunk(req, entrytype);
+        httpd_resp_sendstr_chunk(req, "</td><td>");
+        httpd_resp_sendstr_chunk(req, entrysize);
+        httpd_resp_sendstr_chunk(req, "</td><td>");
+        httpd_resp_sendstr_chunk(req, "<form method=\"post\" action=\"/delete");
+        httpd_resp_sendstr_chunk(req, URL);
+        httpd_resp_sendstr_chunk(req, entry->d_name);
+        httpd_resp_sendstr_chunk(req, "\" onsubmit=\"return confirm('Delete?')\"><button type=\"submit\" >Delete</button></form>");
+        httpd_resp_sendstr_chunk(req, "</td></tr>\n");
+    }
+    closedir(dir);
+
+    /* Finish the file list table */
+    httpd_resp_sendstr_chunk(req, "</tbody></table>");
+
+    /* Send remaining chunk of HTML file to complete it */
+    //httpd_resp_sendstr_chunk(req, "</body></html>");
+
+    /* Send empty chunk to signal HTTP response completion */
+	WSRetourBouton(req) ;
+	if(strcmp(startwith, "/sdca") == 0) {
+		WSShowFreeSpace(req) ;
+	}
+	Text2Html(req, "/html/footer.html");
+    httpd_resp_sendstr_chunk(req, NULL);
+    return ESP_OK;
+}
+
+
+
+#define IS_FILE_EXT(filename, ext) \
+    (strcasecmp(&filename[strlen(filename) - sizeof(ext) + 1], ext) == 0)
+
+/* Set HTTP response content type according to file extension */
+static esp_err_t set_content_type_from_file(httpd_req_t *req, const char *filename)
+{
+    if (IS_FILE_EXT(filename, ".pdf")) {
+        return httpd_resp_set_type(req, "application/pdf");
+    } else if (IS_FILE_EXT(filename, ".html")) {
+        return httpd_resp_set_type(req, "text/html");
+    } else if (IS_FILE_EXT(filename, ".jpeg")) {
+        return httpd_resp_set_type(req, "image/jpeg");
+    } else if (IS_FILE_EXT(filename, ".ico")) {
+        return httpd_resp_set_type(req, "image/x-icon");
+    }
+    /* This is a limited set only */
+    /* For any other type always set as plain text */
+    return httpd_resp_set_type(req, "text/plain");
+}
+
+/* Copies the full path into destination buffer and returns
+ * pointer to path (skipping the preceding base path) */
+static const char* get_path_from_uri_fs(char *dest, const char *base_path, const char *uri, size_t destsize)
+{
+    const size_t base_pathlen = strlen(base_path);
+    size_t pathlen = strlen(uri);
+
+    const char *quest = strchr(uri, '?');
+    if (quest) {
+        pathlen = MIN(pathlen, quest - uri);
+    }
+    const char *hash = strchr(uri, '#');
+    if (hash) {
+        pathlen = MIN(pathlen, hash - uri);
+    }
+
+    if (base_pathlen + pathlen + 1 > destsize) {
+        /* Full path string won't fit into destination buffer */
+        return NULL;
+    }
+
+    /* Construct full path (base + path) */
+    strcpy(dest, base_path);
+    strlcpy(dest + base_pathlen, uri, pathlen + 1);
+
+    /* Return pointer to path, skipping the base */
+    return dest + base_pathlen;
+}
+
+/* Handler to download a file kept on the server */
+static esp_err_t download_get_handler(httpd_req_t *req)
+{
+    char filepath[FILE_PATH_MAX];
+    FILE *fd = NULL;
+    struct stat file_stat;
+	
+    char *filename = get_path_from_uri_fs(filepath, ((struct file_server_data *)req->user_ctx)->base_path,
+                                             req->uri, sizeof(filepath));
+	
+	update_curve_file() ;
+    //ESP_LOGI(TAG,"filename : %s",filename) ;
+	if (!filename) {
+        ESP_LOGE(TAG, "Filename is too long");
+        /* Respond with 500 Internal Server Error */
+        httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Filename too long");
+        return ESP_FAIL;
+    }
+	ESP_LOGI(TAG,"filepath : %s",filepath) ;
+    /* If name has trailing '/', respond with directory contents */
+    if (filename[strlen(filename) - 1] == '/') {
+        return http_resp_dir_html(req, filepath);
+    }
+
+    if (stat(filepath, &file_stat) == -1) {
+        /* If file not present on SPIFFS check if URI
+         * corresponds to one of the hardcoded paths */
+        if (strcmp(filename, "/index.html") == 0) {
+            return index_html_get_handler(req);
+        } else if (strcmp(filename, "/favicon.ico") == 0) {
+            return favicon_get_handler(req);
+        } else if (strcmp(filename, "/html/?") == 0) {
+            return index_html_get_handler(req);
+        } else if (strcmp(filename, "/sdcard/logs/?") == 0) {
+            return index_html_get_handler(req);
+        } else if (strcmp(filename, "/sdcard/?") == 0) {
+            return index_html_get_handler(req);
+        }
+        ESP_LOGE(TAG, "Failed to stat file : %s", filepath);
+        /* Respond with 404 Not Found */
+        httpd_resp_send_err(req, HTTPD_404_NOT_FOUND, "File does not exist");
+        return ESP_FAIL;
+    }
+
+    fd = fopen(filepath, "r");
+    if (!fd) {
+        ESP_LOGE(TAG, "Failed to read existing file : %s", filepath);
+        /* Respond with 500 Internal Server Error */
+        httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to read existing file");
+        return ESP_FAIL;
+    }
+
+    ESP_LOGI(TAG, "Sending file : %s (%ld bytes)...", filename, file_stat.st_size);
+    set_content_type_from_file(req, filename);
+
+    /* Retrieve the pointer to scratch buffer for temporary storage */
+    char *chunk = ((struct file_server_data *)req->user_ctx)->scratch;
+    size_t chunksize;
+    do {
+        /* Read file in chunks into the scratch buffer */
+        chunksize = fread(chunk, 1, SCRATCH_BUFSIZE, fd);
+
+        if (chunksize > 0) {
+            /* Send the buffer contents as HTTP response chunk */
+			httpd_resp_set_type(req, "application/octet-stream");
+            if (httpd_resp_send_chunk(req, chunk, chunksize) != ESP_OK) {
+                fclose(fd);
+                ESP_LOGE(TAG, "File sending failed!");
+                /* Abort sending file */
+                httpd_resp_sendstr_chunk(req, NULL);
+                /* Respond with 500 Internal Server Error */
+                httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to send file");
+               return ESP_FAIL;
+           }
+        }
+
+        /* Keep looping till the whole file is sent */
+    } while (chunksize != 0);
+
+    /* Close file after sending complete */
+    fclose(fd);
+    ESP_LOGI(TAG, "File sending complete");
+
+    /* Respond with an empty chunk to signal HTTP response completion */
+#ifdef CONFIG_EXAMPLE_HTTPD_CONN_CLOSE_HEADER
+    httpd_resp_set_hdr(req, "Connection", "close");
+#endif
+    httpd_resp_send_chunk(req, NULL, 0);
+    return ESP_OK;
+}
+
+/* Handler to upload a file onto the server */
+static esp_err_t upload_post_handler(httpd_req_t *req)
+{
+    char filepath[FILE_PATH_MAX];
+    FILE *fd = NULL;
+    struct stat file_stat;
+	char startwith[7] ;
+
+    /* Skip leading "/upload" from URI to get filename */
+    /* Note sizeof() counts NULL termination hence the -1 */
+    const char *filename = get_path_from_uri_fs(filepath, ((struct file_server_data *)req->user_ctx)->base_path,
+                                             req->uri + sizeof("/upload") - 1, sizeof(filepath));
+	
+	ESP_LOGI(TAG, "upload filename : %s", filename);
+	strlcpy(startwith,filename,6) ;
+    if (!filename) {
+        /* Respond with 500 Internal Server Error */
+        httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Filename too long");
+        return ESP_FAIL;
+    }
+
+    /* Filename cannot have a trailing '/' */
+    if (filename[strlen(filename) - 1] == '/') {
+        ESP_LOGE(TAG, "Invalid filename : %s", filename);
+        httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Invalid filename");
+        return ESP_FAIL;
+    }
+
+    if (stat(filepath, &file_stat) == 0) {
+        ESP_LOGE(TAG, "File already exists : %s", filepath);
+        /* Respond with 400 Bad Request */
+        httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "File already exists");
+        return ESP_FAIL;
+    }
+
+    /* File cannot be larger than a limit */
+    if (req->content_len > MAX_FILE_SIZE) {
+        ESP_LOGE(TAG, "File too large : %d bytes", req->content_len);
+        /* Respond with 400 Bad Request */
+        httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST,
+                            "File size must be less than "
+                            MAX_FILE_SIZE_STR "!");
+        /* Return failure to close underlying connection else the
+         * incoming file content will keep the socket busy */
+        return ESP_FAIL;
+    }
+
+    fd = fopen(filepath, "w");
+    if (!fd) {
+        ESP_LOGE(TAG, "Failed to create file : %s", filepath);
+        /* Respond with 500 Internal Server Error */
+        httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to create file");
+        return ESP_FAIL;
+    }
+
+    ESP_LOGI(TAG, "Receiving file : %s...", filename);
+
+    /* Retrieve the pointer to scratch buffer for temporary storage */
+    char *buf = ((struct file_server_data *)req->user_ctx)->scratch;
+    int received;
+
+    /* Content length of the request gives
+     * the size of the file being uploaded */
+    int remaining = req->content_len;
+
+    while (remaining > 0) {
+
+        ESP_LOGI(TAG, "Remaining size : %d", remaining);
+        /* Receive the file part by part into a buffer */
+        if ((received = httpd_req_recv(req, buf, MIN(remaining, SCRATCH_BUFSIZE))) <= 0) {
+            if (received == HTTPD_SOCK_ERR_TIMEOUT) {
+                /* Retry if timeout occurred */
+                continue;
+            }
+
+            /* In case of unrecoverable error,
+             * close and delete the unfinished file*/
+            fclose(fd);
+            unlink(filepath);
+
+            ESP_LOGE(TAG, "File reception failed!");
+            /* Respond with 500 Internal Server Error */
+            httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to receive file");
+            return ESP_FAIL;
+        }
+
+        /* Write buffer content to file on storage */
+        if (received && (received != fwrite(buf, 1, received, fd))) {
+            /* Couldn't write everything to file!
+             * Storage may be full? */
+            fclose(fd);
+            unlink(filepath);
+
+            ESP_LOGE(TAG, "File write failed!");
+            /* Respond with 500 Internal Server Error */
+            httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to write file to storage");
+            return ESP_FAIL;
+        }
+
+        /* Keep track of remaining size of
+         * the file left to be uploaded */
+        remaining -= received;
+    }
+
+    /* Close file upon upload completion */
+    fclose(fd);
+    ESP_LOGI(TAG, "File reception complete");
+
+    /* Redirect onto root to see the updated file list */
+    httpd_resp_set_status(req, "303 See Other");
+	if(strcmp(startwith, "/html") == 0) {
+    	httpd_resp_set_hdr(req, "Location", "/html/");
+	}
+	else if(strcmp(startwith, "/sdca") == 0) {
+		httpd_resp_set_hdr(req, "Location", "/sdcard/logs/");
+	}
+
+#ifdef CONFIG_EXAMPLE_HTTPD_CONN_CLOSE_HEADER
+    httpd_resp_set_hdr(req, "Connection", "close");
+#endif
+    httpd_resp_sendstr(req, "File uploaded successfully");
+    return ESP_OK;
+}
+
+/* Handler to delete a file from the server */
+static esp_err_t delete_post_handler(httpd_req_t *req)
+{
+    char filepath[FILE_PATH_MAX];
+    struct stat file_stat;
+	char startwith[7] ;
+
+    /* Skip leading "/delete" from URI to get filename */
+    /* Note sizeof() counts NULL termination hence the -1 */
+    const char *filename = get_path_from_uri_fs(filepath, ((struct file_server_data *)req->user_ctx)->base_path,
+                                             req->uri  + sizeof("/delete") - 1, sizeof(filepath));
+    if (!filename) {
+        /* Respond with 500 Internal Server Error */
+        httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Filename too long");
+        return ESP_FAIL;
+    }
+	strlcpy(startwith,filename,6) ;
+    /* Filename cannot have a trailing '/' */
+    if (filename[strlen(filename) - 1] == '/') {
+        ESP_LOGE(TAG, "Invalid filename : %s", filename);
+        httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Invalid filename");
+        return ESP_FAIL;
+    }
+
+    if (stat(filepath, &file_stat) == -1) {
+        ESP_LOGE(TAG, "File does not exist : %s", filename);
+        /* Respond with 400 Bad Request */
+        httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "File does not exist");
+        return ESP_FAIL;
+    }
+
+    ESP_LOGI(TAG, "Deleting file : %s", filename);
+    /* Delete file */
+    unlink(filepath);
+
+    /* Redirect onto root to see the updated file list */
+    httpd_resp_set_status(req, "303 See Other");
+	if(strcmp(startwith, "/html") == 0) {
+    	httpd_resp_set_hdr(req, "Location", "/html/");
+	}
+	else if(strcmp(startwith, "/sdca") == 0) {
+		httpd_resp_set_hdr(req, "Location", "/sdcard/logs/");
+	}
+#ifdef CONFIG_EXAMPLE_HTTPD_CONN_CLOSE_HEADER
+    httpd_resp_set_hdr(req, "Connection", "close");
+#endif
+    httpd_resp_sendstr(req, "File deleted successfully");
+    return ESP_OK;
+}
+
+
+static esp_err_t curves_get_handler(httpd_req_t *req)
+{
+    FILE *fd = NULL;
+    struct stat st;
+	char FileName[] = "/html/curves.txt" ;
+
+	update_curve_file() ;
+	if (stat(FileName, &st) != 0) {
+		ESP_LOGE(TAG, "[%s] not found", FileName);
+		return ESP_FAIL;
+	}
+	ESP_LOGI(TAG, "%s st.st_size=%ld", FileName, st.st_size);
+
+	char*	file_buffer = NULL;
+	size_t file_buffer_len = st.st_size;
+	file_buffer = malloc(file_buffer_len);
+	if (file_buffer == NULL) {
+		ESP_LOGE(TAG, "malloc fail. file_buffer_len %d", file_buffer_len);
+		return ESP_FAIL;
+	}
+
+	ESP_LOGI(TAG, "logs_get_handler req->uri=[%s]", req->uri);
+	fd = fopen(FileName, "r");
+	if (!fd) {
+       ESP_LOGE(TAG, "Failed to read existing file : logs.txt");
+        /* Respond with 500 Internal Server Error */
+        httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to read existing file");
+        return ESP_FAIL;
+    }
+	for (int i=0;i<st.st_size;i++) {
+		fread(&file_buffer[i], sizeof(char), 1, fd);
+	}
+	fclose(fd);
+
+	ESP_LOGI(TAG, "Sending file : logs.txt...");
+	ESP_LOGI(TAG, "%s",file_buffer);
+	httpd_resp_set_type(req, "application/octet-stream");
+	if (httpd_resp_send_chunk(req, file_buffer, st.st_size) != ESP_OK) {
+                fclose(fd);
+                ESP_LOGE(TAG, "File sending failed!");
+                /* Abort sending file */
+                httpd_resp_sendstr_chunk(req, NULL);
+                /* Respond with 500 Internal Server Error */
+                httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to send file");
+               return ESP_FAIL;
+	}
+	httpd_resp_sendstr_chunk(req, NULL);
+
+    ESP_LOGI(TAG, "File sending complete");
+	return ESP_OK;
+}

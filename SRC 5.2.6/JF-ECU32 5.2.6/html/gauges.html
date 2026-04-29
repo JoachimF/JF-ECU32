@@ -1,0 +1,81 @@
+    <div class="topnav">
+      <h1 id="status">Status</h1>
+    </div>
+    <div>
+      <h2 id="error" style="color:#FF0000";>
+          Erreur
+      </h2>
+      <p id="time"></p>
+    </div>
+    <div class="content">
+      <div class="card-grid">
+       <div class="card">
+          <p class="card-title">EGT</p>
+          <canvas id="gauge-EGT"></canvas>
+        </div>
+        <div class="card">
+          <p class="card-title">RPM</p>
+          <canvas id="gauge-RPM"></canvas>
+        </div>
+        <div class="card">
+          <table>
+            <tbody>
+                <tr>
+                    <td>Pompe 1</td>
+                    <td>Pompe 2</td>
+                </tr>
+                <tr>
+                    <td id=pump1>0</td>
+                    <td id=pump2>0</td>
+                </tr>
+                <tr>
+                    <td>Vanne 1</td>
+                    <td>Vanne 2</td>
+                </tr>
+                <tr>
+                    <td id=vanne1>0</td>
+                    <td id=vanne2>0</td>
+                </tr>
+                <tr>
+                    <td>Bougie</th>
+                    <td>RPM</th>
+                </tr>
+                <tr>
+                    <td id=glow>0</td>
+                    <td id=rpmtxt>0</td>
+                </tr>
+                <tr>
+                  <td>Courrant Bougie</th>
+                  <td>Starter</th>
+              </tr>
+              <tr>
+                  <td id=glowcurrent>0</td>
+                  <td id=starter>0</td>
+              </tr>
+              <tr>
+                <td>Voltage batterie</th>
+                <td>-</th>
+            </tr>
+            <tr>
+                <td id=vbatt>0</td>
+                <td id=tmp></td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card">
+            <p class="card-title">RC</p>
+            <canvas id="rc-gauge"></canvas>
+        </div>
+        <div class="card">
+          <p class="card-title">RC-Aux</p>
+          <canvas id="rc-aux-gauge"></canvas>
+        </div>
+        <canvas id="timerpm" style="display: block; box-sizing: border-box; height: 300px; width: 600px;"></canvas>
+        <canvas id="timeegt" style="display: block; box-sizing: border-box; height: 300px; width: 600px;"></canvas>
+      </div>
+      <p></p><form action="/" method="get"><button name="">Retour</button></form>
+    </div>
+  </body>
+</html>
+
