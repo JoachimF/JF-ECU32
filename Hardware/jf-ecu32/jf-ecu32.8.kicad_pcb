@@ -208,10 +208,8 @@
 	(net 87 "Net-(D12-K)")
 	(net 88 "SD_DET")
 	(net 89 "CS_MAX31855")
-	(net 90 "unconnected-(U10-CSB-Pad2)")
-	(net 91 "unconnected-(U10-SDO-Pad5)")
-	(net 92 "Net-(U1-EN)")
-	(net 93 "TDO")
+	(net 90 "Net-(U1-EN)")
+	(net 91 "TDO")
 	(footprint "LED_SMD:LED_0603_1608Metric"
 		(layer "F.Cu")
 		(uuid "084c82e8-54af-4b29-a263-ae2a932e09d8")
@@ -240,7 +238,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "LED_SMD:LED_0603_1608Metric"
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -264,7 +262,7 @@
 				)
 			)
 		)
-		(property "Description" "Light emitting diode"
+		(property "Description" ""
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -276,8 +274,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "LED* LED_SMD:* LED_THT:*")
 		(path "/b80d86eb-1d8b-4e1e-b681-822f270a3391")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start 0.8 -0.735)
@@ -470,7 +470,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Connector_PinHeader_2.00mm:PinHeader_1x01_P2.00mm_Vertical"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -494,7 +494,7 @@
 				)
 			)
 		)
-		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
+		(property "Description" ""
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -506,8 +506,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "Connector*:*")
 		(path "/1c5fc31a-7c8a-46b9-bab9-ee06aff07466")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr through_hole)
 		(fp_line
 			(start -1.06 -1.06)
@@ -674,12 +676,7 @@
 			(at 0 0)
 			(size 1.35 1.35)
 			(drill 0.8)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 17 "PWM_KERO_3.3")
 			(pinfunction "Pin_1")
@@ -727,7 +724,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Package_TO_SOT_SMD:TO-252-2"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -739,7 +736,7 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "http://www.jaolen.com/images/pdf/QM6006D.pdf"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -751,7 +748,7 @@
 				)
 			)
 		)
-		(property "Description" "35A Id, 60V Vds, N-Channel Power MOSFET, 18mOhm Ron, 19.3nC Qg (typ), TO252"
+		(property "Description" ""
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -763,8 +760,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "TO?252*")
 		(path "/9ddb5059-b7ad-46c1-9619-0de473346e88")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.97 3.45)
@@ -1108,7 +1107,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Package_TO_SOT_SMD:TO-252-2"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -1120,7 +1119,7 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "http://www.jaolen.com/images/pdf/QM6006D.pdf"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -1132,7 +1131,7 @@
 				)
 			)
 		)
-		(property "Description" "35A Id, 60V Vds, N-Channel Power MOSFET, 18mOhm Ron, 19.3nC Qg (typ), TO252"
+		(property "Description" ""
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -1144,8 +1143,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "TO?252*")
 		(path "/b799d89b-fdf6-42dc-8282-54d76d9ff2e9")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.97 3.45)
@@ -1489,7 +1490,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -1513,7 +1514,7 @@
 				)
 			)
 		)
-		(property "Description" "Resistor"
+		(property "Description" ""
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -1525,8 +1526,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "R_*")
 		(path "/541ea16d-b118-40cd-9f15-961aca3c4c41")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.237258 -0.5225)
@@ -1686,7 +1689,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -1710,7 +1713,7 @@
 				)
 			)
 		)
-		(property "Description" "Unpolarized capacitor"
+		(property "Description" ""
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -1722,8 +1725,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "C_*")
 		(path "/510355f9-0947-4057-87c3-b5d9703102ec")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.14058 0.51)
@@ -1841,7 +1846,7 @@
 			(size 0.9 0.95)
 			(layers "F.Cu" "F.Paste" "F.Mask")
 			(roundrect_rratio 0.25)
-			(net 92 "Net-(U1-EN)")
+			(net 90 "Net-(U1-EN)")
 			(pintype "passive")
 			(uuid "98553962-9534-495b-af04-c788ae885842")
 		)
@@ -1895,7 +1900,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -1919,7 +1924,7 @@
 				)
 			)
 		)
-		(property "Description" "Generic connector, single row, 01x03, script generated (kicad-library-utils/schlib/autogen/connector/)"
+		(property "Description" ""
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -1931,8 +1936,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "Connector*:*_1x??_*")
 		(path "/9670be7d-074c-4dcb-aacb-7943ac3649bf")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr through_hole)
 		(fp_line
 			(start 1.33 1.27)
@@ -2099,12 +2106,7 @@
 			(at 0 0 180)
 			(size 1.7 1.7)
 			(drill 1)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 73 "P2_MOSFET")
 			(pinfunction "Pin_1")
@@ -2115,12 +2117,7 @@
 			(at 0 2.54 180)
 			(size 1.7 1.7)
 			(drill 1)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 29 "PPM_PWM_PUMP2")
 			(pinfunction "Pin_2")
@@ -2131,12 +2128,7 @@
 			(at 0 5.08 180)
 			(size 1.7 1.7)
 			(drill 1)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 53 "P2_OUTPUT")
 			(pinfunction "Pin_3")
@@ -2183,7 +2175,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -2207,7 +2199,7 @@
 				)
 			)
 		)
-		(property "Description" "Resistor"
+		(property "Description" ""
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -2219,8 +2211,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "R_*")
 		(path "/4f73d291-fff3-45cc-99b6-9dc81a405d05")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.237258 -0.5225)
@@ -2391,7 +2385,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -2415,7 +2409,7 @@
 				)
 			)
 		)
-		(property "Description" "Resistor"
+		(property "Description" ""
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -2427,8 +2421,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "R_*")
 		(path "/a01b0275-6cee-4e29-835a-774dc754aae9")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.237258 -0.5225)
@@ -2588,7 +2584,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -2612,7 +2608,7 @@
 				)
 			)
 		)
-		(property "Description" "Resistor"
+		(property "Description" ""
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -2624,8 +2620,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "R_*")
 		(path "/15af978c-e5ab-429e-a180-ec93b6a557bb")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.237258 -0.5225)
@@ -2797,7 +2795,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -2821,7 +2819,7 @@
 				)
 			)
 		)
-		(property "Description" "Generic connector, single row, 01x03, script generated (kicad-library-utils/schlib/autogen/connector/)"
+		(property "Description" ""
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -2833,8 +2831,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "Connector*:*_1x??_*")
 		(path "/74a0e009-67aa-4b16-a136-e70e5e9b4b41")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr through_hole)
 		(fp_line
 			(start -1.33 -1.33)
@@ -3001,12 +3001,7 @@
 			(at 0 0)
 			(size 1.7 1.7)
 			(drill 1)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 53 "P2_OUTPUT")
 			(pinfunction "Pin_1")
@@ -3017,12 +3012,7 @@
 			(at 0 2.54)
 			(size 1.7 1.7)
 			(drill 1)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 54 "unconnected-(J18-Pin_2-Pad2)")
 			(pinfunction "Pin_2")
@@ -3033,12 +3023,7 @@
 			(at 0 5.08)
 			(size 1.7 1.7)
 			(drill 1)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 78 "GND")
 			(pinfunction "Pin_3")
@@ -3085,7 +3070,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "LED_SMD:LED_0603_1608Metric"
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -3109,7 +3094,7 @@
 				)
 			)
 		)
-		(property "Description" "Light emitting diode"
+		(property "Description" ""
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -3121,8 +3106,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "LED* LED_SMD:* LED_THT:*")
 		(path "/b379886a-a2da-4776-bb51-2792b183e2ad")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -1.485 0.735)
@@ -3316,7 +3303,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical"
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -3340,7 +3327,7 @@
 				)
 			)
 		)
-		(property "Description" "Generic connector, single row, 01x03, script generated (kicad-library-utils/schlib/autogen/connector/)"
+		(property "Description" ""
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -3352,8 +3339,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "Connector*:*_1x??_*")
 		(path "/5a154aa1-0ed3-4b72-b354-ac86da6c1a29")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr through_hole)
 		(fp_line
 			(start -1.33 -1.33)
@@ -3520,12 +3509,7 @@
 			(at 0 0 90)
 			(size 1.7 1.7)
 			(drill 1)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 24 "Net-(D7-A)")
 			(pinfunction "Pin_1")
@@ -3536,12 +3520,7 @@
 			(at 0 2.54 90)
 			(size 1.7 1.7)
 			(drill 1)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 34 "+BATT")
 			(pinfunction "Pin_2")
@@ -3552,12 +3531,7 @@
 			(at 0 5.08 90)
 			(size 1.7 1.7)
 			(drill 1)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 24 "Net-(D7-A)")
 			(pinfunction "Pin_3")
@@ -3605,7 +3579,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -3629,7 +3603,7 @@
 				)
 			)
 		)
-		(property "Description" "Generic connector, single row, 01x03, script generated (kicad-library-utils/schlib/autogen/connector/)"
+		(property "Description" ""
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -3641,8 +3615,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "Connector*:*_1x??_*")
 		(path "/ce620905-27fb-45a6-a34e-114371740d80")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr through_hole)
 		(fp_line
 			(start -1.33 -1.33)
@@ -3809,12 +3785,7 @@
 			(at 0 0)
 			(size 1.7 1.7)
 			(drill 1)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 38 "ST_OUTPUT")
 			(pinfunction "Pin_1")
@@ -3825,12 +3796,7 @@
 			(at 0 2.54)
 			(size 1.7 1.7)
 			(drill 1)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 43 "unconnected-(J4-Pin_2-Pad2)")
 			(pinfunction "Pin_2")
@@ -3841,12 +3807,7 @@
 			(at 0 5.08)
 			(size 1.7 1.7)
 			(drill 1)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 78 "GND")
 			(pinfunction "Pin_3")
@@ -3894,7 +3855,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -3918,7 +3879,7 @@
 				)
 			)
 		)
-		(property "Description" "Generic connector, single row, 01x03, script generated (kicad-library-utils/schlib/autogen/connector/)"
+		(property "Description" ""
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -3930,8 +3891,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "Connector*:*_1x??_*")
 		(path "/3d91f10b-0b7d-479d-9c2a-28a0a3a4ba9d")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr through_hole)
 		(fp_line
 			(start -1.33 -1.33)
@@ -4098,12 +4061,7 @@
 			(at 0 0)
 			(size 1.7 1.7)
 			(drill 1)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 50 "P1_OUTPUT")
 			(pinfunction "Pin_1")
@@ -4114,12 +4072,7 @@
 			(at 0 2.54)
 			(size 1.7 1.7)
 			(drill 1)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 51 "unconnected-(J15-Pin_2-Pad2)")
 			(pinfunction "Pin_2")
@@ -4130,12 +4083,7 @@
 			(at 0 5.08)
 			(size 1.7 1.7)
 			(drill 1)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 78 "GND")
 			(pinfunction "Pin_3")
@@ -4183,7 +4131,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical"
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -4207,7 +4155,7 @@
 				)
 			)
 		)
-		(property "Description" "Generic connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)"
+		(property "Description" ""
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -4219,8 +4167,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "Connector*:*_1x??_*")
 		(path "/5d02f38b-5999-4cff-868e-d131da8b5dc3")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr through_hole)
 		(fp_line
 			(start -1.33 -1.33)
@@ -4387,12 +4337,7 @@
 			(at 0 0 90)
 			(size 1.7 1.7)
 			(drill 1)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 5 "Net-(J10-Pin_1)")
 			(pinfunction "Pin_1")
@@ -4403,12 +4348,7 @@
 			(at 0 2.54 90)
 			(size 1.7 1.7)
 			(drill 1)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 4 "Net-(J10-Pin_2)")
 			(pinfunction "Pin_2")
@@ -4455,7 +4395,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -4479,7 +4419,7 @@
 				)
 			)
 		)
-		(property "Description" "Resistor"
+		(property "Description" ""
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -4491,8 +4431,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "R_*")
 		(path "/497584d7-5bab-4d12-80bd-128fce288d68")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.237258 0.5225)
@@ -4663,7 +4605,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -4687,7 +4629,7 @@
 				)
 			)
 		)
-		(property "Description" "Generic connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)"
+		(property "Description" ""
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -4699,8 +4641,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "Connector*:*_1x??_*")
 		(path "/225d3ea0-35ea-4c2c-8e0f-bfde67b7e86d")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr through_hole)
 		(fp_line
 			(start 1.33 1.27)
@@ -4867,12 +4811,7 @@
 			(at 0 0 180)
 			(size 1.7 1.7)
 			(drill 1)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 78 "GND")
 			(pinfunction "Pin_1")
@@ -4883,12 +4822,7 @@
 			(at 0 2.54 180)
 			(size 1.7 1.7)
 			(drill 1)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 77 "IO0")
 			(pinfunction "Pin_2")
@@ -4935,7 +4869,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -4959,7 +4893,7 @@
 				)
 			)
 		)
-		(property "Description" "Resistor"
+		(property "Description" ""
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -4971,8 +4905,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "R_*")
 		(path "/c360c832-b574-4213-bebc-dc4ed370e8ab")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.237258 0.5225)
@@ -5144,7 +5080,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Connector_AMASS:AMASS_XT30U-F_1x02_P5.0mm_Vertical"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -5168,7 +5104,7 @@
 				)
 			)
 		)
-		(property "Description" "Generic connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)"
+		(property "Description" ""
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -5180,8 +5116,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "Connector*:*_1x??_*")
 		(path "/668d7f38-b2f2-49da-aaa0-4b609862d18b")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr through_hole)
 		(fp_line
 			(start 7.71 -2.71)
@@ -5400,12 +5338,7 @@
 			(at 0 0 180)
 			(size 3.8 3.8)
 			(drill 2.7)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 14 "Net-(D3-A)")
 			(pinfunction "Pin_1")
@@ -5416,12 +5349,7 @@
 			(at 5 0 180)
 			(size 4 4)
 			(drill 2.7)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 34 "+BATT")
 			(pinfunction "Pin_2")
@@ -5468,7 +5396,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Connector_PinHeader_2.00mm:PinHeader_1x01_P2.00mm_Vertical"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -5492,7 +5420,7 @@
 				)
 			)
 		)
-		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
+		(property "Description" ""
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -5504,8 +5432,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "Connector*:*")
 		(path "/f6d96539-0c4b-4802-b2d9-f749ac3b4b77")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr through_hole)
 		(fp_line
 			(start -1.06 -1.06)
@@ -5672,12 +5602,7 @@
 			(at 0 0)
 			(size 1.35 1.35)
 			(drill 0.8)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 78 "GND")
 			(pinfunction "Pin_1")
@@ -5724,7 +5649,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Package_TO_SOT_SMD:TO-252-2"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -5736,7 +5661,7 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "http://www.jaolen.com/images/pdf/QM6006D.pdf"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -5748,7 +5673,7 @@
 				)
 			)
 		)
-		(property "Description" "35A Id, 60V Vds, N-Channel Power MOSFET, 18mOhm Ron, 19.3nC Qg (typ), TO252"
+		(property "Description" ""
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -5760,8 +5685,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "TO?252*")
 		(path "/253f986d-b272-4eb9-b934-d6f0ffca3c2c")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.97 3.45)
@@ -6105,7 +6032,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_2512_6332Metric"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -6129,7 +6056,7 @@
 				)
 			)
 		)
-		(property "Description" "Resistor"
+		(property "Description" ""
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -6141,8 +6068,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "R_*")
 		(path "/e97ba4e6-25c0-443f-ba4f-c8e0371a5746")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -2.177064 -1.71)
@@ -6313,7 +6242,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -6337,7 +6266,7 @@
 				)
 			)
 		)
-		(property "Description" "Resistor"
+		(property "Description" ""
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -6349,8 +6278,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "R_*")
 		(path "/41370187-964c-4013-bb62-3c5c9c709bc9")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.237258 -0.5225)
@@ -6521,7 +6452,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "LED_SMD:LED_0603_1608Metric"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -6545,7 +6476,7 @@
 				)
 			)
 		)
-		(property "Description" "Light emitting diode"
+		(property "Description" ""
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -6557,8 +6488,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "LED* LED_SMD:* LED_THT:*")
 		(path "/b6eedcb9-b139-45a5-b1d3-4c187bf34ad7")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start 0.8 -0.735)
@@ -6752,7 +6685,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical"
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -6776,7 +6709,7 @@
 				)
 			)
 		)
-		(property "Description" "Generic connector, single row, 01x03, script generated (kicad-library-utils/schlib/autogen/connector/)"
+		(property "Description" ""
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -6788,8 +6721,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "Connector*:*_1x??_*")
 		(path "/48d5cace-d5cd-483a-b429-6632334928b1")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr through_hole)
 		(fp_line
 			(start -1.33 -1.33)
@@ -6956,12 +6891,7 @@
 			(at 0 0 90)
 			(size 1.7 1.7)
 			(drill 1)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 30 "Net-(D9-A)")
 			(pinfunction "Pin_1")
@@ -6972,12 +6902,7 @@
 			(at 0 2.54 90)
 			(size 1.7 1.7)
 			(drill 1)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 34 "+BATT")
 			(pinfunction "Pin_2")
@@ -6988,12 +6913,7 @@
 			(at 0 5.08 90)
 			(size 1.7 1.7)
 			(drill 1)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 30 "Net-(D9-A)")
 			(pinfunction "Pin_3")
@@ -7040,7 +6960,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Diode_SMD:D_MiniMELF"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -7052,7 +6972,7 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://assets.nexperia.com/documents/data-sheet/BZV55_SER.pdf"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -7064,7 +6984,7 @@
 				)
 			)
 		)
-		(property "Description" "3.3V, 500mW, 5%, Zener diode, MiniMELF"
+		(property "Description" ""
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -7076,8 +6996,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "D*MiniMELF*")
 		(path "/ecbb004c-7a78-4d5c-8caf-37248d2ae279")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -2.55 -1)
@@ -7328,7 +7250,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Connector_PinHeader_2.00mm:PinHeader_1x01_P2.00mm_Vertical"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -7352,7 +7274,7 @@
 				)
 			)
 		)
-		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
+		(property "Description" ""
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -7364,8 +7286,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "Connector*:*")
 		(path "/ad86953a-b9ef-45b7-9352-a800607d1aad")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr through_hole)
 		(fp_line
 			(start -1.06 -1.06)
@@ -7532,12 +7456,7 @@
 			(at 0 0)
 			(size 1.35 1.35)
 			(drill 0.8)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 18 "PWM_KEROSTART_3.3")
 			(pinfunction "Pin_1")
@@ -7584,7 +7503,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Connector_PinHeader_2.00mm:PinHeader_1x01_P2.00mm_Vertical"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -7608,7 +7527,7 @@
 				)
 			)
 		)
-		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
+		(property "Description" ""
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -7620,8 +7539,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "Connector*:*")
 		(path "/4e36edb2-790b-452d-aab5-e1b7a2be876c")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr through_hole)
 		(fp_line
 			(start -1.06 -1.06)
@@ -7788,12 +7709,7 @@
 			(at 0 0)
 			(size 1.35 1.35)
 			(drill 0.8)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 2 "TCK")
 			(pinfunction "Pin_1")
@@ -7841,7 +7757,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -7865,7 +7781,7 @@
 				)
 			)
 		)
-		(property "Description" "Generic connector, single row, 01x03, script generated (kicad-library-utils/schlib/autogen/connector/)"
+		(property "Description" ""
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -7877,8 +7793,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "Connector*:*_1x??_*")
 		(path "/7d82d3b5-ceee-4601-80ca-c0f251f0b078")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr through_hole)
 		(fp_line
 			(start 1.33 1.27)
@@ -8045,12 +7963,7 @@
 			(at 0 0 180)
 			(size 1.7 1.7)
 			(drill 1)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 37 "ST_MOSFET")
 			(pinfunction "Pin_1")
@@ -8061,12 +7974,7 @@
 			(at 0 2.54 180)
 			(size 1.7 1.7)
 			(drill 1)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 52 "PPM_PWM_STARTER")
 			(pinfunction "Pin_2")
@@ -8077,12 +7985,7 @@
 			(at 0 5.08 180)
 			(size 1.7 1.7)
 			(drill 1)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 38 "ST_OUTPUT")
 			(pinfunction "Pin_3")
@@ -8129,7 +8032,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Package_TO_SOT_SMD:SOT-23"
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -8141,7 +8044,7 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "http://www.aosmd.com/pdfs/datasheet/AO3400A.pdf"
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -8153,7 +8056,7 @@
 				)
 			)
 		)
-		(property "Description" "30V Vds, 5.7A Id, N-Channel MOSFET, SOT-23"
+		(property "Description" ""
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -8165,8 +8068,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "SOT?23*")
 		(path "/ab31a22b-b638-46a2-9c56-dd50e93e4bc5")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start 0 1.56)
@@ -8380,7 +8285,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Connector_AMASS:AMASS_XT30U-M_1x02_P5.0mm_Vertical"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -8404,7 +8309,7 @@
 				)
 			)
 		)
-		(property "Description" "Generic connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)"
+		(property "Description" ""
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -8416,8 +8321,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "Connector*:*_1x??_*")
 		(path "/7602667d-8666-4843-b99d-dd0856ea0b30")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr through_hole)
 		(fp_line
 			(start 7.71 -2.71)
@@ -8636,12 +8543,7 @@
 			(at 0 0 180)
 			(size 3.8 3.8)
 			(drill 2.7)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 78 "GND")
 			(pinfunction "Pin_1")
@@ -8652,12 +8554,7 @@
 			(at 5 0 180)
 			(size 3.8 3.8)
 			(drill 2.7)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 34 "+BATT")
 			(pinfunction "Pin_2")
@@ -8704,7 +8601,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -8728,7 +8625,7 @@
 				)
 			)
 		)
-		(property "Description" "Resistor"
+		(property "Description" ""
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -8740,8 +8637,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "R_*")
 		(path "/eedb0e6c-df61-4772-9334-84e8e11caac7")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.237258 -0.5225)
@@ -8912,7 +8811,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_2512_6332Metric"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -8936,7 +8835,7 @@
 				)
 			)
 		)
-		(property "Description" "Resistor"
+		(property "Description" ""
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -8948,8 +8847,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "R_*")
 		(path "/71dfa0d9-c35a-4b0c-befb-feb1fcd64c69")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -2.177064 -1.71)
@@ -9120,7 +9021,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "RF_Module:ESP32-WROOM-32"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -9132,7 +9033,7 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://www.espressif.com/sites/default/files/documentation/esp32-wroom-32d_esp32-wroom-32u_datasheet_en.pdf"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -9144,7 +9045,7 @@
 				)
 			)
 		)
-		(property "Description" "RF Module, ESP32-D0WD SoC, Wi-Fi 802.11b/g/n, Bluetooth, BLE, 32-bit, 2.7-3.6V, onboard antenna, SMD"
+		(property "Description" ""
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -9156,8 +9057,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "ESP32?WROOM?32*")
 		(path "/9f3721a5-9e70-4d8d-8aa9-bff5898288ac")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start 9.12 9.88)
@@ -9444,7 +9347,7 @@
 			(at -8.75 -5.71 180)
 			(size 1.5 0.9)
 			(layers "F.Cu" "F.Paste" "F.Mask")
-			(net 92 "Net-(U1-EN)")
+			(net 90 "Net-(U1-EN)")
 			(pinfunction "EN")
 			(pintype "input")
 			(uuid "8b2f0665-d7a3-47da-9693-f8d58e8eabab")
@@ -9624,7 +9527,7 @@
 			(at 4.45 9.51 270)
 			(size 1.5 0.9)
 			(layers "F.Cu" "F.Paste" "F.Mask")
-			(net 93 "TDO")
+			(net 91 "TDO")
 			(pinfunction "IO15")
 			(pintype "bidirectional")
 			(uuid "d1b2b46f-7460-44ba-8847-1761256ccf29")
@@ -9922,7 +9825,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Package_TO_SOT_SMD:SOT-23"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -9934,7 +9837,7 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "http://www.aosmd.com/pdfs/datasheet/AO3400A.pdf"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -9946,7 +9849,7 @@
 				)
 			)
 		)
-		(property "Description" "30V Vds, 5.7A Id, N-Channel MOSFET, SOT-23"
+		(property "Description" ""
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -9958,8 +9861,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "SOT?23*")
 		(path "/dbafe917-2e7f-47e0-a2af-370a8715d44e")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start 0 1.56)
@@ -10172,7 +10077,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Package_TO_SOT_SMD:SOT-223-3_TabPin2"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -10184,7 +10089,7 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "http://www.advanced-monolithic.com/pdf/ds1117.pdf"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -10196,7 +10101,7 @@
 				)
 			)
 		)
-		(property "Description" "1A Low Dropout regulator, positive, 3.3V fixed output, SOT-223"
+		(property "Description" ""
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -10208,8 +10113,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "SOT?223*TabPin2*")
 		(path "/b99dcb7b-9517-4a0d-b7a9-c343a142eae2")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -4.1 -3.41)
@@ -10429,7 +10336,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -10453,7 +10360,7 @@
 				)
 			)
 		)
-		(property "Description" "Generic connector, single row, 01x03, script generated (kicad-library-utils/schlib/autogen/connector/)"
+		(property "Description" ""
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -10465,8 +10372,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "Connector*:*_1x??_*")
 		(path "/db6e09e2-08ca-48e9-afe0-4dc58b16059d")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr through_hole)
 		(fp_line
 			(start 1.33 1.27)
@@ -10633,12 +10542,7 @@
 			(at 0 0 180)
 			(size 1.7 1.7)
 			(drill 1)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 21 "PPM_GAZ_5V")
 			(pinfunction "Pin_1")
@@ -10649,12 +10553,7 @@
 			(at 0 2.54 180)
 			(size 1.7 1.7)
 			(drill 1)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 23 "VDC")
 			(pinfunction "Pin_2")
@@ -10665,12 +10564,7 @@
 			(at 0 5.08 180)
 			(size 1.7 1.7)
 			(drill 1)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 78 "GND")
 			(pinfunction "Pin_3")
@@ -10718,7 +10612,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Connector_AMASS:AMASS_XT30U-F_1x02_P5.0mm_Vertical"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -10742,7 +10636,7 @@
 				)
 			)
 		)
-		(property "Description" "Generic connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)"
+		(property "Description" ""
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -10754,8 +10648,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "Connector*:*_1x??_*")
 		(path "/5b7beb96-ea3a-4427-bf46-8659c7ecc8c7")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr through_hole)
 		(fp_line
 			(start 7.71 -2.71)
@@ -10974,12 +10870,7 @@
 			(at 0 0 180)
 			(size 3.8 3.8)
 			(drill 2.7)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 35 "Net-(D15-A)")
 			(pinfunction "Pin_1")
@@ -10990,12 +10881,7 @@
 			(at 5 0 180)
 			(size 4 4)
 			(drill 2.7)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 34 "+BATT")
 			(pinfunction "Pin_2")
@@ -11042,7 +10928,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -11066,7 +10952,7 @@
 				)
 			)
 		)
-		(property "Description" "Resistor"
+		(property "Description" ""
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -11078,8 +10964,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "R_*")
 		(path "/88e5e557-3bfa-476f-b970-9b22eb982551")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.237258 0.5225)
@@ -11250,7 +11138,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Connector_JST:JST_PH_B5B-PH-K_1x05_P2.00mm_Vertical"
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -11274,7 +11162,7 @@
 				)
 			)
 		)
-		(property "Description" "Generic connector, single row, 01x05, script generated (kicad-library-utils/schlib/autogen/connector/)"
+		(property "Description" ""
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -11286,8 +11174,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "Connector*:*_1x??_*")
 		(path "/19aa9d59-fac7-4389-9d93-7c50866d7f47")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr through_hole)
 		(fp_line
 			(start -2.06 2.91)
@@ -11774,12 +11664,7 @@
 			(at 0 0 270)
 			(size 1.2 1.75)
 			(drill 0.75)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(roundrect_rratio 0.208333)
 			(net 60 "3.3V")
@@ -11791,12 +11676,7 @@
 			(at 2 0 270)
 			(size 1.2 1.75)
 			(drill 0.75)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 79 "OneWire")
 			(pinfunction "Pin_2")
@@ -11807,12 +11687,7 @@
 			(at 4 0 270)
 			(size 1.2 1.75)
 			(drill 0.75)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 40 "ESP_SCL")
 			(pinfunction "Pin_3")
@@ -11823,12 +11698,7 @@
 			(at 6 0 270)
 			(size 1.2 1.75)
 			(drill 0.75)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 56 "ESP_SDA")
 			(pinfunction "Pin_4")
@@ -11839,12 +11709,7 @@
 			(at 8 0 270)
 			(size 1.2 1.75)
 			(drill 0.75)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 78 "GND")
 			(pinfunction "Pin_5")
@@ -11892,7 +11757,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Connector_AMASS:AMASS_XT30U-F_1x02_P5.0mm_Vertical"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -11916,7 +11781,7 @@
 				)
 			)
 		)
-		(property "Description" "Generic connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)"
+		(property "Description" ""
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -11928,8 +11793,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "Connector*:*_1x??_*")
 		(path "/bd3026e8-0a2b-49aa-8563-ecb9a5512174")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr through_hole)
 		(fp_line
 			(start 7.71 -2.71)
@@ -12148,12 +12015,7 @@
 			(at 0 0 180)
 			(size 3.8 3.8)
 			(drill 2.7)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 32 "Net-(D10-A)")
 			(pinfunction "Pin_1")
@@ -12164,12 +12026,7 @@
 			(at 5 0 180)
 			(size 4 4)
 			(drill 2.7)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 31 "Net-(D10-K)")
 			(pinfunction "Pin_2")
@@ -12217,7 +12074,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -12241,7 +12098,7 @@
 				)
 			)
 		)
-		(property "Description" "Generic connector, single row, 01x03, script generated (kicad-library-utils/schlib/autogen/connector/)"
+		(property "Description" ""
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -12253,8 +12110,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "Connector*:*_1x??_*")
 		(path "/cdc10def-baae-45f5-97d3-619e1bf3a2c7")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr through_hole)
 		(fp_line
 			(start 1.33 1.27)
@@ -12421,12 +12280,7 @@
 			(at 0 0 180)
 			(size 1.7 1.7)
 			(drill 1)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 48 "TX2")
 			(pinfunction "Pin_1")
@@ -12437,12 +12291,7 @@
 			(at 0 2.54 180)
 			(size 1.7 1.7)
 			(drill 1)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 49 "unconnected-(J12-Pin_2-Pad2)")
 			(pinfunction "Pin_2")
@@ -12453,12 +12302,7 @@
 			(at 0 5.08 180)
 			(size 1.7 1.7)
 			(drill 1)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 78 "GND")
 			(pinfunction "Pin_3")
@@ -12505,7 +12349,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "LED_SMD:LED_0603_1608Metric"
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -12529,7 +12373,7 @@
 				)
 			)
 		)
-		(property "Description" "Light emitting diode"
+		(property "Description" ""
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -12541,8 +12385,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "LED* LED_SMD:* LED_THT:*")
 		(path "/149829d9-cba8-461d-89da-1ad4f1ec99d7")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -1.485 0.735)
@@ -12736,7 +12582,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -12760,7 +12606,7 @@
 				)
 			)
 		)
-		(property "Description" "Generic connector, single row, 01x03, script generated (kicad-library-utils/schlib/autogen/connector/)"
+		(property "Description" ""
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -12772,8 +12618,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "Connector*:*_1x??_*")
 		(path "/bdb014f9-1dd3-4ba6-b6d6-29209d72c341")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr through_hole)
 		(fp_line
 			(start 1.33 1.27)
@@ -12940,12 +12788,7 @@
 			(at 0 0 180)
 			(size 1.7 1.7)
 			(drill 1)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 72 "P1_MOSFET")
 			(pinfunction "Pin_1")
@@ -12956,12 +12799,7 @@
 			(at 0 2.54 180)
 			(size 1.7 1.7)
 			(drill 1)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 28 "PPM_PWM_PUMP1")
 			(pinfunction "Pin_2")
@@ -12972,12 +12810,7 @@
 			(at 0 5.08 180)
 			(size 1.7 1.7)
 			(drill 1)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 50 "P1_OUTPUT")
 			(pinfunction "Pin_3")
@@ -13024,7 +12857,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:CP_Elec_5x3"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -13048,7 +12881,7 @@
 				)
 			)
 		)
-		(property "Description" "Unpolarized capacitor"
+		(property "Description" ""
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -13060,8 +12893,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "C_*")
 		(path "/5bef93e8-ddf6-4f3c-b3f5-3dd8dfadf3d0")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -3.625 -1.685)
@@ -13463,7 +13298,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -13487,7 +13322,7 @@
 				)
 			)
 		)
-		(property "Description" "Resistor"
+		(property "Description" ""
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -13499,8 +13334,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "R_*")
 		(path "/fee7efbe-241f-4082-9675-4defa4966f25")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.237258 0.5225)
@@ -13671,7 +13508,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -13695,7 +13532,7 @@
 				)
 			)
 		)
-		(property "Description" "Resistor"
+		(property "Description" ""
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -13707,8 +13544,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "R_*")
 		(path "/ea3daeee-62fd-4f83-a1f5-2e6a9466a20e")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.237258 -0.5225)
@@ -13879,7 +13718,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -13903,7 +13742,7 @@
 				)
 			)
 		)
-		(property "Description" "Resistor"
+		(property "Description" ""
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -13915,8 +13754,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "R_*")
 		(path "/9c394ff7-2f42-4d46-b567-a65e21a31ad7")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.237258 -0.5225)
@@ -14043,7 +13884,7 @@
 			(size 0.8 0.95)
 			(layers "F.Cu" "F.Paste" "F.Mask")
 			(roundrect_rratio 0.25)
-			(net 92 "Net-(U1-EN)")
+			(net 90 "Net-(U1-EN)")
 			(pintype "passive")
 			(uuid "dc3dc2e5-bef5-4e49-a839-e844facca990")
 		)
@@ -14087,7 +13928,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -14111,7 +13952,7 @@
 				)
 			)
 		)
-		(property "Description" "Resistor"
+		(property "Description" ""
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -14123,8 +13964,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "R_*")
 		(path "/25c98f61-a619-4a33-92d2-62c9f6e727d6")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.237258 0.5225)
@@ -14296,7 +14139,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -14320,7 +14163,7 @@
 				)
 			)
 		)
-		(property "Description" "Generic connector, single row, 01x03, script generated (kicad-library-utils/schlib/autogen/connector/)"
+		(property "Description" ""
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -14332,8 +14175,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "Connector*:*_1x??_*")
 		(path "/a40e2f2e-70a9-4aae-887a-1c22a85a65fb")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr through_hole)
 		(fp_line
 			(start 1.33 1.27)
@@ -14500,12 +14345,7 @@
 			(at 0 0 180)
 			(size 1.7 1.7)
 			(drill 1)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 22 "AUX_5V")
 			(pinfunction "Pin_1")
@@ -14516,12 +14356,7 @@
 			(at 0 2.54 180)
 			(size 1.7 1.7)
 			(drill 1)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 36 "unconnected-(J2-Pin_2-Pad2)")
 			(pinfunction "Pin_2")
@@ -14532,12 +14367,7 @@
 			(at 0 5.08 180)
 			(size 1.7 1.7)
 			(drill 1)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 78 "GND")
 			(pinfunction "Pin_3")
@@ -14584,7 +14414,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -14608,7 +14438,7 @@
 				)
 			)
 		)
-		(property "Description" "Resistor"
+		(property "Description" ""
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -14620,8 +14450,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "R_*")
 		(path "/aaf79f0f-7c4e-40db-84db-12298e77e91d")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.237258 -0.5225)
@@ -14793,7 +14625,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical"
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -14817,7 +14649,7 @@
 				)
 			)
 		)
-		(property "Description" "Generic connector, single row, 01x03, script generated (kicad-library-utils/schlib/autogen/connector/)"
+		(property "Description" ""
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -14829,8 +14661,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "Connector*:*_1x??_*")
 		(path "/1b953ce4-ac37-4aa3-9d7c-185589e3b772")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr through_hole)
 		(fp_line
 			(start -1.33 6.41)
@@ -14997,12 +14831,7 @@
 			(at 0 0 270)
 			(size 1.7 1.7)
 			(drill 1)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 47 "RPM")
 			(pinfunction "Pin_1")
@@ -15013,12 +14842,7 @@
 			(at 0 2.54 270)
 			(size 1.7 1.7)
 			(drill 1)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 1 "+5V")
 			(pinfunction "Pin_2")
@@ -15029,12 +14853,7 @@
 			(at 0 5.08 270)
 			(size 1.7 1.7)
 			(drill 1)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 78 "GND")
 			(pinfunction "Pin_3")
@@ -15081,7 +14900,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:CP_Elec_5x3"
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -15105,7 +14924,7 @@
 				)
 			)
 		)
-		(property "Description" "Unpolarized capacitor"
+		(property "Description" ""
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -15117,8 +14936,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "C_*")
 		(path "/ac5ccad2-8e3f-49ec-a5f9-385e6d7ef063")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start 2.76 -2.76)
@@ -15520,7 +15341,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "LED_SMD:LED_0603_1608Metric"
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -15544,7 +15365,7 @@
 				)
 			)
 		)
-		(property "Description" "Light emitting diode"
+		(property "Description" ""
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -15556,8 +15377,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "LED* LED_SMD:* LED_THT:*")
 		(path "/74b44498-7112-4bb3-bb3a-ffe493b3720e")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -1.485 0.735)
@@ -15750,7 +15573,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric"
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -15774,7 +15597,7 @@
 				)
 			)
 		)
-		(property "Description" "Unpolarized capacitor"
+		(property "Description" ""
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -15786,8 +15609,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "C_*")
 		(path "/fa42980b-2121-47c0-901e-9dbeae9178a9")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.14058 0.51)
@@ -15958,7 +15783,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Package_TO_SOT_SMD:TO-252-2"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -15970,7 +15795,7 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "http://www.jaolen.com/images/pdf/QM6015D.pdf"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -15982,7 +15807,7 @@
 				)
 			)
 		)
-		(property "Description" "-35A Id, -60V Vds, P-Channel Power MOSFET, 25mOhm Ron, 25.0nC Qg (typ), TO252"
+		(property "Description" ""
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -15994,8 +15819,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "TO?252*")
 		(path "/476d6c52-6461-48b3-a92d-83f0bcc1f3e9")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start 3.11 3.45)
@@ -16358,7 +16185,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric"
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -16382,7 +16209,7 @@
 				)
 			)
 		)
-		(property "Description" "Unpolarized capacitor"
+		(property "Description" ""
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -16394,8 +16221,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "C_*")
 		(path "/fe3bfea5-e538-4255-95fb-de5494789030")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.14058 0.51)
@@ -16566,7 +16395,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Connector_PinHeader_2.00mm:PinHeader_1x01_P2.00mm_Vertical"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -16590,7 +16419,7 @@
 				)
 			)
 		)
-		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
+		(property "Description" ""
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -16602,8 +16431,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "Connector*:*")
 		(path "/100fcdac-d7c6-4613-91f8-f1c1bb1a2fff")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr through_hole)
 		(fp_line
 			(start -1.06 -1.06)
@@ -16770,14 +16601,9 @@
 			(at 0 0)
 			(size 1.35 1.35)
 			(drill 0.8)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
-			(net 93 "TDO")
+			(net 91 "TDO")
 			(pinfunction "Pin_1")
 			(pintype "passive")
 			(uuid "2e1c0d63-db4c-4ef4-811c-e291cdf25c23")
@@ -16822,7 +16648,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Package_TO_SOT_SMD:SOT-23"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -16834,7 +16660,7 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "http://www.aosmd.com/pdfs/datasheet/AO3400A.pdf"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -16846,7 +16672,7 @@
 				)
 			)
 		)
-		(property "Description" "30V Vds, 5.7A Id, N-Channel MOSFET, SOT-23"
+		(property "Description" ""
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -16858,8 +16684,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "SOT?23*")
 		(path "/6f8d4f79-052e-4b7e-8570-abccda4930b5")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start 0 1.56)
@@ -17072,7 +16900,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "LED_SMD:LED_0603_1608Metric"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -17096,7 +16924,7 @@
 				)
 			)
 		)
-		(property "Description" "Light emitting diode"
+		(property "Description" ""
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -17108,8 +16936,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "LED* LED_SMD:* LED_THT:*")
 		(path "/f1298838-7b19-4a38-bc2c-834ee1d6f5a3")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start 0.8 -0.735)
@@ -17303,7 +17133,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric"
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -17327,7 +17157,7 @@
 				)
 			)
 		)
-		(property "Description" "Unpolarized capacitor"
+		(property "Description" ""
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -17339,8 +17169,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "C_*")
 		(path "/1153e748-363c-4da2-8adc-0f2f02b22417")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.14058 -0.51)
@@ -17458,7 +17290,7 @@
 			(size 0.9 0.95)
 			(layers "F.Cu" "F.Paste" "F.Mask")
 			(roundrect_rratio 0.25)
-			(net 92 "Net-(U1-EN)")
+			(net 90 "Net-(U1-EN)")
 			(pintype "passive")
 			(uuid "356ddf61-90bf-4de6-a6f2-ff728c5edb45")
 		)
@@ -17511,7 +17343,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "LED_SMD:LED_0603_1608Metric"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -17535,7 +17367,7 @@
 				)
 			)
 		)
-		(property "Description" "Light emitting diode"
+		(property "Description" ""
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -17547,8 +17379,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "LED* LED_SMD:* LED_THT:*")
 		(path "/4bd7ab10-da0a-4fa6-89b0-ef870a8b622e")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -1.485 -0.735)
@@ -17742,7 +17576,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Connector_AMASS:AMASS_XT30U-F_1x02_P5.0mm_Vertical"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -17766,7 +17600,7 @@
 				)
 			)
 		)
-		(property "Description" "Generic connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)"
+		(property "Description" ""
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -17778,8 +17612,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "Connector*:*_1x??_*")
 		(path "/559a70a9-6186-4698-b884-0c503312268d")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr through_hole)
 		(fp_line
 			(start 7.71 -2.71)
@@ -17998,12 +17834,7 @@
 			(at 0 0 180)
 			(size 3.8 3.8)
 			(drill 2.7)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 33 "Net-(D13-A)")
 			(pinfunction "Pin_1")
@@ -18014,12 +17845,7 @@
 			(at 5 0 180)
 			(size 4 4)
 			(drill 2.7)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 34 "+BATT")
 			(pinfunction "Pin_2")
@@ -18066,7 +17892,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Connector_JST:JST_PH_B4B-PH-K_1x04_P2.00mm_Vertical"
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -18090,7 +17916,7 @@
 				)
 			)
 		)
-		(property "Description" "Generic connector, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)"
+		(property "Description" ""
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -18102,8 +17928,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "Connector*:*_1x??_*")
 		(path "/2a201ddb-0f35-45bd-919b-b1a31200f7bb")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr through_hole)
 		(fp_line
 			(start -2.06 2.91)
@@ -18550,12 +18378,7 @@
 			(at 0 0 270)
 			(size 1.2 1.75)
 			(drill 0.75)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(roundrect_rratio 0.208333)
 			(net 60 "3.3V")
@@ -18567,12 +18390,7 @@
 			(at 2 0 270)
 			(size 1.2 1.75)
 			(drill 0.75)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 75 "TX")
 			(pinfunction "Pin_2")
@@ -18583,12 +18401,7 @@
 			(at 4 0 270)
 			(size 1.2 1.75)
 			(drill 0.75)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 76 "RX")
 			(pinfunction "Pin_3")
@@ -18599,12 +18412,7 @@
 			(at 6 0 270)
 			(size 1.2 1.75)
 			(drill 0.75)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
+			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
 			(net 78 "GND")
 			(pinfunction "Pin_4")
@@ -18653,7 +18461,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -18677,7 +18485,7 @@
 				)
 			)
 		)
-		(property "Description" "Resistor"
+		(property "Description" ""
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -18689,8 +18497,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "R_*")
 		(path "/085449fb-bf80-4299-b369-f7ae8da67851")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.237258 -0.5225)
@@ -18864,7 +18674,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Diode_SMD:D_SMA"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -18888,7 +18698,7 @@
 				)
 			)
 		)
-		(property "Description" "Schottky diode"
+		(property "Description" ""
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -18900,8 +18710,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "TO-???* *_Diode_* *SingleDiode* D_*")
 		(path "/0caea3bb-a4ab-4610-9beb-c425a0ce64c3")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -3.4 1.65)
@@ -19145,7 +18957,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Diode_SMD:D_SMF"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -19157,7 +18969,7 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://www.vishay.com/doc?85881"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -19169,7 +18981,7 @@
 				)
 			)
 		)
-		(property "Description" "200W unidirectional Transil Transient Voltage Suppressor, 5Vrwm, SMF"
+		(property "Description" ""
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -19181,8 +18993,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "D*SMF*")
 		(path "/70f5ce58-1ba7-44b6-884c-9e98b6c15bd5")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -2.28 -1.01)
@@ -19426,7 +19240,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Package_TO_SOT_SMD:SOT-23-5"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -19438,7 +19252,7 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "http://www.ti.com/lit/ds/symlink/opa340.pdf"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -19450,7 +19264,7 @@
 				)
 			)
 		)
-		(property "Description" "Single Single-Supply, Rail-to-Rail Operational Amplifier, MicroAmplifier Series, SOT-23-5"
+		(property "Description" ""
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -19462,8 +19276,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "SOT?23*")
 		(path "/edee8792-a03c-4b82-9ea0-e1454a096aee")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start 0 1.56)
@@ -19698,7 +19514,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -19722,7 +19538,7 @@
 				)
 			)
 		)
-		(property "Description" "Resistor"
+		(property "Description" ""
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -19734,8 +19550,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "R_*")
 		(path "/c4a7ee86-3934-4008-878b-378b3e912e81")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.237258 -0.5225)
@@ -19909,7 +19727,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Package_TO_SOT_SMD:SOT-23"
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -19921,7 +19739,7 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "http://www.ti.com/lit/ds/symlink/lm4040-n.pdf"
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -19933,7 +19751,7 @@
 				)
 			)
 		)
-		(property "Description" "2.500V Precision Micropower Shunt Voltage Reference, SOT-23"
+		(property "Description" ""
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -19945,8 +19763,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "SOT?23*")
 		(path "/dd67f14e-c9fe-4760-b45d-3027a82a8fe9")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start 0 1.56)
@@ -20159,7 +19979,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -20171,7 +19991,7 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "http://datasheets.maximintegrated.com/en/ds/MAX31855.pdf"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -20183,7 +20003,7 @@
 				)
 			)
 		)
-		(property "Description" "Cold Junction K-type Termocouple Interface, SPI, SO8"
+		(property "Description" ""
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -20195,8 +20015,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "SOIC*3.9x4.9mm*P1.27mm*")
 		(path "/16c7889f-6d31-4b10-81c5-4d8cc8a2d144")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start 0 -2.56)
@@ -20459,7 +20281,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric"
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -20483,7 +20305,7 @@
 				)
 			)
 		)
-		(property "Description" "Unpolarized capacitor"
+		(property "Description" ""
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -20495,8 +20317,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "C_*")
 		(path "/15cdf005-d2ee-4888-94ad-d04da9fe9389")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.14058 -0.51)
@@ -20670,7 +20494,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -20694,7 +20518,7 @@
 				)
 			)
 		)
-		(property "Description" "Resistor"
+		(property "Description" ""
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -20706,8 +20530,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "R_*")
 		(path "/cdb4d7d8-7675-4e45-b048-70be5b907144")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.237258 -0.5225)
@@ -20881,7 +20707,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Diode_SMD:D_SMA"
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -20905,7 +20731,7 @@
 				)
 			)
 		)
-		(property "Description" "Schottky diode"
+		(property "Description" ""
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -20917,8 +20743,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "TO-???* *_Diode_* *SingleDiode* D_*")
 		(path "/3c39e437-0673-4a8b-b7f1-6642dee1ecda")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -3.4 -1.65)
@@ -21162,7 +20990,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -21186,7 +21014,7 @@
 				)
 			)
 		)
-		(property "Description" "Unpolarized capacitor"
+		(property "Description" ""
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -21198,8 +21026,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "C_*")
 		(path "/19954e77-f44e-4ae5-a0cc-bf659e5e27f3")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.14058 0.51)
@@ -21373,7 +21203,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -21397,7 +21227,7 @@
 				)
 			)
 		)
-		(property "Description" "Resistor"
+		(property "Description" ""
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -21409,8 +21239,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "R_*")
 		(path "/d9710a0a-396e-41da-9e39-cb053366c2e6")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.237258 0.5225)
@@ -21584,7 +21416,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Package_TO_SOT_SMD:SOT-23"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -21596,7 +21428,7 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "http://www.aosmd.com/pdfs/datasheet/AO3400A.pdf"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -21608,7 +21440,7 @@
 				)
 			)
 		)
-		(property "Description" "30V Vds, 5.7A Id, N-Channel MOSFET, SOT-23"
+		(property "Description" ""
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -21620,8 +21452,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "SOT?23*")
 		(path "/c0471ece-aa62-46d5-bbc9-77e602ecf9bc")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start 0 -1.56)
@@ -21837,7 +21671,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric"
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -21861,7 +21695,7 @@
 				)
 			)
 		)
-		(property "Description" "Unpolarized capacitor"
+		(property "Description" ""
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -21873,8 +21707,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "C_*")
 		(path "/4443b421-e7c5-4086-85a2-c5c633243f21")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.14058 -0.51)
@@ -22048,7 +21884,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -22072,7 +21908,7 @@
 				)
 			)
 		)
-		(property "Description" "Unpolarized capacitor"
+		(property "Description" ""
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -22084,8 +21920,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "C_*")
 		(path "/582089c3-a4b2-4df1-9c86-407a8508e28c")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.14058 0.51)
@@ -22259,7 +22097,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -22283,7 +22121,7 @@
 				)
 			)
 		)
-		(property "Description" "Unpolarized capacitor"
+		(property "Description" ""
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -22295,8 +22133,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "C_*")
 		(path "/5f01c597-54a5-479d-a8b8-b74ca36f4a54")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.14058 0.51)
@@ -22458,7 +22298,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Value" "20K"
+		(property "Value" "200K"
 			(at 0 -1.43 0)
 			(layer "B.Fab")
 			(uuid "c0c31b09-131c-4702-a340-6c3a5a42cd31")
@@ -22470,7 +22310,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -22494,7 +22334,7 @@
 				)
 			)
 		)
-		(property "Description" "Resistor"
+		(property "Description" ""
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -22506,8 +22346,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "R_*")
 		(path "/85cfba16-a204-4608-be7e-52011224ba7d")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.237258 0.5225)
@@ -22681,7 +22523,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Diode_SMD:D_SMA"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -22705,7 +22547,7 @@
 				)
 			)
 		)
-		(property "Description" "Schottky diode"
+		(property "Description" ""
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -22717,8 +22559,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "TO-???* *_Diode_* *SingleDiode* D_*")
 		(path "/777c29c1-c4f9-4ff1-a35b-f44b02a3b407")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -3.4 1.65)
@@ -22962,7 +22806,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -22986,7 +22830,7 @@
 				)
 			)
 		)
-		(property "Description" "Resistor"
+		(property "Description" ""
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -22998,8 +22842,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "R_*")
 		(path "/10853f7d-87a2-4cf0-951c-51e2a8798c6f")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.237258 0.5225)
@@ -23173,7 +23019,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -23197,7 +23043,7 @@
 				)
 			)
 		)
-		(property "Description" "Resistor"
+		(property "Description" ""
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -23209,8 +23055,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "R_*")
 		(path "/c12e41b1-8186-434e-b00c-d6365078a204")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.237258 0.5225)
@@ -23384,7 +23232,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -23408,7 +23256,7 @@
 				)
 			)
 		)
-		(property "Description" "Resistor"
+		(property "Description" ""
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -23420,8 +23268,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "R_*")
 		(path "/d3035de1-cacf-4809-892e-1baa7a32ac6e")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.237258 0.5225)
@@ -23595,7 +23445,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Diode_SMD:D_SMA"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -23619,7 +23469,7 @@
 				)
 			)
 		)
-		(property "Description" "Schottky diode"
+		(property "Description" ""
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -23631,8 +23481,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "TO-???* *_Diode_* *SingleDiode* D_*")
 		(path "/cf6c58cd-b729-4782-9974-45cf2b81f197")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -3.4 1.65)
@@ -23876,7 +23728,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -23900,7 +23752,7 @@
 				)
 			)
 		)
-		(property "Description" "Resistor"
+		(property "Description" ""
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -23912,8 +23764,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "R_*")
 		(path "/63a1ebbd-c746-4769-b912-e1080eada5e3")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.237258 -0.5225)
@@ -24087,7 +23941,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -24111,7 +23965,7 @@
 				)
 			)
 		)
-		(property "Description" "Resistor"
+		(property "Description" ""
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -24123,8 +23977,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "R_*")
 		(path "/bc8b491e-24cf-448f-944f-927034ef207e")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.237258 -0.5225)
@@ -24298,7 +24154,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Package_SO:SOP-16_4.4x10.4mm_P1.27mm"
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -24310,7 +24166,7 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "http://www.intersil.com/content/dam/intersil/documents/cd40/cd4050bms.pdf"
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -24322,7 +24178,7 @@
 				)
 			)
 		)
-		(property "Description" "Hex Buffer"
+		(property "Description" ""
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -24334,8 +24190,10 @@
 				)
 			)
 		)
-		(path "/a1a480a3-4e35-460c-8359-1bae4c5b2a57")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(property ki_fp_filters "DIP?16*")
+		(path "/d44ce0fc-11a0-4cc9-b317-b3ad2b320dc3")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -2.4 5.4)
@@ -24647,7 +24505,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Diode_SMD:D_SMA"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -24671,7 +24529,7 @@
 				)
 			)
 		)
-		(property "Description" "Schottky diode"
+		(property "Description" ""
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -24683,8 +24541,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "TO-???* *_Diode_* *SingleDiode* D_*")
 		(path "/9e400f68-bc6a-4da8-aefc-ea4a65bd857c")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -3.4 1.65)
@@ -24928,7 +24788,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Package_SO:SOP-16_4.4x10.4mm_P1.27mm"
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -24940,7 +24800,7 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "http://www.intersil.com/content/dam/intersil/documents/cd40/cd4050bms.pdf"
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -24952,7 +24812,7 @@
 				)
 			)
 		)
-		(property "Description" "Hex Buffer"
+		(property "Description" ""
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -24964,8 +24824,10 @@
 				)
 			)
 		)
-		(path "/e91b68ec-d045-40eb-8b60-6b7290672983")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(property ki_fp_filters "DIP?16*")
+		(path "/6cc133c5-ca8a-4d30-b0a7-e28030578d3d")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -2.4 5.4)
@@ -25277,7 +25139,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric"
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -25301,7 +25163,7 @@
 				)
 			)
 		)
-		(property "Description" "Unpolarized capacitor"
+		(property "Description" ""
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -25313,8 +25175,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "C_*")
 		(path "/842255f1-0ffe-4d64-bdf3-df180013631d")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.14058 0.51)
@@ -25458,18 +25322,18 @@
 			)
 		)
 	)
-	(footprint "Connector_Card:J_SD_Card-micro_socket_A"
+	(footprint "JF-ECU32 Library:J_SD_Card-micro_socket_A"
 		(layer "B.Cu")
 		(uuid "ae0a5e21-5fc7-456a-964a-214b179a8ce3")
 		(at 69.214032 191.679855)
 		(descr "SD Card Socket, Olimex, MICRO-SD-CARD ")
 		(property "Reference" "J22"
-			(at -1.015032 -0.163855 -90)
+			(at -9.201432 -2.644855 -90)
 			(layer "B.SilkS")
-			(uuid "d212660a-2594-4cdc-95c9-6801dd4ec0d7")
+			(uuid "1cd31ab4-d295-40ef-9cb4-9efa0cccd7e9")
 			(effects
 				(font
-					(size 0.7 0.7)
+					(size 0.64 0.64)
 					(thickness 0.15)
 				)
 				(justify mirror)
@@ -25479,303 +25343,308 @@
 			(at 0 -10.16 180)
 			(layer "B.Fab")
 			(hide yes)
-			(uuid "0722dd7b-55df-4915-93e3-fa85d665d61d")
+			(uuid "4bf4f6e0-f695-4785-9191-6145f4059e9f")
 			(effects
 				(font
-					(size 0.7 0.7)
+					(size 0.64 0.64)
 					(thickness 0.15)
 				)
 				(justify mirror)
 			)
 		)
-		(property "Footprint" ""
-			(at 0 0 0)
-			(layer "F.Fab")
+		(property "Footprint" "JF-ECU32 Library:J_SD_Card-micro_socket_A"
+			(at 0 0 180)
+			(layer "B.Fab")
 			(hide yes)
-			(uuid "14ee793e-71e4-46dd-b3a5-90b97f532c2e")
+			(uuid "a317ed85-c45f-4d94-afc4-8c414ed217a8")
 			(effects
 				(font
 					(size 1.27 1.27)
 					(thickness 0.15)
 				)
+				(justify mirror)
 			)
 		)
-		(property "Datasheet" ""
-			(at 0 0 0)
-			(layer "F.Fab")
+		(property "Datasheet" "https://datasheet.lcsc.com/lcsc/2110151630_XKB-Connectivity-XKTF-015-N_C381082.pdf"
+			(at 0 0 180)
+			(layer "B.Fab")
 			(hide yes)
-			(uuid "9ddb6a0f-ccf3-4852-8d78-860d789bbb41")
+			(uuid "4f0b6b19-bf01-4c87-b1e3-20b5d3055dbb")
 			(effects
 				(font
 					(size 1.27 1.27)
 					(thickness 0.15)
 				)
+				(justify mirror)
 			)
 		)
-		(property "Description" "Micro SD Card Socket with one card detection pin"
-			(at 0 0 0)
-			(layer "F.Fab")
+		(property "Description" ""
+			(at 0 0 180)
+			(layer "B.Fab")
 			(hide yes)
-			(uuid "51520d09-32a0-4805-91de-fa5a95c4f324")
+			(uuid "ef26b16e-cd74-4da3-9250-9c18a9785859")
 			(effects
 				(font
 					(size 1.27 1.27)
 					(thickness 0.15)
 				)
+				(justify mirror)
 			)
 		)
+		(property ki_fp_filters "microSD*")
 		(path "/2eb59105-d461-4ee4-906b-ccbbc85058aa")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
-			(start -8.25 1.75)
-			(end -8.25 -5.5)
+			(start -8.25 -5.5)
+			(end -8.25 1.75)
 			(stroke
 				(width 0.15)
 				(type default)
 			)
 			(layer "B.SilkS")
-			(uuid "a71e0349-9d50-48ca-92df-3c0dbced54fe")
+			(uuid "87eca5a6-0f80-435f-abf4-540306df6964")
+		)
+		(fp_line
+			(start -8.25 4.5)
+			(end -8.25 4.978145)
+			(stroke
+				(width 0.15)
+				(type default)
+			)
+			(layer "B.SilkS")
+			(uuid "c48ccdb2-7af4-4df5-9170-e016c81335a6")
 		)
 		(fp_line
 			(start -8.25 4.978145)
-			(end -8.25 4.5)
-			(stroke
-				(width 0.15)
-				(type default)
-			)
-			(layer "B.SilkS")
-			(uuid "2d94696d-0188-4d65-be5c-16b5ba94bd9c")
-		)
-		(fp_line
-			(start -8.25 7.478145)
-			(end -8.25 4.978145)
-			(stroke
-				(width 0.15)
-				(type solid)
-			)
-			(layer "B.SilkS")
-			(uuid "d60dafbc-c170-4f5d-b609-26cfc24a06fc")
-		)
-		(fp_line
-			(start -6.85 4.978145)
-			(end -8.25 4.978145)
-			(stroke
-				(width 0.15)
-				(type solid)
-			)
-			(layer "B.SilkS")
-			(uuid "f96731f0-058f-4f7c-a364-a3060e83e470")
-		)
-		(fp_line
-			(start -6.75 -7)
-			(end -4 -7)
-			(stroke
-				(width 0.15)
-				(type default)
-			)
-			(layer "B.SilkS")
-			(uuid "070dd2be-d9c1-4c04-b3a0-78ec7edb1119")
-		)
-		(fp_line
-			(start -5.45 7.478145)
 			(end -8.25 7.478145)
 			(stroke
 				(width 0.15)
 				(type solid)
 			)
 			(layer "B.SilkS")
-			(uuid "c060dcb9-558c-4a8b-984c-05f41d3dec6c")
+			(uuid "b7bdd757-fb07-4592-a478-bf9136b72062")
 		)
 		(fp_line
-			(start -0.015032 6.278145)
+			(start -8.25 4.978145)
+			(end -6.85 4.978145)
+			(stroke
+				(width 0.15)
+				(type solid)
+			)
+			(layer "B.SilkS")
+			(uuid "5453c96c-fd1d-4062-9614-2c79b84c5213")
+		)
+		(fp_line
+			(start -8.25 7.478145)
+			(end -5.45 7.478145)
+			(stroke
+				(width 0.15)
+				(type solid)
+			)
+			(layer "B.SilkS")
+			(uuid "790767e0-d019-4c8d-9833-6b27ffc4aeed")
+		)
+		(fp_line
+			(start -5.515032 7.478145)
 			(end -0.015032 7.478145)
 			(stroke
 				(width 0.15)
 				(type solid)
 			)
 			(layer "B.SilkS")
-			(uuid "bd1e1292-7db9-454e-b2ea-118693adddef")
+			(uuid "294a3f33-4551-40bc-b106-d8487351d268")
+		)
+		(fp_line
+			(start -4 -7)
+			(end -6.75 -7)
+			(stroke
+				(width 0.15)
+				(type default)
+			)
+			(layer "B.SilkS")
+			(uuid "a157c5b2-b926-4dfa-8aa6-9986f7a04478")
 		)
 		(fp_line
 			(start -0.015032 7.478145)
-			(end -5.515032 7.478145)
+			(end -0.015032 6.278145)
 			(stroke
 				(width 0.15)
 				(type solid)
 			)
 			(layer "B.SilkS")
-			(uuid "5dd160b8-98d1-4b2c-824c-b898f9996f1e")
+			(uuid "94f1abc8-3cfa-4af0-9f4a-7430ad339d75")
 		)
 		(fp_line
-			(start 5.234968 4.978145)
-			(end 6.5 4.978145)
+			(start -0.015032 7.478145)
+			(end 5.484968 7.478145)
 			(stroke
 				(width 0.15)
 				(type solid)
 			)
 			(layer "B.SilkS")
-			(uuid "cf488090-6316-4f74-bde8-8cf80699922a")
+			(uuid "b769ec39-d8dd-408f-9a4d-f6756ae0684c")
 		)
 		(fp_line
 			(start 5.484968 7.478145)
-			(end -0.015032 7.478145)
+			(end 6.5 7.478145)
 			(stroke
 				(width 0.15)
 				(type solid)
 			)
 			(layer "B.SilkS")
-			(uuid "7a6013a4-7fc8-4a2e-9ea5-16eff8868b82")
+			(uuid "5e03e7a4-a189-4094-9c73-9d062b377325")
 		)
 		(fp_line
-			(start 6.5 1.75)
-			(end 6.5 -5.5)
+			(start 6.5 -5.5)
+			(end 6.5 1.75)
 			(stroke
 				(width 0.15)
 				(type default)
 			)
 			(layer "B.SilkS")
-			(uuid "34c0be0f-0b4f-46b1-b1c5-34dbb48b1932")
+			(uuid "49b67da3-9715-45ef-a3ec-4b28912614b8")
 		)
 		(fp_line
-			(start 6.5 4.989073)
-			(end 6.5 4.510928)
+			(start 6.5 4.510928)
+			(end 6.5 4.989073)
 			(stroke
 				(width 0.15)
 				(type default)
 			)
 			(layer "B.SilkS")
-			(uuid "f46634c6-d167-4d36-bcef-fdd64d9c476f")
+			(uuid "69a30f47-4a41-4f8e-a767-dbaec2f9b5a8")
 		)
 		(fp_line
-			(start 6.5 7.478145)
-			(end 5.484968 7.478145)
+			(start 6.5 4.978145)
+			(end 5.234968 4.978145)
 			(stroke
 				(width 0.15)
 				(type solid)
 			)
 			(layer "B.SilkS")
-			(uuid "fe6b72c9-6021-493d-9f7d-412f4fdd0b35")
+			(uuid "f3cf0cca-29cc-4511-bc31-3bc8977b933f")
 		)
 		(fp_line
-			(start 6.5 7.478145)
-			(end 6.5 4.978145)
+			(start 6.5 4.978145)
+			(end 6.5 7.478145)
 			(stroke
 				(width 0.15)
 				(type solid)
 			)
 			(layer "B.SilkS")
-			(uuid "a5716695-e343-48bb-bcd1-681fdbcf096c")
+			(uuid "34c963cc-fdd8-4511-8c1f-99744e70e6b5")
+		)
+		(fp_line
+			(start -5.515032 7.478145)
+			(end -5.515032 8.778145)
+			(stroke
+				(width 0.15)
+				(type solid)
+			)
+			(layer "Dwgs.User")
+			(uuid "8724facd-5421-44ed-ad8a-93b4e0735fd9")
 		)
 		(fp_line
 			(start -5.515032 8.778145)
-			(end -5.515032 7.478145)
-			(stroke
-				(width 0.15)
-				(type solid)
-			)
-			(layer "Dwgs.User")
-			(uuid "aecb3447-45bc-4a4d-ae98-be9efb71ae19")
-		)
-		(fp_line
-			(start -5.515032 9.678145)
-			(end -5.515032 8.778145)
-			(stroke
-				(width 0.15)
-				(type solid)
-			)
-			(layer "Dwgs.User")
-			(uuid "b07653dc-6d1b-4491-a527-d30439f8d224")
-		)
-		(fp_line
-			(start -5.515032 12.978145)
-			(end -5.515032 12.478145)
-			(stroke
-				(width 0.15)
-				(type solid)
-			)
-			(layer "Dwgs.User")
-			(uuid "6d38f385-590f-47c7-952f-9bdb95fb43c8")
-		)
-		(fp_line
-			(start -5.015032 8.778145)
-			(end -5.515032 8.778145)
-			(stroke
-				(width 0.15)
-				(type solid)
-			)
-			(layer "Dwgs.User")
-			(uuid "776c690c-e946-47b3-b01e-2c3943722982")
-		)
-		(fp_line
-			(start -5.015032 12.978145)
-			(end -5.515032 12.978145)
-			(stroke
-				(width 0.15)
-				(type solid)
-			)
-			(layer "Dwgs.User")
-			(uuid "2ba0a4ba-68f1-4b5e-95e7-acf282d811d4")
-		)
-		(fp_line
-			(start 4.984968 8.778145)
-			(end 5.484968 8.778145)
-			(stroke
-				(width 0.15)
-				(type solid)
-			)
-			(layer "Dwgs.User")
-			(uuid "10df5c89-c0a6-4f9e-a008-cadce855adeb")
-		)
-		(fp_line
-			(start 4.984968 12.978145)
-			(end 5.484968 12.978145)
-			(stroke
-				(width 0.15)
-				(type solid)
-			)
-			(layer "Dwgs.User")
-			(uuid "37d4bf1b-8e28-45bb-a495-4ea3eaff70f7")
-		)
-		(fp_line
-			(start 5.484968 8.778145)
-			(end 5.484968 7.478145)
-			(stroke
-				(width 0.15)
-				(type solid)
-			)
-			(layer "Dwgs.User")
-			(uuid "db8aa4fd-6d69-4a52-80d6-c99ec7e90679")
-		)
-		(fp_line
-			(start 5.484968 9.678145)
 			(end -5.515032 9.678145)
 			(stroke
 				(width 0.15)
 				(type solid)
 			)
 			(layer "Dwgs.User")
-			(uuid "7b9683c0-57d5-45e9-a8a3-9988ff4efc2e")
+			(uuid "06be3171-e0f4-4ffa-802f-211e6d91ccce")
 		)
 		(fp_line
-			(start 5.484968 9.678145)
+			(start -5.515032 8.778145)
+			(end -5.015032 8.778145)
+			(stroke
+				(width 0.15)
+				(type solid)
+			)
+			(layer "Dwgs.User")
+			(uuid "d6af99f3-b993-4f2d-98ad-3ff479701f8f")
+		)
+		(fp_line
+			(start -5.515032 9.678145)
+			(end 5.484968 9.678145)
+			(stroke
+				(width 0.15)
+				(type solid)
+			)
+			(layer "Dwgs.User")
+			(uuid "8c1e48c7-0b50-45c4-85b1-e219696231a1")
+		)
+		(fp_line
+			(start -5.515032 12.478145)
+			(end -5.515032 12.978145)
+			(stroke
+				(width 0.15)
+				(type solid)
+			)
+			(layer "Dwgs.User")
+			(uuid "df8e3c5d-6d4a-4f43-9441-353b33ff6923")
+		)
+		(fp_line
+			(start -5.515032 12.978145)
+			(end -5.015032 12.978145)
+			(stroke
+				(width 0.15)
+				(type solid)
+			)
+			(layer "Dwgs.User")
+			(uuid "43596004-3b46-408a-b1cb-c2d91e96f80e")
+		)
+		(fp_line
+			(start 5.484968 7.478145)
 			(end 5.484968 8.778145)
 			(stroke
 				(width 0.15)
 				(type solid)
 			)
 			(layer "Dwgs.User")
-			(uuid "2ee5a58a-0c21-4833-a98c-fd89ab3b41dd")
+			(uuid "32367b4c-168a-41da-b048-d3f06a05efe8")
 		)
 		(fp_line
-			(start 5.484968 12.978145)
-			(end 5.484968 12.478145)
+			(start 5.484968 8.778145)
+			(end 4.984968 8.778145)
 			(stroke
 				(width 0.15)
 				(type solid)
 			)
 			(layer "Dwgs.User")
-			(uuid "34ee3e18-890b-4915-ad97-e32c5d44ca2f")
+			(uuid "f4047d09-175a-4ea4-9f42-40dfb1abe35f")
+		)
+		(fp_line
+			(start 5.484968 8.778145)
+			(end 5.484968 9.678145)
+			(stroke
+				(width 0.15)
+				(type solid)
+			)
+			(layer "Dwgs.User")
+			(uuid "400dd7e3-81f1-44ab-bc00-63421a0f5109")
+		)
+		(fp_line
+			(start 5.484968 12.478145)
+			(end 5.484968 12.978145)
+			(stroke
+				(width 0.15)
+				(type solid)
+			)
+			(layer "Dwgs.User")
+			(uuid "662e4dbe-7bc8-40da-8df3-9f95e3dcece3")
+		)
+		(fp_line
+			(start 5.484968 12.978145)
+			(end 4.984968 12.978145)
+			(stroke
+				(width 0.15)
+				(type solid)
+			)
+			(layer "Dwgs.User")
+			(uuid "df559a8c-3683-4afc-9852-8c82249e68cc")
 		)
 		(fp_rect
 			(start -8.25 7.5)
@@ -25786,12 +25655,12 @@
 			)
 			(fill none)
 			(layer "B.Fab")
-			(uuid "22414d62-f723-4e9c-8e2c-242876e83919")
+			(uuid "590c8d07-e84c-4879-a274-fbbc2e374b6d")
 		)
 		(fp_text user "${REFERENCE}"
 			(at -0.5 0.25 180)
 			(layer "B.Fab")
-			(uuid "85bd97ae-5ad4-4b38-9fc2-1cef59e4720d")
+			(uuid "56a8d6e7-2662-4c4d-8366-475a245e36c1")
 			(effects
 				(font
 					(size 0.5 0.5)
@@ -25804,25 +25673,15 @@
 			(at -4.015032 3.478145)
 			(size 0.9 0.9)
 			(drill 0.9)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
-			(uuid "386109e3-dec3-40c8-9d8b-cd24dd28852a")
+			(layers "*.Cu" "*.Mask")
+			(uuid "22b80283-e0d9-4a4f-a98f-63c5546e0b3c")
 		)
 		(pad "" np_thru_hole circle
 			(at 3.984968 3.478145)
 			(size 0.9 0.9)
 			(drill 0.9)
-			(layers "*.Cu" "*.Mask" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "In5.Cu" "In6.Cu"
-				"In7.Cu" "In8.Cu" "In9.Cu" "In10.Cu" "In11.Cu" "In12.Cu" "In13.Cu" "In14.Cu"
-				"In15.Cu" "In16.Cu" "In17.Cu" "In18.Cu" "In19.Cu" "In20.Cu" "In21.Cu"
-				"In22.Cu" "In23.Cu" "In24.Cu" "In25.Cu" "In26.Cu" "In27.Cu" "In28.Cu"
-				"In29.Cu" "In30.Cu"
-			)
-			(uuid "718c8465-e90b-43c4-8c0e-3685f03a0a52")
+			(layers "*.Cu" "*.Mask")
+			(uuid "1e37e085-0a71-4bcf-a0df-a1b66cb8c92d")
 		)
 		(pad "1" smd rect
 			(at -3.215032 -7.021855)
@@ -25831,7 +25690,7 @@
 			(net 46 "Net-(J22-DAT2)")
 			(pinfunction "DAT2")
 			(pintype "bidirectional")
-			(uuid "984e2919-4225-4a7c-a01c-91de9b33b868")
+			(uuid "7539019c-d95e-4a25-ad9c-b9268a6d3c60")
 		)
 		(pad "2" smd rect
 			(at -2.115032 -7.021855)
@@ -25840,7 +25699,7 @@
 			(net 57 "SD_CS")
 			(pinfunction "DAT3/CD")
 			(pintype "bidirectional")
-			(uuid "aec9a6cf-dd4c-4e3e-a037-fe4a5e246d8c")
+			(uuid "758aafe9-4bdd-4edc-aae9-4d10751f2563")
 		)
 		(pad "3" smd rect
 			(at -1.015032 -7.021855)
@@ -25849,7 +25708,7 @@
 			(net 59 "MOSI")
 			(pinfunction "CMD")
 			(pintype "input")
-			(uuid "ae438a33-1bae-4a8c-9e96-124b03d737a0")
+			(uuid "d53087e6-1315-4b1e-887b-6fa5383e94f6")
 		)
 		(pad "4" smd rect
 			(at 0.084968 -7.021855)
@@ -25858,7 +25717,7 @@
 			(net 60 "3.3V")
 			(pinfunction "VDD")
 			(pintype "power_in")
-			(uuid "1af85971-8adf-4fce-b813-16b656110d0c")
+			(uuid "c455cef9-ac59-421c-aa92-01f328495ee1")
 		)
 		(pad "5" smd rect
 			(at 1.184968 -7.021855)
@@ -25867,7 +25726,7 @@
 			(net 44 "CLK")
 			(pinfunction "CLK")
 			(pintype "input")
-			(uuid "cc229ec2-30b5-42ca-901c-10108c35ffcb")
+			(uuid "2773d602-84ba-4a41-b7fd-c865c5c3b51c")
 		)
 		(pad "6" smd rect
 			(at 2.284968 -7.021855)
@@ -25876,7 +25735,7 @@
 			(net 78 "GND")
 			(pinfunction "VSS")
 			(pintype "power_in")
-			(uuid "35f4a926-9e35-419f-b70f-eb608af38a87")
+			(uuid "15aad949-9127-47f5-8c1a-adaf19c7e7ef")
 		)
 		(pad "7" smd rect
 			(at 3.384968 -7.021855)
@@ -25885,7 +25744,7 @@
 			(net 45 "MISO")
 			(pinfunction "DAT0")
 			(pintype "bidirectional")
-			(uuid "89d0fb9f-e14c-4ea3-a544-7059b4934f55")
+			(uuid "e94bdb06-f7ac-4b31-9494-4f036b74ed51")
 		)
 		(pad "8" smd rect
 			(at 4.484968 -7.021855)
@@ -25894,7 +25753,7 @@
 			(net 62 "Net-(J22-DAT1)")
 			(pinfunction "DAT1")
 			(pintype "bidirectional")
-			(uuid "80c4e46f-9654-46fd-8f5f-fa2176b25ac6")
+			(uuid "d234de2c-62cb-43c8-b4c4-a34a1f012188")
 		)
 		(pad "9" smd rect
 			(at 5.584968 -7.021855)
@@ -25903,31 +25762,31 @@
 			(net 88 "SD_DET")
 			(pinfunction "DET")
 			(pintype "passive")
-			(uuid "49aa0693-dd4e-47d1-ad35-1722de00aee1")
+			(uuid "48b5950f-e0d7-47fe-b202-1c503599830f")
 		)
-		(pad "SHIELD" smd rect
+		(pad "SH" smd rect
 			(at -8.715032 3.078145)
 			(size 1.2 2.2)
 			(layers "B.Cu" "B.Paste" "B.Mask")
-			(uuid "10139bf1-addb-4932-9f94-0ee2d699e949")
+			(uuid "816f50d5-9f13-48ba-82f3-0f3cb1d6740f")
 		)
-		(pad "SHIELD" smd rect
+		(pad "SH" smd rect
 			(at -7.815032 -6.521855)
 			(size 1.6 1.4)
 			(layers "B.Cu" "B.Paste" "B.Mask")
-			(uuid "73a58a4e-c257-42e5-ba87-6a05eff7d3a2")
+			(uuid "f70ccc5c-6710-4b6b-93b8-432e4fb046bb")
 		)
-		(pad "SHIELD" smd rect
+		(pad "SH" smd rect
 			(at 6.784968 -6.521855)
 			(size 1.2 1.4)
 			(layers "B.Cu" "B.Paste" "B.Mask")
-			(uuid "8fdb35b0-cf29-4378-a014-5504e721770f")
+			(uuid "1682abf6-35c4-4534-8682-0463322079ac")
 		)
-		(pad "SHIELD" smd rect
+		(pad "SH" smd rect
 			(at 6.784968 3.078145)
 			(size 1.2 2.2)
 			(layers "B.Cu" "B.Paste" "B.Mask")
-			(uuid "f7a2adaa-0a64-470f-8605-831efa97a098")
+			(uuid "5a9ecff6-7f06-4165-b770-a053c0ad3315")
 		)
 	)
 	(footprint "Resistor_SMD:R_0603_1608Metric"
@@ -25948,7 +25807,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Value" "20K"
+		(property "Value" "100K"
 			(at 0 -1.43 0)
 			(layer "B.Fab")
 			(uuid "5eb42628-a5d1-41ae-a3eb-6ebaf56536b6")
@@ -25960,7 +25819,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -25984,7 +25843,7 @@
 				)
 			)
 		)
-		(property "Description" "Resistor"
+		(property "Description" ""
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -25996,8 +25855,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "R_*")
 		(path "/759c894a-e706-4107-9e2d-0bd09765b9cc")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.237258 -0.5225)
@@ -26171,7 +26032,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -26195,7 +26056,7 @@
 				)
 			)
 		)
-		(property "Description" "Resistor"
+		(property "Description" ""
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -26207,8 +26068,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "R_*")
 		(path "/889e981b-4f46-4224-a497-1c5ce74c13e0")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.237258 -0.5225)
@@ -26370,7 +26233,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Value" "20K"
+		(property "Value" "10K"
 			(at 0 -1.43 0)
 			(layer "B.Fab")
 			(uuid "c96eb373-9818-4e8e-94ab-b01f1af4587c")
@@ -26382,7 +26245,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -26406,7 +26269,7 @@
 				)
 			)
 		)
-		(property "Description" "Resistor"
+		(property "Description" ""
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -26418,8 +26281,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "R_*")
 		(path "/888a58d7-4fd9-45ff-8b5b-78fd1d29edb0")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.237258 0.5225)
@@ -26593,7 +26458,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -26617,7 +26482,7 @@
 				)
 			)
 		)
-		(property "Description" "Unpolarized capacitor"
+		(property "Description" ""
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -26629,8 +26494,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "C_*")
 		(path "/31a50673-924f-411c-87da-3776c35c369e")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.14058 0.51)
@@ -26804,7 +26671,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Package_TO_SOT_SMD:SOT-223-3_TabPin2"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -26816,7 +26683,7 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "http://www.advanced-monolithic.com/pdf/ds1117.pdf"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -26828,7 +26695,7 @@
 				)
 			)
 		)
-		(property "Description" "1A Low Dropout regulator, positive, 5.0V fixed output, SOT-223"
+		(property "Description" ""
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -26840,8 +26707,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "SOT?223*TabPin2*")
 		(path "/49466373-458b-4513-ade4-2e7347890546")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -4.1 3.41)
@@ -27063,7 +26932,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -27087,7 +26956,7 @@
 				)
 			)
 		)
-		(property "Description" "Unpolarized capacitor"
+		(property "Description" ""
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -27099,8 +26968,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "C_*")
 		(path "/898a1176-f050-4648-8f9b-5491e677db70")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.14058 0.51)
@@ -27274,7 +27145,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -27298,7 +27169,7 @@
 				)
 			)
 		)
-		(property "Description" "Resistor"
+		(property "Description" ""
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -27310,8 +27181,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "R_*")
 		(path "/7e9d3877-d544-4dc5-8fc3-826bbe09db4a")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.237258 -0.5225)
@@ -27485,7 +27358,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Package_LGA:Bosch_LGA-8_2x2.5mm_P0.65mm_ClockwisePinNumbering"
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -27497,7 +27370,7 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://ae-bst.resource.bosch.com/media/_tech/media/datasheets/BST-BMP280-DS001.pdf"
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -27509,7 +27382,7 @@
 				)
 			)
 		)
-		(property "Description" "Absolute Barometric Pressure Sensor, LGA-8"
+		(property "Description" ""
 			(at 0 0 -90)
 			(layer "F.Fab")
 			(hide yes)
@@ -27521,8 +27394,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "Bosch*LGA*2x2.5mm*P0.65mm*")
 		(path "/d635b028-1fbc-4337-b94a-bd469f2052de")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start 0.87 1.1)
@@ -27709,7 +27584,7 @@
 			(at -0.325 0.8 180)
 			(size 0.5 0.35)
 			(layers "B.Cu" "B.Paste" "B.Mask")
-			(net 90 "unconnected-(U10-CSB-Pad2)")
+			(net 60 "3.3V")
 			(pinfunction "CSB")
 			(pintype "input")
 			(uuid "10544b57-6fa2-4bad-b435-2d4d062f8088")
@@ -27736,7 +27611,7 @@
 			(at 0.975 -0.8 180)
 			(size 0.5 0.35)
 			(layers "B.Cu" "B.Paste" "B.Mask")
-			(net 91 "unconnected-(U10-SDO-Pad5)")
+			(net 60 "3.3V")
 			(pinfunction "SDO")
 			(pintype "bidirectional")
 			(uuid "986c07c8-a96e-4704-aa65-640c68bcdd4a")
@@ -27810,7 +27685,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Diode_SMD:D_SMA"
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -27834,7 +27709,7 @@
 				)
 			)
 		)
-		(property "Description" "Schottky diode"
+		(property "Description" ""
 			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
@@ -27846,8 +27721,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "TO-???* *_Diode_* *SingleDiode* D_*")
 		(path "/0b4ca232-fa1f-4a2f-a4df-ccd591e626fe")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -3.4 1.65)
@@ -28091,7 +27968,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Package_TO_SOT_SMD:SOT-23-8"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -28103,7 +27980,7 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "http://www.ti.com/lit/ds/symlink/ina219.pdf"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -28115,7 +27992,7 @@
 				)
 			)
 		)
-		(property "Description" "Zero-Drift, Bidirectional Current/Power Monitor (0-26V) With I2C Interface, SOT-23-8"
+		(property "Description" ""
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -28127,8 +28004,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "SOT?23*")
 		(path "/031e28d6-2edf-4412-a90d-61f4caff676d")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start 0 -1.56)
@@ -28394,7 +28273,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Package_TO_SOT_SMD:SOT-23"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -28406,7 +28285,7 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "http://www.aosmd.com/pdfs/datasheet/AO3400A.pdf"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -28418,7 +28297,7 @@
 				)
 			)
 		)
-		(property "Description" "30V Vds, 5.7A Id, N-Channel MOSFET, SOT-23"
+		(property "Description" ""
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -28430,8 +28309,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "SOT?23*")
 		(path "/461d5788-db5c-43f4-8f27-5bd274c4610e")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start 0 -1.56)
@@ -28647,7 +28528,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -28671,7 +28552,7 @@
 				)
 			)
 		)
-		(property "Description" "Unpolarized capacitor"
+		(property "Description" ""
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -28683,8 +28564,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "C_*")
 		(path "/a8edaef2-0418-4b3f-afa9-41c8addd37aa")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.14058 -0.51)
@@ -28858,7 +28741,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -28882,7 +28765,7 @@
 				)
 			)
 		)
-		(property "Description" "Resistor"
+		(property "Description" ""
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -28894,8 +28777,10 @@
 				)
 			)
 		)
+		(property ki_fp_filters "R_*")
 		(path "/4954bbfe-ec97-4f89-9f24-e357e629e3dd")
-		(sheetfile "jf-ecu32.7.kicad_sch")
+		(sheetname "Racine")
+		(sheetfile "jf-ecu32.8.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.237258 -0.5225)
@@ -35418,6 +35303,22 @@
 		(uuid "07d80a11-1484-43ed-b680-3000cad573a5")
 	)
 	(segment
+		(start 50.898 184.5)
+		(end 50.898 184.179)
+		(width 0.25)
+		(layer "B.Cu")
+		(net 60)
+		(uuid "0d46cc57-a09f-4c57-bbe8-a80e372bb68e")
+	)
+	(segment
+		(start 51 186)
+		(end 51 185.316)
+		(width 0.25)
+		(layer "B.Cu")
+		(net 60)
+		(uuid "0d805a87-d6be-4d00-9e92-473dfbcd6d60")
+	)
+	(segment
 		(start 69.256 188.341)
 		(end 69.299 188.298)
 		(width 0.25)
@@ -35706,6 +35607,14 @@
 		(uuid "671afb19-6c16-486b-82e7-2fa33a383e0f")
 	)
 	(segment
+		(start 51.473 186.014)
+		(end 51.014 186.014)
+		(width 0.25)
+		(layer "B.Cu")
+		(net 60)
+		(uuid "7a939eaa-deb1-4596-ad7e-08d9bfbbb143")
+	)
+	(segment
 		(start 43.688 189.66)
 		(end 45.85 189.66)
 		(width 0.25)
@@ -35730,12 +35639,20 @@
 		(uuid "865a1416-1df9-4528-b998-ea6c2e1d081e")
 	)
 	(segment
-		(start 50.898 185.214)
-		(end 50.898 184.179)
+		(start 51 185.316)
+		(end 50.898 185.214)
 		(width 0.25)
 		(layer "B.Cu")
 		(net 60)
-		(uuid "9959cdaa-4e7b-403a-9487-2692ad19dc4a")
+		(uuid "89eaf367-da3a-48f0-a6b8-66f0f536c0ca")
+	)
+	(segment
+		(start 49.873 184.714)
+		(end 50.684 184.714)
+		(width 0.25)
+		(layer "B.Cu")
+		(net 60)
+		(uuid "8a6ef2c2-8b10-4b9e-8bf6-9670e2071ecd")
 	)
 	(segment
 		(start 69.812 188.811)
@@ -35752,6 +35669,22 @@
 		(layer "B.Cu")
 		(net 60)
 		(uuid "a3f4f2ae-2cbc-4169-b5a7-8796c48b11d1")
+	)
+	(segment
+		(start 50.684 184.714)
+		(end 50.898 184.5)
+		(width 0.25)
+		(layer "B.Cu")
+		(net 60)
+		(uuid "a627aebe-28c1-4bda-b1ec-6ee06df66b8d")
+	)
+	(segment
+		(start 50.898 185.214)
+		(end 50.898 184.5)
+		(width 0.25)
+		(layer "B.Cu")
+		(net 60)
+		(uuid "a76f8685-ec13-448a-b3ef-56d5e506f4a3")
 	)
 	(segment
 		(start 66.167 183.261)
@@ -35872,6 +35805,14 @@
 		(layer "B.Cu")
 		(net 60)
 		(uuid "f3067c8f-8bbf-48c4-a445-b8b44f7938b8")
+	)
+	(segment
+		(start 51.014 186.014)
+		(end 51 186)
+		(width 0.25)
+		(layer "B.Cu")
+		(net 60)
+		(uuid "f557c205-f14f-4210-8194-3c0f6ec156a6")
 	)
 	(segment
 		(start 57.023 171.831)
@@ -40270,6 +40211,22 @@
 		(uuid "ff268092-09bc-4dd5-950f-2c037317fde4")
 	)
 	(segment
+		(start 51.887 184.714)
+		(end 51.943 184.658)
+		(width 0.25)
+		(layer "B.Cu")
+		(net 78)
+		(uuid "489afa05-4159-44f1-bff9-80991fdecf61")
+	)
+	(segment
+		(start 51.473 184.714)
+		(end 51.887 184.714)
+		(width 0.25)
+		(layer "B.Cu")
+		(net 78)
+		(uuid "6f5fa248-06f7-44ec-b247-0b642460d1f0")
+	)
+	(segment
 		(start 79.011 178.799)
 		(end 79.011 176.801)
 		(width 0.25)
@@ -40690,7 +40647,7 @@
 		(end 60.8302 173.3852)
 		(width 0.25)
 		(layer "F.Cu")
-		(net 92)
+		(net 90)
 		(uuid "39e3ad8e-70e3-42f1-a671-0d232b0aec44")
 	)
 	(segment
@@ -40698,7 +40655,7 @@
 		(end 59.4614 172.365)
 		(width 0.25)
 		(layer "F.Cu")
-		(net 92)
+		(net 90)
 		(uuid "4f1275c8-22b8-4438-b6d8-9e5c1e2289e7")
 	)
 	(segment
@@ -40706,7 +40663,7 @@
 		(end 60.8302 172.339)
 		(width 0.25)
 		(layer "F.Cu")
-		(net 92)
+		(net 90)
 		(uuid "6b212f4b-25a3-4043-a454-847631df8cc5")
 	)
 	(segment
@@ -40714,7 +40671,7 @@
 		(end 66.0547 185.6887)
 		(width 0.25)
 		(layer "F.Cu")
-		(net 92)
+		(net 90)
 		(uuid "7e21ab42-1287-4099-8112-49d817f6b119")
 	)
 	(segment
@@ -40722,7 +40679,7 @@
 		(end 60.642 169.418)
 		(width 0.25)
 		(layer "F.Cu")
-		(net 92)
+		(net 90)
 		(uuid "a42d5576-9de0-41eb-b555-f9727f1f33f8")
 	)
 	(segment
@@ -40730,7 +40687,7 @@
 		(end 59.245 168.021)
 		(width 0.25)
 		(layer "F.Cu")
-		(net 92)
+		(net 90)
 		(uuid "b49c28f0-5fa5-4f3f-8d62-b5ec6a164c2a")
 	)
 	(segment
@@ -40738,7 +40695,7 @@
 		(end 62.07 174.625)
 		(width 0.25)
 		(layer "F.Cu")
-		(net 92)
+		(net 90)
 		(uuid "b90a440d-14b6-47a5-b0d8-2dde9c9e5a8a")
 	)
 	(segment
@@ -40746,7 +40703,7 @@
 		(end 60.8302 172.339)
 		(width 0.25)
 		(layer "F.Cu")
-		(net 92)
+		(net 90)
 		(uuid "cc896198-9701-44f2-89a6-c6ac916cab06")
 	)
 	(segment
@@ -40754,7 +40711,7 @@
 		(end 60.642 172.1508)
 		(width 0.25)
 		(layer "F.Cu")
-		(net 92)
+		(net 90)
 		(uuid "d5a41c42-41c5-4862-89d0-9722298cd6b1")
 	)
 	(segment
@@ -40762,7 +40719,7 @@
 		(end 60.8042 172.365)
 		(width 0.25)
 		(layer "F.Cu")
-		(net 92)
+		(net 90)
 		(uuid "d9bcb29c-da48-4b20-be6a-056e8a755fc0")
 	)
 	(segment
@@ -40770,7 +40727,7 @@
 		(end 68.6616 188.2956)
 		(width 0.25)
 		(layer "F.Cu")
-		(net 92)
+		(net 90)
 		(uuid "e357a00a-f790-4c35-a5d9-47ed94b3f915")
 	)
 	(segment
@@ -40778,7 +40735,7 @@
 		(end 66.0547 177.3067)
 		(width 0.25)
 		(layer "F.Cu")
-		(net 92)
+		(net 90)
 		(uuid "e36d9201-06f4-4bbc-970f-69aa14bec3b2")
 	)
 	(segment
@@ -40786,7 +40743,7 @@
 		(end 76.9286 188.2956)
 		(width 0.25)
 		(layer "F.Cu")
-		(net 92)
+		(net 90)
 		(uuid "f4dc3aa8-6cc5-4c02-ae7f-24c499f03055")
 	)
 	(segment
@@ -40794,7 +40751,7 @@
 		(end 63.373 174.625)
 		(width 0.25)
 		(layer "F.Cu")
-		(net 92)
+		(net 90)
 		(uuid "fd271464-c736-405a-8cfd-90b100cfbd36")
 	)
 	(segment
@@ -40802,7 +40759,7 @@
 		(end 63.7286 169.1894)
 		(width 0.25)
 		(layer "F.Cu")
-		(net 93)
+		(net 91)
 		(uuid "2d8bddf4-45b3-4199-b6d3-72cb2180a618")
 	)
 	(segment
@@ -40810,7 +40767,7 @@
 		(end 63.7286 173.0756)
 		(width 0.25)
 		(layer "F.Cu")
-		(net 93)
+		(net 91)
 		(uuid "d0f10089-ec3b-4cc9-b175-73187f6010bb")
 	)
 	(zone
@@ -43326,7 +43283,7 @@
 				(xy 41.047109 185.009549) (xy 41.025633 185.034038) (xy 40.708103 185.351569) (xy 40.627322 185.405546)
 				(xy 40.532033 185.4245) (xy 40.161512 185.4245) (xy 40.161509 185.4245) (xy 40.1615 185.424501)
 				(xy 40.06188 185.440279) (xy 40.061874 185.440281) (xy 39.941778 185.501473) (xy 39.846472 185.596779)
-				(xy 39.836052 185.617231) (xy 39.825494 185.637953) (xy 39.825193 185.638543) (xy 39.765045 185.714841)
+				(xy 39.836052 185.617231) (xy 39.825734 185.637482) (xy 39.825193 185.638543) (xy 39.765045 185.714841)
 				(xy 39.680278 185.762313) (xy 39.603332 185.7745) (xy 38.687147 185.7745) (xy 38.604364 185.796681)
 				(xy 38.604363 185.796681) (xy 38.604361 185.796682) (xy 38.559978 185.822307) (xy 38.530133 185.839538)
 				(xy 38.517186 185.849473) (xy 38.516035 185.847973) (xy 38.452321 185.890546) (xy 38.357033 185.9095)
